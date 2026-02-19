@@ -1,0 +1,9 @@
+spring:
+  application:
+    name: com.maintenops.nvcc
+  profiles:
+    active: dev
+
+server:
+  port: 8082
+
