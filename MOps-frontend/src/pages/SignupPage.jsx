@@ -18,10 +18,10 @@ const SignupPage = () => {
     const navigate = useNavigate();
 
     const departments = [
-        { id: 'plumbing', label: 'Plumbing', icon: 'M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z', color: '#1a73e8', bg: 'bg-[#1a73e8]/10' },
-        { id: 'carpentry', label: 'Carpentry', icon: 'M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z M21 12a9 9 0 11-18 0 9 9 0 0118 0z', color: '#f9ab00', bg: 'bg-[#f9ab00]/10' },
-        { id: 'electrical', label: 'Electrical', icon: 'M13 10V3L4 14h7v7l9-11h-7z', color: '#c5221f', bg: 'bg-[#c5221f]/10' },
-        { id: 'em', label: 'EM', icon: 'M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4', color: '#137333', bg: 'bg-[#137333]/10' }
+        { id: 'Seva Office', label: 'Seva Office', icon: 'M12 8c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4m0-2c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6 2.69-6 6-6zm3.5 8c.83 0 1.5.67 1.5 1.5S16.33 19 15.5 19 14 18.33 14 17.5s.67-1.5 1.5-1.5z', color: '#1a73e8', bg: 'bg-[#1a73e8]/10' },
+        { id: 'Jiva Daya', label: 'Jiva Daya', icon: 'M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z', color: '#d33527', bg: 'bg-[#d33527]/10' },
+        { id: 'Campus Program', label: 'Campus Program', icon: 'M12 14l9-5-9-5-9 5m0 0l9 5m-9-5v10l9 5m0-10l9-5m-9 5v10m0-10l-9-5m19 5l-9-5', color: '#f9ab00', bg: 'bg-[#f9ab00]/10' },
+        { id: 'Kitchen', label: 'Kitchen', icon: 'M9 3v2H5v4h4v2H2v4h2v8c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2v-8h2v-4h-7V5h4V3H9zm0 5h6v10H9V8z', color: '#137333', bg: 'bg-[#137333]/10' }
     ];
 
     const handleChange = (e) => {
@@ -57,9 +57,11 @@ const SignupPage = () => {
         try {
             setLoading(true);
             await signup(formData.name, formData.email, formData.password, formData.department);
-            navigate('/');
-        } catch {
-            setError('Failed to create account');
+            
+            // Signup successful - redirect to login page
+            navigate('/login');
+        } catch (err) {
+            setError(err.message || 'Failed to create account');
         } finally {
             setLoading(false);
         }
@@ -129,7 +131,7 @@ const SignupPage = () => {
                         <Input
                             label="Full Name"
                             name="name"
-                            placeholder="John Doe"
+                            placeholder="Nityanand Das"
                             value={formData.name}
                             onChange={handleChange}
                             required
@@ -139,7 +141,7 @@ const SignupPage = () => {
                             label="Email"
                             type="email"
                             name="email"
-                            placeholder="name@company.com"
+                            placeholder="nityananda@iskconnvcc.in"
                             value={formData.email}
                             onChange={handleChange}
                             required

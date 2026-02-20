@@ -1,13 +1,14 @@
 import React from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { Link, useNavigate } from 'react-router-dom';
+import { getRoleDisplayName } from '../../utils/roleUtils';
 
 const Topbar = () => {
     const { user, logout } = useAuth();
     const navigate = useNavigate();
 
-    const handleLogout = () => {
-        logout();
+    const handleLogout = async () => {
+        await logout();
         navigate('/login');
     };
 
@@ -41,12 +42,13 @@ const Topbar = () => {
                             {user?.name || 'User'}
                         </div>
                         <div className="text-[12px] text-[#5f6368]">
-                            {user?.role || 'Employee'}
+                            {getRoleDisplayName(user?.role)}
                         </div>
                     </div>
                     <button
                         onClick={handleLogout}
-                        className="w-9 h-9 rounded-full bg-[#1a73e8] text-white flex items-center justify-center font-bold text-[14px] shadow-sm hover:ring-2 hover:ring-[#e8f0fe] transition-all"
+                        className="w-9 h-9 rounded-full bg-[#d93025] text-white flex items-center justify-center font-bold text-[14px] shadow-sm hover:bg-[#b3261e] hover:ring-2 hover:ring-[#fce8e6] transition-all"
+                        title="Logout"
                     >
                         {user?.name?.charAt(0) || 'U'}
                     </button>

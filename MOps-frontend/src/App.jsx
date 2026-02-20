@@ -21,7 +21,7 @@ function App() {
           <Route path="/signup" element={<SignupPage />} />
 
           {/* User Dashboard Routes */}
-          <Route element={<ProtectedRoute allowedRoles={['User']} />}>
+          <Route element={<ProtectedRoute allowedRoles={['REQUESTER']} />}>
             <Route path="/dashboard" element={<DashboardLayout />}>
               <Route index element={<UserDashboard />} />
               <Route path="requests" element={<div>My Requests Placeholder</div>} />
@@ -30,7 +30,7 @@ function App() {
           </Route>
 
           {/* Admin Dashboard Routes */}
-          <Route element={<ProtectedRoute allowedRoles={['Admin']} />}>
+          <Route element={<ProtectedRoute allowedRoles={['ADMIN']} />}>
             <Route path="/admin" element={<DashboardLayout />}>
               <Route index element={<AdminDashboard />} />
               <Route path="queue" element={<div>Action Queue Placeholder</div>} />
@@ -40,7 +40,7 @@ function App() {
           </Route>
 
           {/* Super Admin Dashboard Routes */}
-          <Route element={<ProtectedRoute allowedRoles={['SuperAdmin']} />}>
+          <Route element={<ProtectedRoute allowedRoles={['SUPER_ADMIN']} />}>
             <Route path="/super-admin" element={<DashboardLayout />}>
               <Route index element={<SuperAdminDashboard />} />
               <Route path="escalations" element={<div>Escalations Placeholder</div>} />

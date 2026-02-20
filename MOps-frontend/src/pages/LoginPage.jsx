@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import Input from '../components/Input';
 import Button from '../components/Button';
 import { useAuth } from '../context/AuthContext';
+import { getDashboardRoute } from '../utils/roleUtils';
 
 const LoginPage = () => {
     const [email, setEmail] = useState('');
@@ -27,13 +28,8 @@ const LoginPage = () => {
             const userData = await login(email, password);
 
             // Redirect based on role
-            if (userData.role === 'Admin') {
-                navigate('/admin');
-            } else if (userData.role === 'SuperAdmin') {
-                navigate('/super-admin');
-            } else {
-                navigate('/dashboard');
-            }
+            const route = getDashboardRoute(userData.role);
+            navigate(route);
         } catch (err) {
             setError(err.message || 'Failed to login');
         } finally {

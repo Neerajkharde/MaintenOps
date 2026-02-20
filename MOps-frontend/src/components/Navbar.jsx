@@ -2,14 +2,15 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import Button from './Button';
+import { getRoleDisplayName, getDashboardRoute } from '../utils/roleUtils';
 
 const Navbar = () => {
     const { user, logout } = useAuth();
     const navigate = useNavigate();
     const [isOpen, setIsOpen] = useState(false);
 
-    const handleLogout = () => {
-        logout();
+    const handleLogout = async () => {
+        await logout();
         navigate('/login');
     };
 
@@ -23,24 +24,32 @@ const Navbar = () => {
                     </span>
                 </Link>
 
-                <div className="hidden md:flex items-center gap-2">
+                <div className="hidden md:flex items-center gap-4">
                     {user ? (
                         <>
                             <Link
-                                to={user.role === 'Admin' ? '/admin' : user.role === 'SuperAdmin' ? '/super-admin' : '/dashboard'}
+                                to={getDashboardRoute(user.role)}
                                 className="text-[14px] font-medium text-[#5f6368] font-google-sans hover:text-[#1a73e8] transition-colors"
                             >
                                 Dashboard
                             </Link>
-                            <span className="text-[14px] font-medium text-[#5f6368] font-google-sans px-4 border-l border-[#dadce0] ml-2">
-                                {user.email}
-                            </span>
-                            <button
-                                onClick={handleLogout}
-                                className="h-10 px-6 rounded-full border border-[#dadce0] text-[#1a73e8] font-google-sans text-[14px] font-medium hover:bg-[#e8f0fe] hover:border-[#e8f0fe] transition-all duration-200"
-                            >
-                                Logout
-                            </button>
+                            <div className="flex items-center gap-3 pl-4 border-l border-[#dadce0]">
+                                <div className="text-right">
+                                    <div className="text-[14px] font-medium text-[#202124] font-google-sans leading-tight">
+                                        {user.name || user.username || 'User'}
+                                    </div>
+                                    <div className="text-[12px] text-[#5f6368]">
+                                        {getRoleDisplayName(user.role)}
+                                    </div>
+                                </div>
+                                <button
+                                    onClick={handleLogout}
+                                    className="h-9 w-9 rounded-full bg-[#d93025] text-white flex items-center justify-center font-bold text-[14px] hover:bg-[#b3261e] hover:ring-2 hover:ring-[#fce8e6] transition-all"
+                                    title="Logout"
+                                >
+                                    {(user.name || user.username || 'U')?.charAt(0).toUpperCase()}
+                                </button>
+                            </div>
                         </>
                     ) : (
                         <>
@@ -68,11 +77,21 @@ const Navbar = () => {
 
             {/* Mobile Menu */}
             {isOpen && (
-                <div className="absolute top-[64px] left-0 right-0 bg-white border-b border-[#dadce0] p-4 md:hidden flex flex-col gap-2 shadow-google-2">
+                <div className="absolute top-[64px] left-0 right-0 bg-white border-b border-[#dadce0] p-4 md:hidden flex flex-col gap-3 shadow-google-2">
                     {user ? (
                         <>
-                            <div className="text-[14px] font-google-sans text-[#5f6368] px-4 py-2">{user.email}</div>
-                            <button onClick={handleLogout} className="w-full h-10 rounded-full border border-[#dadce0] text-[#1a73e8] font-medium font-google-sans">Logout</button>
+                            <div className="flex items-center gap-3 px-4 py-2">
+                                <div className="text-right flex-1">
+                                    <div className="text-[14px] font-medium text-[#202124] font-google-sans">{user.name || user.username || 'User'}</div>
+                                    <div className="text-[12px] text-[#5f6368]">{getRoleDisplayName(user.role)}</div>
+                                </div>
+                                <button onClick={handleLogout} className="h-9 w-9 rounded-full bg-[#d93025] text-white flex items-center justify-center font-bold text-[14px] hover:bg-[#b3261e]">
+                                    {(user.name || user.username || 'U')?.charAt(0).toUpperCase()}
+                                </button>
+                            </div>
+                            <Link to={getDashboardRoute(user.role)} onClick={() => setIsOpen(false)}>
+                                <button className="w-full h-10 rounded-full bg-[#f1f3f4] text-[#1a73e8] font-medium font-google-sans">Dashboard</button>
+                            </Link>
                         </>
                     ) : (
                         <>
