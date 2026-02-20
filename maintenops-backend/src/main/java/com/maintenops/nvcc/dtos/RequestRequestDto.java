@@ -9,6 +9,10 @@ import java.time.LocalDateTime;
 
 @Data
 public class RequestRequestDto {
+
+    @NotBlank(message = "Mobile number is required")
+    private String mobileNumber;
+
     @NotBlank(message = "Item description is required")
     private String itemDescription;
 
@@ -21,7 +25,7 @@ public class RequestRequestDto {
     @NotBlank(message = "Service department is required")
     private String serviceDepartmentName;
 
-    @NotBlank(message = "Organization department is required")
+    // Organization department will be auto-populated from logged-in user
     private String organizationDepartmentName;
 
 }
