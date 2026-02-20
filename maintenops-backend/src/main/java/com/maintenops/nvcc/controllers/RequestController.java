@@ -6,6 +6,7 @@ import com.maintenops.nvcc.entities.Request;
 import com.maintenops.nvcc.security.JwtPrincipal;
 import com.maintenops.nvcc.services.RequestService;
 import com.maintenops.nvcc.services.impls.RequestServiceImpl;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,6 +25,7 @@ public class RequestController {
     @PostMapping
     @PreAuthorize("hasRole('REQUESTER')")
     public ResponseEntity<RequestResponseDto> createRequest(
+            @Valid
             @RequestBody RequestRequestDto request,
             @AuthenticationPrincipal JwtPrincipal principal) {
 

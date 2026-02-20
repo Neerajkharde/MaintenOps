@@ -14,6 +14,8 @@ public class Request {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id; // id (PK)
 
+    // Mobile Number
+
     @Column(unique = true, nullable = false)
     private String requestNumber; // request_number (unique)
 

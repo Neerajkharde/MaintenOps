@@ -12,7 +12,7 @@ public class RequestRequestDto {
     @NotBlank(message = "Item description is required")
     private String itemDescription;
 
-    @NotNull(message = "Required date is required")
+// This is set by Admin
     private Instant requiredDate;
 
     private boolean urgencyRequested;
@@ -25,3 +25,4 @@ public class RequestRequestDto {
     private String organizationDepartmentName;
 
 }
+
