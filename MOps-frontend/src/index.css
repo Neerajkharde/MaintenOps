@@ -62,4 +62,35 @@
   .shadow-google-3 {
     box-shadow: 0 1px 3px 0 rgba(60, 64, 67, 0.3), 0 4px 8px 3px rgba(60, 64, 67, 0.15);
   }
+
+  .animate-fadeUp {
+    animation: fadeUp 400ms cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  }
+
+  .animate-pulseBlue {
+    animation: pulseBlue 2s infinite;
+  }
+}
+
+@keyframes fadeUp {
+  0% {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pulseBlue {
+  0% {
+    box-shadow: 0 0 0 0 rgba(26,115,232,0.4);
+  }
+  50% {
+    box-shadow: 0 0 0 8px transparent;
+  }
+  100% {
+    box-shadow: 0 0 0 8px transparent;
+  }
 }

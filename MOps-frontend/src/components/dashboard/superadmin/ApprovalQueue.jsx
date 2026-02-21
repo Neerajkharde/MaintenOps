@@ -1,6 +1,9 @@
-import React from 'react';
+import React, { useState } from 'react';
+import QuotationEntryModal from './QuotationEntryModal';
 
 const ApprovalQueue = () => {
+    const [selectedRequest, setSelectedRequest] = useState(null);
+    const [isQuotationModalOpen, setIsQuotationModalOpen] = useState(false);
     const approvals = [
         { id: 'QT-2024-88', vendor: 'Apex Electricals', amount: '$4,200', req: 'Generate Set Replacement' },
         { id: 'QT-2024-91', vendor: 'CoolTech HVAC', amount: '$1,800', req: 'Annual Maintenance Contract' },
@@ -24,7 +27,15 @@ const ApprovalQueue = () => {
                         <div className="text-[13px] text-[#3c4043] mb-4">{item.req}</div>
 
                         <div className="flex gap-2">
-                            <button className="flex-1 bg-[#1a73e8] text-white py-1.5 rounded-[6px] text-[13px] font-medium hover:bg-[#1557b0]">Approve</button>
+                            <button
+                                onClick={() => {
+                                    setSelectedRequest(item);
+                                    setIsQuotationModalOpen(true);
+                                }}
+                                className="flex-1 bg-[#1a73e8] text-white py-1.5 rounded-[6px] text-[13px] font-medium hover:bg-[#1557b0]"
+                            >
+                                Approve
+                            </button>
                             <button className="flex-1 bg-white border border-[#dadce0] text-[#5f6368] py-1.5 rounded-[6px] text-[13px] font-medium hover:bg-[#f1f3f4]">Reject</button>
                         </div>
                     </div>
@@ -33,6 +44,19 @@ const ApprovalQueue = () => {
             <button className="w-full mt-4 text-[13px] font-medium text-[#1a73e8] hover:bg-[#e8f0fe] py-2 rounded transition-colors">
                 View History
             </button>
+
+            <QuotationEntryModal
+                isOpen={isQuotationModalOpen}
+                onClose={() => {
+                    setIsQuotationModalOpen(false);
+                    setSelectedRequest(null);
+                }}
+                onSubmit={(data) => {
+                    console.log('Submitting Quotation Data:', data);
+                    // Hook into API or context to save quotation here
+                }}
+                request={selectedRequest}
+            />
         </div>
     );
 };

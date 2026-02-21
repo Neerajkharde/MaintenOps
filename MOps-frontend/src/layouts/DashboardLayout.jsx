@@ -8,16 +8,15 @@ const DashboardLayout = () => {
     const { user } = useAuth();
 
     return (
-        <div className="min-h-screen bg-[#f8fafe] font-sans">
-            <Topbar />
+        <div className="min-h-screen bg-[#f1f3f4] font-['Roboto',sans-serif]">
             <Sidebar role={user?.role} />
-
-            {/* Main Content Area */}
-            <main className="pt-[64px] md:pl-[240px] min-h-screen transition-all duration-300">
-                <div className="max-w-[1440px] mx-auto p-6 lg:p-8">
+            <div className="md:pl-[240px] flex flex-col min-h-screen transition-all duration-300">
+                <Topbar />
+                {/* Main Content Area */}
+                <main className="pt-[64px] flex-grow">
                     <Outlet />
-                </div>
-            </main>
+                </main>
+            </div>
         </div>
     );
 };
