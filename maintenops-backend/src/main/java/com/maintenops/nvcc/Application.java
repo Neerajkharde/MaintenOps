@@ -44,15 +44,15 @@ public class Application implements CommandLineRunner {
 		// departmentService.createOrgDepartment(deptDto);
 		// System.out.println("Department created successfully ✅");
 
-		// UserRequestDto dto = UserRequestDto.builder()
-		// 		.username("Super Admin")
-		// 		.email("super@example.com")
-		// 		.password("123456")
-		// 		.orgDeptName("ISKCON")
-		// 		.roles(Set.of("SUPER_ADMIN"))
-		// 		.build();
-
-		// userService.createUser(dto);
-		// System.out.println("Super Admin created successfully ✅");
+//		 UserRequestDto dto = UserRequestDto.builder()
+//		 		.username("Admin")
+//		 		.email("admin@example.com")
+//		 		.password("Admin#1234")
+//		 		.orgDeptName("ISKCON")
+//		 		.roles(Set.of("ADMIN"))
+//		 		.build();
+//
+//		 userService.createUser(dto);
+//		 System.out.println("Admin created successfully ✅");
 	}
 }

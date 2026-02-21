@@ -73,5 +73,21 @@ public class SuperAdminController {
         RequestResponseDto updatedRequest = requestService.reviewRequestAsSuperAdmin(dto, principal);
         return ResponseEntity.ok(updatedRequest);
     }
+
+    /**
+     * Get review history for the logged-in Super Admin
+     * Returns requests that the super admin has already reviewed and quoted
+     *
+     * @param principal the authenticated super admin user
+     * @return ResponseEntity with list of requests and HTTP 200 (OK) status
+     */
+    @GetMapping("/requests/history")
+    @PreAuthorize("hasRole('SUPER_ADMIN')")
+    public ResponseEntity<List<RequestResponseDto>> getSuperAdminHistory(
+            @AuthenticationPrincipal JwtPrincipal principal) {
+
+        List<RequestResponseDto> requests = requestService.getSuperAdminRequestHistory(principal);
+        return ResponseEntity.ok(requests);
+    }
 }
 

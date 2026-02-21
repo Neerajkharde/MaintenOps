@@ -5,7 +5,7 @@ import NewRequestModal from '../../components/requests/NewRequestModal';
 
 const UserDashboard = () => {
     const { user } = useAuth();
-    const { activeRequests, stats } = useRequests();
+    const { activeRequests, stats, loading, error, refreshRequests } = useRequests();
     const [animatedStats, setAnimatedStats] = useState({ total: 0, active: 0, pending: 0, completed: 0 });
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedTrackId, setSelectedTrackId] = useState('');
@@ -48,17 +48,44 @@ const UserDashboard = () => {
         }
     };
 
+    if (loading) {
+        return (
+            <div className="flex flex-col items-center justify-center min-h-[60vh]">
+                <div className="w-12 h-12 border-4 border-[#e8f0fe] border-t-[#1a73e8] rounded-full animate-spin mb-4"></div>
+                <p className="text-[#5f6368] font-['Roboto',sans-serif]">Loading your dashboard...</p>
+            </div>
+        );
+    }
+
+    if (error) {
+        return (
+            <div className="flex flex-col items-center justify-center min-h-[60vh] text-center">
+                <div className="w-16 h-16 bg-[#fce8e6] text-[#c5221f] rounded-full flex items-center justify-center mb-4">
+                    <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
+                </div>
+                <h3 className="text-[18px] font-['Google_Sans',sans-serif] text-[#202124] mb-2">Something went wrong</h3>
+                <p className="text-[#5f6368] font-['Roboto',sans-serif] mb-6">{error}</p>
+                <button
+                    onClick={refreshRequests}
+                    className="px-6 py-2 bg-[#1a73e8] text-white rounded-[50px] font-['Google_Sans',sans-serif] text-[14px] hover:bg-[#1557b0] transition-colors"
+                >
+                    Try Again
+                </button>
+            </div>
+        );
+    }
+
     return (
-        <div className="relative pb-24">
+        <div className="relative pb-24 px-4 sm:px-6 lg:px-8 pt-6 max-w-7xl mx-auto">
             {/* SECTION 1 — WELCOME BANNER */}
             <div className="bg-[#e8f0fe] rounded-[16px] px-8 py-6 flex flex-col sm:flex-row justify-between items-start sm:items-center relative overflow-hidden animate-fadeUp" style={{ animationDelay: '0ms' }}>
                 <div className="absolute left-0 top-0 bottom-0 w-[4px] bg-[#1a73e8]"></div>
                 <div>
                     <h2 className="text-[24px] font-['Google_Sans_Display',sans-serif] text-[#202124] mb-1">
-                        Good morning, {user?.name?.split(' ')[0] || 'Hitesh'} 👋
+                        Hare Krishna, {user?.name?.split(' ')[0] || user?.username || 'User'} 👋
                     </h2>
                     <p className="text-[14px] font-['Roboto',sans-serif] text-[#5f6368]">
-                        You have 3 active requests. 1 is awaiting your attention.
+                        You have {stats.active} submitted request{stats.active !== 1 ? 's' : ''}. {stats.pending} {stats.pending === 1 ? ' is' : ' are'} awaiting SA approval.
                     </p>
                 </div>
                 <div className="mt-4 sm:mt-0">
@@ -86,21 +113,21 @@ const UserDashboard = () => {
                         <svg className="w-5 h-5 text-[#1a73e8]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
                     </div>
                     <div className="text-[32px] font-['Google_Sans_Display',sans-serif] text-[#1a73e8] leading-tight">{animatedStats.active}</div>
-                    <div className="text-[13px] font-['Roboto',sans-serif] text-[#5f6368] mt-1">In Progress</div>
+                    <div className="text-[13px] font-['Roboto',sans-serif] text-[#5f6368] mt-1">Submitted</div>
                 </div>
                 <div className="bg-white rounded-[16px] p-6 shadow-[0_1px_3px_rgba(0,0,0,0.1)] relative">
                     <div className="absolute top-6 right-6 w-10 h-10 bg-[#fef9e7] rounded-full flex items-center justify-center">
                         <svg className="w-5 h-5 text-[#f9ab00]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                     </div>
                     <div className="text-[32px] font-['Google_Sans_Display',sans-serif] text-[#f9ab00] leading-tight">{animatedStats.pending}</div>
-                    <div className="text-[13px] font-['Roboto',sans-serif] text-[#5f6368] mt-1">Awaiting Review</div>
+                    <div className="text-[13px] font-['Roboto',sans-serif] text-[#5f6368] mt-1">Pending SA</div>
                 </div>
                 <div className="bg-white rounded-[16px] p-6 shadow-[0_1px_3px_rgba(0,0,0,0.1)] relative">
                     <div className="absolute top-6 right-6 w-10 h-10 bg-[#e6f4ea] rounded-full flex items-center justify-center">
                         <svg className="w-5 h-5 text-[#137333]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
                     </div>
                     <div className="text-[32px] font-['Google_Sans_Display',sans-serif] text-[#137333] leading-tight">{animatedStats.completed}</div>
-                    <div className="text-[13px] font-['Roboto',sans-serif] text-[#5f6368] mt-1">Completed</div>
+                    <div className="text-[13px] font-['Roboto',sans-serif] text-[#5f6368] mt-1">Approved</div>
                 </div>
             </div>
 
@@ -158,74 +185,70 @@ const UserDashboard = () => {
                         </div>
                     )}
 
-                    <div className="relative pl-3 mt-4">
-                        {/* Connecting Line (background) */}
-                        <div className="absolute left-[23.5px] top-4 bottom-4 w-[2px] bg-[#dadce0]"></div>
-                        {/* Connecting Line (progress) */}
-                        <div className="absolute left-[23.5px] top-4 h-[65px] w-[2px] bg-[#137333]"></div>
-                        <div className="absolute left-[23.5px] top-[65px] h-[50px] w-[2px] bg-transparent border-l-2 border-dashed border-[#dadce0]"></div>
+                    {(() => {
+                        const currentReq = activeRequests.find(r => r.id === selectedTrackId);
+                        const isSubmitted = currentReq?.status === 'SUBMITTED';
+                        const isPendingSA = currentReq?.status === 'PENDING_SA_APPROVAL';
+                        const isApproved = currentReq?.status === 'APPROVED';
 
-                        {/* Stage 1 */}
-                        <div className="flex gap-4 mb-6 relative z-10">
-                            <div className="w-6 h-6 rounded-full bg-[#137333] flex items-center justify-center flex-shrink-0 mt-0.5">
-                                <svg className="w-3.5 h-3.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>
-                            </div>
-                            <div>
-                                <div className="text-[14px] font-['Google_Sans',sans-serif] font-medium text-[#202124]">Request Submitted</div>
-                                <div className="text-[12px] font-['Roboto',sans-serif] text-[#5f6368]">Feb 20, 2026 · 10:30 AM</div>
-                            </div>
-                        </div>
+                        return (
+                            <div className="relative pl-3 mt-4">
+                                {/* Connecting Line (background) */}
+                                <div className="absolute left-[23.5px] top-4 bottom-4 w-[2px] bg-[#dadce0]"></div>
+                                {/* Connecting Line (progress) */}
+                                <div className={`absolute left-[23.5px] top-4 w-[2px] bg-[#137333] transition-all duration-500 ${isApproved ? 'h-[120px]' : isPendingSA ? 'h-[60px]' : 'h-0'}`}></div>
 
-                        {/* Stage 2 */}
-                        <div className="flex gap-4 mb-6 relative z-10">
-                            <div className="w-6 h-6 rounded-full bg-[#137333] flex items-center justify-center flex-shrink-0 mt-0.5">
-                                <svg className="w-3.5 h-3.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>
-                            </div>
-                            <div>
-                                <div className="text-[14px] font-['Google_Sans',sans-serif] font-medium text-[#202124]">Admin Reviewed</div>
-                                <div className="text-[12px] font-['Roboto',sans-serif] text-[#5f6368]">Feb 21, 2026 · admin_user</div>
-                                <div className="mt-2 bg-[#f8f9fa] p-3 rounded-[8px] text-[13px] font-['Roboto',sans-serif] italic text-[#5f6368] border border-[#f1f3f4]">
-                                    "Feasible to complete. Electrical team available."
+                                {/* Stage 1 */}
+                                <div className="flex gap-4 mb-8 relative z-10">
+                                    <div className="w-6 h-6 rounded-full bg-[#137333] flex items-center justify-center flex-shrink-0 mt-0.5">
+                                        <svg className="w-3.5 h-3.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>
+                                    </div>
+                                    <div>
+                                        <div className="text-[14px] font-['Google_Sans',sans-serif] font-medium text-[#202124]">Request Submitted</div>
+                                        <div className="text-[12px] font-['Roboto',sans-serif] text-[#5f6368]">{currentReq?.date || 'N/A'}</div>
+                                    </div>
+                                </div>
+
+                                {/* Stage 2 */}
+                                <div className="flex gap-4 mb-8 relative z-10">
+                                    {isApproved ? (
+                                        <div className="w-6 h-6 rounded-full bg-[#137333] flex items-center justify-center flex-shrink-0 mt-0.5">
+                                            <svg className="w-3.5 h-3.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>
+                                        </div>
+                                    ) : isPendingSA ? (
+                                        <div className="w-6 h-6 rounded-full bg-[#1a73e8] flex-shrink-0 mt-0.5 animate-pulseBlue border-2 border-white shadow-[0_0_0_4px_rgba(26,115,232,0.1)]"></div>
+                                    ) : (
+                                        <div className="w-6 h-6 rounded-full border-2 border-[#dadce0] bg-white flex-shrink-0 mt-0.5"></div>
+                                    )}
+                                    <div className={isSubmitted ? 'opacity-70' : ''}>
+                                        <div className={`text-[14px] font-['Google_Sans',sans-serif] ${isPendingSA || isApproved ? 'font-medium text-[#202124]' : 'text-[#9aa0a6]'}`}>Pending SA Approval</div>
+                                        {isPendingSA && (
+                                            <div className="mt-2 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-[50px] bg-[#fef9e7] text-[#f9ab00] text-[12px] font-medium">
+                                                <span>⏳</span> Awaiting super admin review
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+
+                                {/* Stage 3 */}
+                                <div className="flex gap-4 relative z-10">
+                                    {isApproved ? (
+                                        <div className="w-6 h-6 rounded-full bg-[#137333] flex items-center justify-center flex-shrink-0 mt-0.5 shadow-[0_0_0_4px_rgba(19,115,51,0.1)]">
+                                            <svg className="w-3.5 h-3.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>
+                                        </div>
+                                    ) : (
+                                        <div className="w-6 h-6 rounded-full border-2 border-[#dadce0] bg-white flex-shrink-0 mt-0.5"></div>
+                                    )}
+                                    <div className={!isApproved ? 'opacity-70' : ''}>
+                                        <div className={`text-[14px] font-['Google_Sans',sans-serif] ${isApproved ? 'font-medium text-[#202124]' : 'text-[#9aa0a6]'}`}>Approved for Work</div>
+                                        {isApproved && (
+                                            <div className="mt-1 text-[13px] font-['Roboto',sans-serif] text-[#137333] font-medium">Ready for execution</div>
+                                        )}
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-
-                        {/* Stage 3 (Current) */}
-                        <div className="flex gap-4 mb-6 relative z-10">
-                            <div className="w-6 h-6 rounded-full bg-[#1a73e8] flex-shrink-0 mt-0.5 animate-pulseBlue border-2 border-white"></div>
-                            <div>
-                                <div className="text-[14px] font-['Google_Sans',sans-serif] font-medium text-[#1a73e8]">Awaiting Super Admin</div>
-                                <div className="text-[12px] font-['Roboto',sans-serif] text-[#5f6368]">Quotation pending</div>
-                                <div className="mt-2 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-[50px] bg-[#fef9e7] text-[#f9ab00] text-[12px] font-medium">
-                                    <span>⏳</span> Usually takes 1-2 business days
-                                </div>
-                            </div>
-                        </div>
-
-                        {/* Stage 4 */}
-                        <div className="flex gap-4 mb-6 relative z-10 opacity-70">
-                            <div className="w-6 h-6 rounded-full border-2 border-[#dadce0] bg-white flex-shrink-0 mt-0.5"></div>
-                            <div>
-                                <div className="text-[14px] font-['Google_Sans',sans-serif] text-[#9aa0a6]">Approval & Quotation</div>
-                            </div>
-                        </div>
-
-                        {/* Stage 5 */}
-                        <div className="flex gap-4 mb-6 relative z-10 opacity-70">
-                            <div className="w-6 h-6 rounded-full border-2 border-[#dadce0] bg-white flex-shrink-0 mt-0.5"></div>
-                            <div>
-                                <div className="text-[14px] font-['Google_Sans',sans-serif] text-[#9aa0a6]">Work in Progress</div>
-                            </div>
-                        </div>
-
-                        {/* Stage 6 */}
-                        <div className="flex gap-4 relative z-10 opacity-70">
-                            <div className="w-6 h-6 rounded-full border-2 border-[#dadce0] bg-white flex-shrink-0 mt-0.5"></div>
-                            <div>
-                                <div className="text-[14px] font-['Google_Sans',sans-serif] text-[#9aa0a6]">Completed</div>
-                            </div>
-                        </div>
-                    </div>
+                        );
+                    })()}
                 </div>
 
                 {/* RIGHT: Quotation Card */}

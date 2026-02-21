@@ -21,4 +21,8 @@ public interface RequestService {
     // Super Admin Operations
     RequestResponseDto reviewRequestAsSuperAdmin(SuperAdminReviewRequestDto dto, JwtPrincipal superAdminPrincipal);
     List<RequestResponseDto> getRequestsForSuperAdminReview();
+
+    // History Operations
+    List<RequestResponseDto> getAdminRequestHistory(JwtPrincipal principal);
+    List<RequestResponseDto> getSuperAdminRequestHistory(JwtPrincipal principal);
 }

@@ -16,7 +16,7 @@ const ProfilePage = () => {
     };
 
     return (
-        <div className="relative pb-24 animate-fadeUp">
+        <div className="relative pb-24 px-4 sm:px-6 lg:px-8 pt-6 max-w-7xl mx-auto animate-fadeUp">
             <div className="mb-6">
                 <h1 className="text-[28px] text-[#202124] mb-1 font-['Google_Sans_Display',sans-serif]">My Profile</h1>
                 <p className="text-[14px] text-[#5f6368] font-['Roboto',sans-serif]">View and manage your account details and settings.</p>

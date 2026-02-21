@@ -49,7 +49,7 @@ const LoginPage = () => {
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
                             </svg>
                         </div>
-                        <span className="text-[16px] font-bold text-[#0F172A] tracking-tight">MaintenancePortal</span>
+                        <span className="text-[16px] font-bold text-[#0F172A] tracking-tight">MaintenOps</span>
                     </Link>
 
                     <h2 className="text-[32px] font-bold text-[#0F172A] leading-tight mb-4">
@@ -63,7 +63,7 @@ const LoginPage = () => {
                 {/* Abstract shape decoration */}
                 <div className="absolute -bottom-24 -right-24 w-96 h-96 bg-blue-50 rounded-full blur-3xl opacity-50 pointer-events-none"></div>
                 <div className="z-10 text-[13px] text-[#94A3B8]">
-                    &copy; {new Date().getFullYear()} Maintenance Portal Inc.
+                    &copy; {new Date().getFullYear()} MaintenOps
                 </div>
             </div>
 
@@ -84,7 +84,7 @@ const LoginPage = () => {
                         <Input
                             label="Email"
                             type="email"
-                            placeholder="name@company.com"
+                            placeholder="nityananda@iskconnvcc.in"
                             value={email}
                             onChange={(e) => setEmail(e.target.value)}
                             error={error && !email ? 'Email is required' : ''}

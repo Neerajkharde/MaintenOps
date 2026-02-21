@@ -41,7 +41,7 @@ const Sidebar = ({ role }) => {
                         <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
                     </div>
                     <span className="text-[20px] font-['Google_Sans_Display',sans-serif] text-[#1a73e8]">
-                        MaintenanceOps
+                        MaintenOps
                     </span>
                 </Link>
             </div>

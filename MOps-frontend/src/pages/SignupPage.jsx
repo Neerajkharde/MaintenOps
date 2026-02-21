@@ -79,7 +79,7 @@ const SignupPage = () => {
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
                             </svg>
                         </div>
-                        <span className="text-[16px] font-bold text-[#0F172A] tracking-tight">MaintenancePortal</span>
+                        <span className="text-[16px] font-bold text-[#0F172A] tracking-tight">MaintenOps</span>
                     </Link>
 
                     <h2 className="text-[32px] font-bold text-[#0F172A] leading-tight mb-4">
@@ -224,7 +224,7 @@ const SignupPage = () => {
                     </form>
 
                     <div className="mt-8 text-center text-[12px] text-[#94A3B8]">
-                        © 2025 MaintenancePortal. All rights reserved.
+                        © 2026 MaintenOps. All rights reserved.
                     </div>
                 </div>
             </div>

@@ -70,5 +70,21 @@ public class AdminController {
         RequestResponseDto updatedRequest = requestService.reviewRequestAsAdmin(dto, principal);
         return ResponseEntity.ok(updatedRequest);
     }
+
+    /**
+     * Get review history for the logged-in Admin
+     * Returns requests that the admin has already reviewed
+     *
+     * @param principal the authenticated admin user
+     * @return ResponseEntity with list of requests and HTTP 200 (OK) status
+     */
+    @GetMapping("/requests/history")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<List<RequestResponseDto>> getAdminHistory(
+            @AuthenticationPrincipal JwtPrincipal principal) {
+
+        List<RequestResponseDto> requests = requestService.getAdminRequestHistory(principal);
+        return ResponseEntity.ok(requests);
+    }
 }
 

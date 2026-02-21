@@ -46,14 +46,14 @@ const refreshAccessToken = async () => {
                 localStorage.setItem('expiresIn', expiresIn);
                 
                 console.log('[API] Access token refreshed successfully');
-                return true;
+                return accessToken;
             } else {
                 console.log('[API] Token refresh failed with status:', response.status);
-                return false;
+                return null;
             }
         } catch (error) {
             console.error('[API] Token refresh error:', error);
-            return false;
+            return null;
         } finally {
             isRefreshing = false;
             refreshPromise = null;
@@ -92,14 +92,13 @@ export const apiCall = async (endpoint, options = {}) => {
     // Handle unauthorized (token expired) - try to refresh
     if (response.status === 401) {
         console.log('[API] Got 401, attempting token refresh');
-        const refreshed = await refreshAccessToken();
+        const refreshedToken = await refreshAccessToken();
         
-        if (refreshed) {
-            // Retry the original request with new token (from updated state)
-            const newToken = getAccessToken();
+        if (refreshedToken) {
+            // Retry the original request with new token directly from refresh
             const newHeaders = {
                 ...headers,
-                'Authorization': `${tokenType} ${newToken}`,
+                'Authorization': `${tokenType} ${refreshedToken}`,
             };
             
             console.log('[API] Retrying request with new token');

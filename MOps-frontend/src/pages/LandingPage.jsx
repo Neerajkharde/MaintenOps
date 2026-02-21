@@ -285,7 +285,7 @@ const LandingPage = () => {
                 <div className="max-w-[1440px] mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
                     <div className="flex items-center gap-2">
                         <span className="text-[18px] font-normal font-google-sans text-[#5f6368] tracking-tight">
-                            Maintenance<span className="font-bold text-[#1a73e8]">Ops</span>
+                            Mainten<span className="font-bold text-[#1a73e8]">Ops</span>
                         </span>
                     </div>
 
@@ -296,7 +296,7 @@ const LandingPage = () => {
                     </div>
 
                     <div className="text-[13px] text-[#bdc1c6]">
-                        © 2025 MaintenanceOps
+                        © 2026 MaintenOps
                     </div>
                 </div>
             </footer>

@@ -233,6 +233,24 @@ public class RequestServiceImpl implements RequestService {
                 .toList();
     }
 
+    @Override
+    public List<RequestResponseDto> getAdminRequestHistory(JwtPrincipal principal) {
+        Long adminId = principal.getUserId();
+        List<Request> requests = requestRepository.findByReviewedByAdminId(adminId);
+        return requests.stream()
+                .map(this::mapToResponse)
+                .toList();
+    }
+
+    @Override
+    public List<RequestResponseDto> getSuperAdminRequestHistory(JwtPrincipal principal) {
+        Long superAdminId = principal.getUserId();
+        List<Request> requests = requestRepository.findByReviewedBySuperAdminId(superAdminId);
+        return requests.stream()
+                .map(this::mapToResponse)
+                .toList();
+    }
+
     // Helper Method
     private String generateRequestNumber() {
         // Format: REQ-YYYY-RandomNumber

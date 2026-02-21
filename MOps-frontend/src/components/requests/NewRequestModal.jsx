@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useRequests } from '../../context/RequestContext';
+import { requestService } from '../../services/requestService';
 
 const NewRequestModal = ({ isOpen, onClose }) => {
     const { addRequest } = useRequests();
@@ -8,6 +9,15 @@ const NewRequestModal = ({ isOpen, onClose }) => {
     const [isUrgent, setIsUrgent] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isSuccess, setIsSuccess] = useState(false);
+    const [createdToken, setCreatedToken] = useState(null);
+
+    // Form State for backend DTO
+    const [formData, setFormData] = useState({
+        mobileNumber: '',
+        itemDescription: '',
+        urgencyReason: ''
+    });
+    const [errors, setErrors] = useState({});
 
     if (!isOpen) return null;
 
@@ -28,31 +38,55 @@ const NewRequestModal = ({ isOpen, onClose }) => {
             icon: <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M7 2v11h3v9l7-12h-4l4-8z" /></svg>
         },
         {
-            id: 'EM', label: 'Estate Management', desc: 'General facility, civil, infrastructure',
+            id: 'EM', label: 'EM', desc: 'General facility, civil, infrastructure',
             color: '#137333', bg: '#e6f4ea',
             icon: <svg className="w-6 h-6" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2L2 12h3v8h6v-6h2v6h6v-8h3L12 2zm3 10h-2v-2h2v2zm0-4h-2V6h2v2z" /></svg>
         }
     ];
 
+    const validateForm = () => {
+        const newErrors = {};
+        if (!formData.mobileNumber.trim()) newErrors.mobileNumber = 'Mobile number is required';
+        else if (!/^\d{10}$/.test(formData.mobileNumber)) newErrors.mobileNumber = 'Valid 10-digit number required';
+        if (!formData.itemDescription.trim()) newErrors.itemDescription = 'Description is required';
+        if (isUrgent && !formData.urgencyReason.trim()) newErrors.urgencyReason = 'Justification is required for urgent requests';
+
+        setErrors(newErrors);
+        return Object.keys(newErrors).length === 0;
+    };
+
     const handleNext = () => setStep(2);
     const handleBack = () => setStep(1);
 
-    const handleSubmit = () => {
+    const handleSubmit = async () => {
+        if (!validateForm()) return;
+
         setIsSubmitting(true);
+        setErrors({});
 
-        const newReq = {
-            id: `REQ-2026-00${Math.floor(Math.random() * 9)}`,
-            dept: selectedDept?.label || 'General',
-            desc: 'New maintenance request from dashboard',
-            date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
-            status: 'SUBMITTED'
-        };
+        try {
+            const payload = {
+                mobileNumber: formData.mobileNumber,
+                itemDescription: formData.itemDescription,
+                serviceDepartmentName: selectedDept.label,
+                urgencyRequested: isUrgent,
+                urgencyReason: isUrgent ? formData.urgencyReason : ''
+            };
 
-        setTimeout(() => {
-            addRequest(newReq);
+            const createdRequest = await requestService.createRequest(payload);
+
+            // Add the real request returned from backend to context
+            addRequest(createdRequest);
+
+            setCreatedToken(createdRequest.requestNumber);
             setIsSubmitting(false);
             setIsSuccess(true);
-        }, 1500);
+        } catch (error) {
+            console.error('Failed to create request:', error);
+            // General error or fallback
+            setErrors({ submit: error.message || 'Failed to submit request. Please try again.' });
+            setIsSubmitting(false);
+        }
     };
 
     const handleClose = () => {
@@ -60,6 +94,9 @@ const NewRequestModal = ({ isOpen, onClose }) => {
         setSelectedDept(null);
         setIsUrgent(false);
         setIsSuccess(false);
+        setCreatedToken(null);
+        setFormData({ mobileNumber: '', itemDescription: '', urgencyReason: '' });
+        setErrors({});
         onClose();
     };
 
@@ -74,7 +111,7 @@ const NewRequestModal = ({ isOpen, onClose }) => {
                     </div>
                     <h2 className="text-[24px] font-['Google_Sans_Display',sans-serif] text-[#202124] mb-2">Request Submitted!</h2>
                     <p className="text-[14px] font-['Roboto',sans-serif] text-[#5f6368] mb-8">
-                        Your token number is <strong>#3802</strong>. You'll be notified at each stage.
+                        Your token number is <strong>{createdToken || '#3802'}</strong>. You'll be notified at each stage.
                     </p>
                     <button
                         onClick={handleClose}
@@ -195,7 +232,7 @@ const NewRequestModal = ({ isOpen, onClose }) => {
                         </div>
 
                         {/* STEP 2: Request Details */}
-                        <div className="w-1/2 flex-shrink-0 px-8 py-4 max-w-[680px] mx-auto">
+                        <div className="w-1/2 flex-shrink-0 px-8 py-8 max-w-[680px] mx-auto">
                             {/* Read-only Header */}
                             <div className="flex items-center gap-4 mb-6 bg-[#f8f9fa] p-3 rounded-[12px] border border-[#f1f3f4]">
                                 <div className="border-[1.5px] border-[#dadce0] rounded-[8px] px-3 py-1.5 bg-white">
@@ -211,18 +248,10 @@ const NewRequestModal = ({ isOpen, onClose }) => {
 
                             <form className="space-y-4" onSubmit={(e) => e.preventDefault()}>
                                 {/* Row 1 */}
-                                <div className="grid grid-cols-2 gap-4">
+                                <div className="grid grid-cols-1 gap-4">
                                     <div>
-                                        <label className="block text-[13px] font-['Google_Sans',sans-serif] font-medium text-[#5f6368] mb-1.5">Date</label>
-                                        <input
-                                            type="date"
-                                            defaultValue={new Date().toISOString().split('T')[0]}
-                                            className="w-full h-12 px-3 border-[1.5px] border-[#dadce0] rounded-[8px] text-[15px] font-['Roboto',sans-serif] text-[#202124] focus:outline-none focus:border-[#1a73e8] focus:shadow-[0_0_0_3px_rgba(26,115,232,0.12)] bg-white"
-                                        />
-                                    </div>
-                                    <div>
-                                        <label className="block text-[13px] font-['Google_Sans',sans-serif] font-medium text-[#5f6368] mb-1.5">Department Name</label>
-                                        <div className="h-12 flex items-center">
+                                        <label className="block text-[13px] font-medium font-['Google_Sans',sans-serif] text-[#5f6368] mb-1.5">Department Name</label>
+                                        <div className="w-full h-12 flex items-center">
                                             {selectedDept ? (
                                                 <span
                                                     className="inline-flex px-4 py-1.5 rounded-[50px] text-[13px] font-medium"
@@ -240,20 +269,18 @@ const NewRequestModal = ({ isOpen, onClose }) => {
                                 {/* Row 2 */}
                                 <div className="grid grid-cols-2 gap-4">
                                     <div>
-                                        <label className="block text-[13px] font-['Google_Sans',sans-serif] font-medium text-[#5f6368] mb-1.5">Name of Applicant</label>
-                                        <input
-                                            type="text"
-                                            placeholder="Your full name"
-                                            className="w-full h-12 px-3 border-[1.5px] border-[#dadce0] rounded-[8px] text-[15px] font-['Roboto',sans-serif] text-[#202124] focus:outline-none focus:border-[#1a73e8] focus:shadow-[0_0_0_3px_rgba(26,115,232,0.12)] placeholder-[#9aa0a6]"
-                                        />
-                                    </div>
-                                    <div>
                                         <label className="block text-[13px] font-['Google_Sans',sans-serif] font-medium text-[#5f6368] mb-1.5">Contact No.</label>
                                         <input
                                             type="tel"
                                             placeholder="10-digit mobile number"
-                                            className="w-full h-12 px-3 border-[1.5px] border-[#dadce0] rounded-[8px] text-[15px] font-['Roboto',sans-serif] text-[#202124] focus:outline-none focus:border-[#1a73e8] focus:shadow-[0_0_0_3px_rgba(26,115,232,0.12)] placeholder-[#9aa0a6]"
+                                            value={formData.mobileNumber}
+                                            onChange={(e) => setFormData({ ...formData, mobileNumber: e.target.value })}
+                                            className={`w-full h-12 px-3 border-[1.5px] ${errors.mobileNumber ? 'border-[#c5221f]' : 'border-[#dadce0]'} rounded-[8px] text-[15px] font-['Roboto',sans-serif] text-[#202124] focus:outline-none focus:border-[#1a73e8] focus:shadow-[0_0_0_3px_rgba(26,115,232,0.12)] placeholder-[#9aa0a6]`}
                                         />
+                                        {errors.mobileNumber && <p className="text-[#c5221f] text-[12px] mt-1">{errors.mobileNumber}</p>}
+                                    </div>
+                                    <div className="flex items-end text-[12px] text-[#5f6368] pb-4">
+                                        <p>Your name and org department are auto-captured.</p>
                                     </div>
                                 </div>
 
@@ -263,9 +290,18 @@ const NewRequestModal = ({ isOpen, onClose }) => {
                                     <textarea
                                         rows={3}
                                         placeholder="Describe the work needed in detail — e.g., Cupboard to make safe for phones, 8 items"
-                                        className="w-full p-3 border-[1.5px] border-[#dadce0] rounded-[8px] text-[15px] font-['Roboto',sans-serif] text-[#202124] focus:outline-none focus:border-[#1a73e8] focus:shadow-[0_0_0_3px_rgba(26,115,232,0.12)] placeholder-[#9aa0a6] resize-none"
+                                        value={formData.itemDescription}
+                                        onChange={(e) => setFormData({ ...formData, itemDescription: e.target.value })}
+                                        className={`w-full p-3 border-[1.5px] ${errors.itemDescription ? 'border-[#c5221f]' : 'border-[#dadce0]'} rounded-[8px] text-[15px] font-['Roboto',sans-serif] text-[#202124] focus:outline-none focus:border-[#1a73e8] focus:shadow-[0_0_0_3px_rgba(26,115,232,0.12)] placeholder-[#9aa0a6] resize-none`}
                                     />
-                                    <div className="text-right text-[12px] text-[#5f6368] mt-1 font-['Roboto',sans-serif]">0/500</div>
+                                    <div className="flex justify-between mt-1">
+                                        {errors.itemDescription ? (
+                                            <p className="text-[#c5221f] text-[12px] font-['Roboto',sans-serif]">{errors.itemDescription}</p>
+                                        ) : (
+                                            <p></p> // Placeholder for flex formatting
+                                        )}
+                                        <div className="text-[12px] text-[#5f6368] font-['Roboto',sans-serif]">{formData.itemDescription.length}/500</div>
+                                    </div>
                                 </div>
 
                                 {/* Photo Upload */}
@@ -302,8 +338,11 @@ const NewRequestModal = ({ isOpen, onClose }) => {
                                         <textarea
                                             rows={2}
                                             placeholder="Explain why this is urgent..."
-                                            className="w-full p-2 border-[1.5px] border-[#c5221f] rounded-[8px] text-[14px] font-['Roboto',sans-serif] text-[#202124] focus:outline-none focus:shadow-[0_0_0_3px_rgba(197,34,31,0.12)] resize-none"
+                                            value={formData.urgencyReason}
+                                            onChange={(e) => setFormData({ ...formData, urgencyReason: e.target.value })}
+                                            className={`w-full p-2 border-[1.5px] ${errors.urgencyReason ? 'border-[#c5221f]' : 'border-[#dadce0] focus:border-[#c5221f]'} rounded-[8px] text-[14px] font-['Roboto',sans-serif] text-[#202124] focus:outline-none focus:shadow-[0_0_0_3px_rgba(197,34,31,0.12)] resize-none`}
                                         />
+                                        {errors.urgencyReason && <p className="text-[#c5221f] text-[12px] mt-1">{errors.urgencyReason}</p>}
                                     </div>
                                 </div>
 
@@ -345,12 +384,17 @@ const NewRequestModal = ({ isOpen, onClose }) => {
                                 </div>
 
                             </form>
+                            {errors.submit && (
+                                <div className="mt-4 p-3 bg-[#fce8e6] border border-[#c5221f] rounded-[8px] text-[#c5221f] text-[13px] text-center">
+                                    {errors.submit}
+                                </div>
+                            )}
                         </div>
-                    </div>
-                </div>
+                    </div >
+                </div >
 
                 {/* Sticky Footer Actions */}
-                <div className="sticky bottom-0 bg-white border-t border-[#dadce0] p-6 flex justify-between items-center z-10 w-full mt-auto">
+                < div className="sticky bottom-0 bg-white border-t border-[#dadce0] p-6 flex justify-between items-center z-10 w-full mt-auto" >
                     {step === 1 ? (
                         <>
                             <div className="w-20"></div> {/* Spacer for alignment */}
@@ -398,10 +442,10 @@ const NewRequestModal = ({ isOpen, onClose }) => {
                             </button>
                         </>
                     )}
-                </div>
+                </div >
 
-            </div>
-        </div>
+            </div >
+        </div >
     );
 };
 

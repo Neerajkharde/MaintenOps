@@ -20,13 +20,13 @@ const RequestsPage = () => {
             case 'Electrical': return <span className="inline-block px-3 py-[4px] rounded-[50px] bg-[#fce8e6] text-[#c5221f] text-[12px]">Electrical</span>;
             case 'Carpentry': return <span className="inline-block px-3 py-[4px] rounded-[50px] bg-[#fff8e1] text-[#f9ab00] text-[12px]">Carpentry</span>;
             case 'Plumbing': return <span className="inline-block px-3 py-[4px] rounded-[50px] bg-[#e6f4ea] text-[#137333] text-[12px]">Plumbing</span>;
-            case 'Estate Management': return <span className="inline-block px-3 py-[4px] rounded-[50px] bg-[#e6f4ea] text-[#137333] text-[12px]">Estate Mgt</span>;
+            case 'EM': return <span className="inline-block px-3 py-[4px] rounded-[50px] bg-[#e6f4ea] text-[#137333] text-[12px]">EM</span>;
             default: return <span className="inline-block px-3 py-[4px] rounded-[50px] bg-[#f1f3f4] text-[#5f6368] text-[12px]">{dept}</span>;
         }
     };
 
     return (
-        <div className="relative pb-24 animate-fadeUp">
+        <div className="relative pb-24 px-4 sm:px-6 lg:px-8 pt-6 max-w-7xl mx-auto animate-fadeUp">
             <div className="mb-6">
                 <h1 className="text-[28px] text-[#202124] mb-1 font-['Google_Sans_Display',sans-serif]">My Requests</h1>
                 <p className="text-[14px] text-[#5f6368] font-['Roboto',sans-serif]">View and track all your previous and active maintenance requests.</p>
