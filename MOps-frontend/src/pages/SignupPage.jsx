@@ -18,10 +18,10 @@ const SignupPage = () => {
     const navigate = useNavigate();
 
     const departments = [
-        { id: 'Seva Office', label: 'Seva Office', icon: 'M12 8c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4m0-2c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6 2.69-6 6-6zm3.5 8c.83 0 1.5.67 1.5 1.5S16.33 19 15.5 19 14 18.33 14 17.5s.67-1.5 1.5-1.5z', color: '#1a73e8', bg: 'bg-[#1a73e8]/10' },
-        { id: 'Jiva Daya', label: 'Jiva Daya', icon: 'M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z', color: '#d33527', bg: 'bg-[#d33527]/10' },
-        { id: 'Campus Program', label: 'Campus Program', icon: 'M12 14l9-5-9-5-9 5m0 0l9 5m-9-5v10l9 5m0-10l9-5m-9 5v10m0-10l-9-5m19 5l-9-5', color: '#f9ab00', bg: 'bg-[#f9ab00]/10' },
-        { id: 'Kitchen', label: 'Kitchen', icon: 'M9 3v2H5v4h4v2H2v4h2v8c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2v-8h2v-4h-7V5h4V3H9zm0 5h6v10H9V8z', color: '#137333', bg: 'bg-[#137333]/10' }
+        { id: 'Seva Office', label: 'Seva Office', icon: 'M12 8c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4m0-2c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6 2.69-6 6-6zm3.5 8c.83 0 1.5.67 1.5 1.5S16.33 19 15.5 19 14 18.33 14 17.5s.67-1.5 1.5-1.5z', color: '#1a73e8' },
+        { id: 'Jiva Daya', label: 'Jiva Daya', icon: 'M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z', color: '#d93025' },
+        { id: 'Campus Program', label: 'Campus Program', icon: 'M12 14l9-5-9-5-9 5m0 0l9 5m-9-5v10l9 5m0-10l9-5m-9 5v10m0-10l-9-5m19 5l-9-5', color: '#f9ab00' },
+        { id: 'Kitchen', label: 'Kitchen', icon: 'M9 3v2H5v4h4v2H2v4h2v8c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2v-8h2v-4h-7V5h4V3H9zm0 5h6v10H9V8z', color: '#137333' }
     ];
 
     const handleChange = (e) => {
@@ -57,8 +57,6 @@ const SignupPage = () => {
         try {
             setLoading(true);
             await signup(formData.name, formData.email, formData.password, formData.department);
-            
-            // Signup successful - redirect to login page
             navigate('/login');
         } catch (err) {
             setError(err.message || 'Failed to create account');
@@ -68,165 +66,128 @@ const SignupPage = () => {
     };
 
     return (
-        <div className="flex min-h-screen bg-white font-sans">
-
-            {/* Left: Brand/Marketing (Hidden on Mobile) */}
-            <div className="hidden lg:flex w-[45%] flex-col justify-between p-12 bg-[#F8FAFC] border-r border-[#E2E8F0] relative overflow-hidden">
-                <div className="z-10">
-                    <Link to="/" className="flex items-center gap-2.5 mb-12">
-                        <div className="w-8 h-8 bg-[#2563EB] rounded-[6px] flex items-center justify-center shadow-sm">
-                            <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
-                            </svg>
-                        </div>
-                        <span className="text-[16px] font-bold text-[#0F172A] tracking-tight">MaintenOps</span>
-                    </Link>
-
-                    <h2 className="text-[32px] font-bold text-[#0F172A] leading-tight mb-4">
-                        Join efficient teams. <br /> Get started today.
-                    </h2>
-                    <div className="space-y-4 max-w-[320px]">
-                        <div className="flex items-center gap-3 text-[#64748B]">
-                            <div className="w-5 h-5 rounded-full bg-blue-100 text-[#2563EB] flex items-center justify-center shrink-0">
-                                <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" /></svg>
-                            </div>
-                            <span className="text-[15px]">Real-time request tracking</span>
-                        </div>
-                        <div className="flex items-center gap-3 text-[#64748B]">
-                            <div className="w-5 h-5 rounded-full bg-blue-100 text-[#2563EB] flex items-center justify-center shrink-0">
-                                <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" /></svg>
-                            </div>
-                            <span className="text-[15px]">Automated workflow notifications</span>
-                        </div>
-                        <div className="flex items-center gap-3 text-[#64748B]">
-                            <div className="w-5 h-5 rounded-full bg-blue-100 text-[#2563EB] flex items-center justify-center shrink-0">
-                                <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" /></svg>
-                            </div>
-                            <span className="text-[15px]">Comprehensive reporting dashboard</span>
-                        </div>
-                    </div>
+        <div className="min-h-screen bg-background flex flex-col items-center justify-center p-6 font-body overflow-y-auto py-12">
+            {/* Logo */}
+            <div className="mb-8 flex flex-col items-center gap-3 animate-fadeUp">
+                <div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center shadow-sm text-primary">
+                    <svg className="w-7 h-7" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                    </svg>
                 </div>
-
-                {/* Abstract shape decoration */}
-                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-full h-full bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-white/50 to-transparent opacity-50 pointer-events-none"></div>
-                <div className="z-10 text-[13px] text-[#94A3B8]">
-                    By joining, you agree to our Terms and Privacy Policy.
-                </div>
+                <span className="text-[24px] font-display font-medium text-on-surface tracking-tight">MaintenOps</span>
             </div>
 
-            {/* Right: Auth Form */}
-            <div className="flex-1 flex flex-col items-center justify-center p-6 lg:p-12 relative overflow-y-auto">
-                <div className="w-full max-w-[480px] animate-fade-in my-auto">
-                    <div className="mb-8 text-center lg:text-left">
-                        <h1 className="text-[24px] font-bold text-[#0F172A] mb-2">Create an account</h1>
-                        <p className="text-[#64748B]">
-                            Already have an account?{' '}
-                            <Link to="/login" className="text-[#2563EB] hover:text-[#1D4ED8] font-medium transition-colors">
-                                Log in
-                            </Link>
-                        </p>
-                    </div>
-
-                    <form onSubmit={handleSubmit} className="space-y-4">
-                        <Input
-                            label="Full Name"
-                            name="name"
-                            placeholder="Nityanand Das"
-                            value={formData.name}
-                            onChange={handleChange}
-                            required
-                        />
-
-                        <Input
-                            label="Email"
-                            type="email"
-                            name="email"
-                            placeholder="nityananda@iskconnvcc.in"
-                            value={formData.email}
-                            onChange={handleChange}
-                            required
-                        />
-
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                            <Input
-                                label="Password"
-                                type="password"
-                                name="password"
-                                placeholder="Create a password"
-                                value={formData.password}
-                                onChange={handleChange}
-                                required
-                            />
-
-                            <Input
-                                label="Confirm Password"
-                                type="password"
-                                name="confirmPassword"
-                                placeholder="Confirm password"
-                                value={formData.confirmPassword}
-                                onChange={handleChange}
-                                required
-                            />
-                        </div>
-
-                        {/* Department Selection */}
-                        <div className="pt-2">
-                            <label className="block text-sm font-medium text-gray-700 mb-2">Select Department</label>
-                            <div className="grid grid-cols-2 gap-3">
-                                {departments.map((dept) => (
-                                    <div
-                                        key={dept.id}
-                                        onClick={() => handleDeptSelect(dept.id)}
-                                        className={`relative bg-white border-[1.5px] rounded-[12px] p-4 cursor-pointer transition-all duration-200 group flex items-start gap-3
-                                            ${formData.department === dept.id
-                                                ? 'border-[#1a73e8] bg-[#e8f0fe]'
-                                                : 'border-[#dadce0] hover:shadow-[0_4px_12px_rgba(0,0,0,0.08)]'}`}
-                                        style={{ borderColor: formData.department === dept.id ? '#1a73e8' : undefined }}
-                                        onMouseEnter={(e) => {
-                                            if (formData.department !== dept.id) e.currentTarget.style.borderColor = dept.color;
-                                        }}
-                                        onMouseLeave={(e) => {
-                                            if (formData.department !== dept.id) e.currentTarget.style.borderColor = '#dadce0';
-                                        }}
-                                    >
-                                        <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 ${formData.department === dept.id ? 'bg-white' : dept.bg}`}>
-                                            <svg className="w-4 h-4" style={{ color: dept.color }} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={dept.icon} />
-                                            </svg>
-                                        </div>
-                                        <div className="flex-1">
-                                            <h3 className="text-[13px] font-medium text-[#202124] leading-tight">{dept.label}</h3>
-                                            {/* Optional Short Desc */}
-                                            {/* <p className="text-[11px] text-[#5f6368] mt-0.5">Maintaince</p> */}
-                                        </div>
-                                        {formData.department === dept.id && (
-                                            <div className="absolute top-2 right-2">
-                                                <div className="w-4 h-4 bg-[#1a73e8] rounded-full flex items-center justify-center">
-                                                    <svg className="w-2.5 h-2.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" /></svg>
-                                                </div>
-                                            </div>
-                                        )}
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
-
-                        {error && (
-                            <div className="text-[13px] text-red-500 bg-red-50 p-3 rounded-[6px] border border-red-100 flex items-center gap-2 mt-2">
-                                <svg className="w-4 h-4 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" /></svg>
-                                {error}
-                            </div>
-                        )}
-
-                        <Button type="submit" variant="primary" fullWidth loading={loading} className="!mt-6">
-                            Create Account
-                        </Button>
-                    </form>
-
-                    <div className="mt-8 text-center text-[12px] text-[#94A3B8]">
-                        © 2026 MaintenOps. All rights reserved.
-                    </div>
+            {/* Signup Card */}
+            <div className="w-full max-w-[500px] bg-white border border-outline rounded-xl p-8 lg:p-10 shadow-sm animate-fadeUp" style={{ animationDelay: '100ms' }}>
+                <div className="text-center mb-8">
+                    <h1 className="text-[24px] font-display font-medium text-on-surface mb-2">Create account</h1>
+                    <p className="text-[14px] text-on-surface-variant font-ui">to join MaintenOps (ISKCON NVCC)</p>
                 </div>
+
+                <form onSubmit={handleSubmit} className="space-y-6">
+                    <Input
+                        label="Full Name"
+                        name="name"
+                        placeholder="Nityanand Das"
+                        value={formData.name}
+                        onChange={handleChange}
+                        className="font-ui"
+                        required
+                    />
+
+                    <Input
+                        label="Email address"
+                        type="email"
+                        name="email"
+                        placeholder="nityananda@iskconnvcc.in"
+                        value={formData.email}
+                        onChange={handleChange}
+                        className="font-ui"
+                        required
+                    />
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <Input
+                            label="Password"
+                            type="password"
+                            name="password"
+                            placeholder="6+ chars"
+                            value={formData.password}
+                            onChange={handleChange}
+                            className="font-ui text-sm sm:text-base"
+                            required
+                        />
+                        <Input
+                            label="Confirm"
+                            type="password"
+                            name="confirmPassword"
+                            placeholder="Re-type"
+                            value={formData.confirmPassword}
+                            onChange={handleChange}
+                            className="font-ui text-sm sm:text-base"
+                            required
+                        />
+                    </div>
+
+                    {/* Department Selection */}
+                    <div className="space-y-3">
+                        <label className="text-[12px] font-ui font-bold text-on-surface-variant uppercase tracking-widest pl-1">Target Department</label>
+                        <div className="grid grid-cols-2 gap-3">
+                            {departments.map((dept) => (
+                                <div
+                                    key={dept.id}
+                                    onClick={() => handleDeptSelect(dept.id)}
+                                    className={`relative bg-transparent border-[1.5px] rounded-xl p-3 cursor-pointer transition-all flex items-center gap-3 group
+                                        ${formData.department === dept.id
+                                            ? 'border-primary bg-primary-container/20'
+                                            : 'border-outline/40 hover:border-outline hover:bg-surface-variant/20'}`}
+                                >
+                                    <div className={`w-8 h-8 rounded-lg flex items-center justify-center shrink-0 transition-colors
+                                        ${formData.department === dept.id ? 'bg-primary text-white' : 'bg-surface-variant text-on-surface-variant group-hover:bg-surface-variant/50'}`}>
+                                        <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d={dept.icon} />
+                                        </svg>
+                                    </div>
+                                    <span className={`text-[13px] font-display font-medium transition-colors ${formData.department === dept.id ? 'text-primary' : 'text-on-surface-variant'}`}>
+                                        {dept.label}
+                                    </span>
+                                    {formData.department === dept.id && (
+                                        <div className="absolute -top-1.5 -right-1.5 w-5 h-5 bg-primary text-white rounded-full flex items-center justify-center shadow-sm">
+                                            <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" /></svg>
+                                        </div>
+                                    )}
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+
+                    {error && (
+                        <div className="text-[13px] text-error bg-error-container/30 px-4 py-3 rounded-md border border-error/10 flex items-center gap-2 font-ui animate-fadeUp">
+                            <svg className="w-4 h-4 shrink-0 fill-error" viewBox="0 0 20 20"><path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" /></svg>
+                            {error}
+                        </div>
+                    )}
+
+                    <div className="flex flex-col gap-4 !mt-10">
+                        <div className="flex items-center justify-between text-[14px]">
+                            <Link to="/login" className="text-primary hover:text-primary/80 font-medium font-ui transition-colors">Sign in instead</Link>
+                            <Button type="submit" variant="primary" loading={loading} className="px-8 !rounded-md">
+                                Create
+                            </Button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+
+            {/* Footer */}
+            <div className="mt-8 flex gap-6 text-[12px] text-on-surface-variant font-ui">
+                <a href="#" className="hover:text-on-surface">Privacy</a>
+                <a href="#" className="hover:text-on-surface">Terms</a>
+                <a href="#" className="hover:text-on-surface">Help</a>
+            </div>
+
+            <div className="mt-4 text-[11px] text-on-surface-variant/60 font-ui">
+                © 2026 MaintenOps. All rights reserved.
             </div>
         </div>
     );

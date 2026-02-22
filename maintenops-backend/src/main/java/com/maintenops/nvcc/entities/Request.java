@@ -39,8 +39,7 @@ public class Request {
 
     @Column(name = "required_date")
     private Instant requiredDate; // required_date
-    // This is set by Admin after receiving the request, based on the urgency and workload.
-    // It can be updated later if needed.
+    // TODO: Think what to do here
 
 
     // --- Urgency Module  ---
@@ -80,6 +79,15 @@ public class Request {
 
     @Column(name = "quotation_description", columnDefinition = "TEXT")
     private String quotationDescription; // Quotation details
+
+    @Column(name = "total_estimated_cost", precision = 10, scale = 2)
+    private java.math.BigDecimal totalEstimatedCost; // Auto-calculated from material picker
+
+    @Column(name = "estimated_days")
+    private Integer estimatedDays; // Admin sets during quotation creation
+
+    @Column(name = "quotation_notes", columnDefinition = "TEXT")
+    private String quotationNotes; // Internal admin notes (not shown to requester)
 
     @Column(name = "super_admin_remarks", columnDefinition = "TEXT")
     private String superAdminRemarks; // Super Admin's comments

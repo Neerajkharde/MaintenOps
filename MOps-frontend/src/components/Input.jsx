@@ -1,25 +1,26 @@
 import React from 'react';
 
-const Input = ({ label, error, ...props }) => {
+const Input = ({ label, error, className = '', ...props }) => {
     return (
         <div className="flex flex-col gap-1.5 w-full">
             {label && (
-                <label className="text-[14px] font-medium text-[#0F172A]">
+                <label className="text-[14px] font-medium font-ui text-on-surface ml-1">
                     {label}
                 </label>
             )}
             <input
                 className={`
-          w-full h-11 px-3.5 rounded-[8px] border text-[15px] outline-none transition-all duration-200
+          w-full h-11 px-4 rounded-md border text-[15px] outline-none transition-all duration-200 font-body
           ${error
-                        ? 'border-red-500 focus:border-red-500 focus:ring-1 focus:ring-red-500'
-                        : 'border-[#E2E8F0] focus:border-[#2563EB] focus:ring-1 focus:ring-[#2563EB] hover:border-[#CBD5E1]'
+                        ? 'border-error focus:border-error focus:ring-1 focus:ring-error bg-error-container/5'
+                        : 'border-outline focus:border-primary focus:ring-1 focus:ring-primary hover:border-on-surface-variant'
                     }
-          bg-white text-[#0F172A] placeholder:text-[#94A3B8]
+          bg-white text-on-surface placeholder:text-on-surface-variant/50
+          ${className}
         `}
                 {...props}
             />
-            {error && <span className="text-[13px] text-red-500">{error}</span>}
+            {error && <span className="text-[12px] text-error ml-1 font-ui">{error}</span>}
         </div>
     );
 };

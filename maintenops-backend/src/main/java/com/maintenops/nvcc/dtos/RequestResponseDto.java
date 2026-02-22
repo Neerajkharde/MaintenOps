@@ -2,7 +2,9 @@ package com.maintenops.nvcc.dtos;
 
 import lombok.Data;
 
+import java.math.BigDecimal;
 import java.time.Instant;
+import java.util.List;
 
 @Data
 public class RequestResponseDto {
@@ -29,9 +31,14 @@ public class RequestResponseDto {
     // Super Admin & Quotation Fields
     private Double quotationAmount;
     private String quotationDescription;
+    private BigDecimal totalEstimatedCost; // Auto-calculated from material picker
+    private Integer estimatedDays;
     private String superAdminRemarks;
     private String superAdminName;
     private Instant superAdminReviewedAt;
+
+    // Material Line Items (populated when quotation is created)
+    private List<MaterialLineItemDTO> materials;
 
     private Instant createdAt;
 }

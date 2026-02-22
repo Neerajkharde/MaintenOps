@@ -3,18 +3,23 @@ import { createPortal } from 'react-dom';
 import { requestService } from '../../services/requestService';
 import { formatDate } from '../../utils/dateUtils';
 
+/**
+ * SuperAdminReviewModal — SA reviews the Admin's material-based quotation and approves it.
+ * On approval, status transitions to QUOTATION_SENT (user gets the quotation).
+ */
 const SuperAdminReviewModal = ({ isOpen, onClose, request, onSuccess }) => {
-    const [quotationAmount, setQuotationAmount] = useState('');
-    const [quotationDescription, setQuotationDescription] = useState('');
     const [superAdminRemarks, setSuperAdminRemarks] = useState('');
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [error, setError] = useState('');
 
     if (!isOpen || !request) return null;
 
+    const materials = request.materials || [];
+    const totalCost = request.totalEstimatedCost ?? request.quotationAmount;
+
     const handleSubmit = async () => {
-        if (!quotationAmount || !quotationDescription.trim() || !superAdminRemarks.trim()) {
-            setError('All fields (Amount, Description, Remarks) are mandatory.');
+        if (!superAdminRemarks.trim()) {
+            setError('Approval remarks are required.');
             return;
         }
 
@@ -24,11 +29,13 @@ const SuperAdminReviewModal = ({ isOpen, onClose, request, onSuccess }) => {
         try {
             await requestService.submitSuperAdminReview({
                 requestId: request.id,
-                quotationAmount: parseFloat(quotationAmount),
-                quotationDescription: quotationDescription,
+                // These fields are now auto-populated from the material picker
+                quotationAmount: Number(totalCost ?? 0),
+                quotationDescription: request.quotationDescription || '',
                 superAdminRemarks: superAdminRemarks,
-                approved: true
+                approved: true,
             });
+            setIsSubmitting(false);
             onSuccess();
         } catch (err) {
             console.error('Submit review failed:', err);
@@ -39,13 +46,15 @@ const SuperAdminReviewModal = ({ isOpen, onClose, request, onSuccess }) => {
 
     return createPortal(
         <div className="fixed inset-0 bg-black/40 backdrop-blur-[4px] z-[100] flex items-center justify-center p-4">
-            <div className="bg-white rounded-[24px] w-full max-w-[600px] shadow-[0_24px_60px_rgba(0,0,0,0.15)] flex flex-col relative my-auto animate-fadeUp overflow-hidden">
+            <div className="bg-white rounded-[24px] w-full max-w-[680px] shadow-[0_24px_60px_rgba(0,0,0,0.15)] flex flex-col relative my-auto animate-fadeUp overflow-hidden max-h-[90vh]">
 
                 {/* Header */}
                 <div className="px-8 py-6 border-b border-[#dadce0] flex justify-between items-center bg-[#f8f9fa]">
                     <div>
-                        <h2 className="text-[20px] font-['Google_Sans_Display',sans-serif] text-[#202124]">Super Admin Approval</h2>
-                        <p className="text-[13px] font-['Roboto',sans-serif] text-[#5f6368]">Request {request.requestNumber}</p>
+                        <h2 className="text-[20px] font-['Google_Sans_Display',sans-serif] text-[#202124]">
+                            Review & Approve Quotation
+                        </h2>
+                        <p className="text-[13px] text-[#5f6368]">Request {request.requestNumber}</p>
                     </div>
                     <button
                         onClick={onClose}
@@ -58,82 +67,132 @@ const SuperAdminReviewModal = ({ isOpen, onClose, request, onSuccess }) => {
                 </div>
 
                 {/* Content */}
-                <div className="p-8 overflow-y-auto max-h-[70vh]">
+                <div className="p-8 overflow-y-auto flex-1">
 
-                    {/* Read-only Request Info */}
-                    <div className="mb-6 bg-[#f8f9fa] border border-[#f1f3f4] rounded-[16px] p-5">
-                        <div className="grid grid-cols-2 gap-4 mb-4 border-b border-[#dadce0] pb-4">
+                    {/* Request Info */}
+                    <div className="mb-5 bg-[#f8f9fa] border border-[#f1f3f4] rounded-[16px] p-5">
+                        <div className="grid grid-cols-3 gap-4 mb-3 border-b border-[#dadce0] pb-3">
                             <div>
-                                <label className="block text-[12px] font-['Roboto',sans-serif] text-[#5f6368] mb-1">Requester</label>
+                                <div className="text-[11px] text-[#5f6368] mb-1">Requester</div>
                                 <div className="text-[14px] font-medium text-[#202124]">{request.requesterName}</div>
                             </div>
                             <div>
-                                <label className="block text-[12px] font-['Roboto',sans-serif] text-[#5f6368] mb-1">Service Dept</label>
-                                <div className="inline-block px-3 py-[4px] rounded-[50px] bg-[#e6f4ea] text-[#137333] text-[12px] font-medium">{request.serviceDepartmentName}</div>
-                            </div>
-                        </div>
-
-                        <div>
-                            <label className="block text-[12px] font-['Roboto',sans-serif] text-[#5f6368] mb-1">Description</label>
-                            <p className="text-[14px] text-[#202124] mb-4">
-                                {request.itemDescription}
-                            </p>
-                        </div>
-
-                        {/* Admin Assessment Section */}
-                        <div className="bg-white border border-[#1a73e8]/20 rounded-[8px] p-4 mt-2">
-                            <h4 className="text-[13px] font-bold text-[#1a73e8] mb-2 uppercase tracking-wide">Admin Assessment</h4>
-                            <div className="grid grid-cols-2 gap-4 mb-3">
-                                <div>
-                                    <label className="block text-[11px] text-[#5f6368] mb-1">Reviewed By</label>
-                                    <div className="text-[13px] font-medium">{request.adminName || 'Admin'}</div>
-                                </div>
-                                <div>
-                                    <label className="block text-[11px] text-[#5f6368] mb-1">Required Date</label>
-                                    <div className="text-[13px] font-medium">{request.requiredDate ? formatDate(request.requiredDate) : 'N/A'}</div>
+                                <div className="text-[11px] text-[#5f6368] mb-1">Service</div>
+                                <div className="inline-block px-3 py-[4px] rounded-[50px] bg-[#e6f4ea] text-[#137333] text-[12px] font-medium">
+                                    {request.serviceDepartmentName}
                                 </div>
                             </div>
                             <div>
-                                <label className="block text-[11px] text-[#5f6368] mb-1">Admin Remarks</label>
-                                <div className="text-[13px] bg-[#f8f9fa] p-2 rounded text-[#3c4043]">{request.adminRemarks || 'N/A'}</div>
+                                <div className="text-[11px] text-[#5f6368] mb-1">📅 Required By</div>
+                                <div className="text-[14px] font-semibold text-[#202124]">
+                                    {request.requiredDate ? formatDate(request.requiredDate) : '—'}
+                                </div>
                             </div>
                         </div>
+                        <div>
+                            <div className="text-[11px] text-[#5f6368] mb-1">Description</div>
+                            <p className="text-[13px] text-[#202124]">{request.itemDescription}</p>
+                        </div>
+
+                        {/* Admin Assessment */}
+                        {request.adminName && (
+                            <div className="mt-3 bg-white border border-[#1a73e8]/20 rounded-[8px] p-3">
+                                <div className="text-[11px] font-bold text-[#1a73e8] mb-2 uppercase tracking-wide">Admin Assessment</div>
+                                <div className="grid grid-cols-2 gap-3 mb-2">
+                                    <div>
+                                        <div className="text-[10px] text-[#5f6368] mb-0.5">Reviewed By</div>
+                                        <div className="text-[13px] font-medium">{request.adminName}</div>
+                                    </div>
+                                    <div>
+                                        <div className="text-[10px] text-[#5f6368] mb-0.5">Required Date</div>
+                                        <div className="text-[13px] font-medium">
+                                            {request.requiredDate ? formatDate(request.requiredDate) : 'N/A'}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className="text-[12px] text-[#3c4043] bg-[#f8f9fa] p-2 rounded">{request.adminRemarks}</div>
+                            </div>
+                        )}
                     </div>
 
-                    <h3 className="text-[16px] font-['Google_Sans',sans-serif] font-medium text-[#202124] mb-4">Provide Quotation</h3>
+                    {/* Material Cost Breakdown */}
+                    {materials.length > 0 ? (
+                        <div className="mb-5">
+                            <div className="flex items-center justify-between mb-3">
+                                <h3 className="text-[15px] font-['Google_Sans',sans-serif] font-semibold text-[#202124]">
+                                    Material Quotation
+                                </h3>
+                                <div className="bg-[#e8f0fe] text-[#1a73e8] px-4 py-1.5 rounded-[50px] text-[14px] font-semibold">
+                                    ₹{Number(totalCost ?? 0).toFixed(2)}
+                                </div>
+                            </div>
 
-                    {/* Interactive Review Form */}
-                    <div className="space-y-5">
-                        <div>
-                            <label className="block text-[13px] font-['Google_Sans',sans-serif] font-medium text-[#5f6368] mb-1.5">Estimated Cost (₹) <span className="text-[#c5221f]">*</span></label>
-                            <input
-                                type="number"
-                                value={quotationAmount}
-                                onChange={(e) => setQuotationAmount(e.target.value)}
-                                min="0" step="0.01"
-                                placeholder="0.00"
-                                className="w-full h-11 px-3 border-[1.5px] border-[#dadce0] rounded-[8px] text-[14px] focus:outline-none focus:border-[#1a73e8] focus:shadow-[0_0_0_3px_rgba(26,115,232,0.12)]"
-                            />
+                            <div className="border border-[#dadce0] rounded-[12px] overflow-hidden">
+                                <table className="w-full text-[13px]">
+                                    <thead className="bg-[#f8f9fa] border-b border-[#dadce0]">
+                                        <tr>
+                                            <th className="px-4 py-2.5 text-left text-[#5f6368] font-medium">Material</th>
+                                            <th className="px-4 py-2.5 text-right text-[#5f6368] font-medium">Qty</th>
+                                            <th className="px-4 py-2.5 text-right text-[#5f6368] font-medium">Rate (₹)</th>
+                                            <th className="px-4 py-2.5 text-left text-[#5f6368] font-medium">Vendor</th>
+                                            <th className="px-4 py-2.5 text-right text-[#5f6368] font-medium">Total</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {materials.map((item, idx) => (
+                                            <tr key={idx} className="border-t border-[#f1f3f4]">
+                                                <td className="px-4 py-2.5">
+                                                    <div className="font-medium text-[#202124]">{item.materialName}</div>
+                                                    {item.specification && (
+                                                        <div className="text-[11px] text-[#5f6368]">{item.specification}</div>
+                                                    )}
+                                                </td>
+                                                <td className="px-4 py-2.5 text-right">{item.quantity} {item.unit}</td>
+                                                <td className="px-4 py-2.5 text-right">
+                                                    ₹{Number(item.unitPrice).toFixed(2)}
+                                                    {item.lastPurchaseRate && (
+                                                        <div className="text-[10px] text-[#5f6368]">last: ₹{item.lastPurchaseRate}</div>
+                                                    )}
+                                                </td>
+                                                <td className="px-4 py-2.5 text-[#5f6368]">{item.vendorName}</td>
+                                                <td className="px-4 py-2.5 text-right font-semibold">₹{Number(item.totalPrice).toFixed(2)}</td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                    <tfoot className="bg-[#f8f9fa] border-t-2 border-[#dadce0]">
+                                        <tr>
+                                            <td colSpan={4} className="px-4 py-2.5 text-right font-semibold">Total</td>
+                                            <td className="px-4 py-2.5 text-right font-bold text-[#1a73e8]">
+                                                ₹{Number(totalCost ?? 0).toFixed(2)}
+                                            </td>
+                                        </tr>
+                                    </tfoot>
+                                </table>
+                            </div>
+
+                            {request.requiredDate && (
+                                <div className="mt-2 text-[13px] text-[#5f6368]">
+                                    📅 Required by: <strong>{new Date(request.requiredDate).toLocaleDateString('en-IN', { day: '2-digit', month: '2-digit', year: 'numeric' })}</strong>
+                                </div>
+                            )}
                         </div>
-
-                        <div>
-                            <label className="block text-[13px] font-['Google_Sans',sans-serif] font-medium text-[#5f6368] mb-1.5">Quotation Breakdown <span className="text-[#c5221f]">*</span></label>
-                            <textarea
-                                rows={2}
-                                value={quotationDescription}
-                                onChange={(e) => setQuotationDescription(e.target.value)}
-                                placeholder="e.g. Parts (₹3500), Labor (₹1500)"
-                                className="w-full p-3 border-[1.5px] border-[#dadce0] rounded-[8px] text-[14px] focus:outline-none focus:border-[#1a73e8] focus:shadow-[0_0_0_3px_rgba(26,115,232,0.12)] resize-none"
-                            />
+                    ) : (
+                        <div className="mb-5 p-4 bg-[#fff3e0] border border-[#ffcc80] rounded-[8px] text-[#e65100] text-[13px]">
+                            ⚠️ No material quotation created yet. Ask admin to create a quotation first.
                         </div>
+                    )}
 
+                    {/* SA Remarks */}
+                    <div className="space-y-4">
                         <div>
-                            <label className="block text-[13px] font-['Google_Sans',sans-serif] font-medium text-[#5f6368] mb-1.5">Super Admin Remarks <span className="text-[#c5221f]">*</span></label>
+                            <label className="block text-[13px] font-['Google_Sans',sans-serif] font-medium text-[#5f6368] mb-1.5">
+                                Approval Remarks <span className="text-[#c5221f]">*</span>
+                            </label>
                             <textarea
                                 rows={3}
                                 value={superAdminRemarks}
-                                onChange={(e) => setSuperAdminRemarks(e.target.value)}
-                                placeholder="Final approval notes or conditions."
+                                onChange={e => setSuperAdminRemarks(e.target.value)}
+                                placeholder="e.g. Approved. Proceed with procurement as quoted."
                                 className="w-full p-3 border-[1.5px] border-[#dadce0] rounded-[8px] text-[14px] focus:outline-none focus:border-[#1a73e8] focus:shadow-[0_0_0_3px_rgba(26,115,232,0.12)] resize-none"
                             />
                         </div>
@@ -144,17 +203,16 @@ const SuperAdminReviewModal = ({ isOpen, onClose, request, onSuccess }) => {
                             </div>
                         )}
                     </div>
-
                 </div>
 
-                {/* Footer Actions */}
+                {/* Footer */}
                 <div className="px-8 py-5 border-t border-[#dadce0] bg-[#f8f9fa] flex flex-row-reverse gap-3">
                     <button
                         onClick={handleSubmit}
-                        disabled={isSubmitting}
-                        className="bg-[#1a73e8] hover:bg-[#1557b0] text-white px-6 py-[10px] rounded-[50px] font-['Google_Sans',sans-serif] text-[14px] font-medium transition-all shadow-md flex items-center justify-center min-w-[140px] disabled:opacity-70"
+                        disabled={isSubmitting || materials.length === 0}
+                        className="bg-[#1a73e8] hover:bg-[#1557b0] text-white px-6 py-[10px] rounded-[50px] font-['Google_Sans',sans-serif] text-[14px] font-medium transition-all shadow-md flex items-center justify-center min-w-[160px] disabled:opacity-70"
                     >
-                        {isSubmitting ? 'Approving...' : 'Approve & Quote'}
+                        {isSubmitting ? 'Approving...' : '✉️ Approve & Send to Requester'}
                     </button>
                     <button
                         onClick={onClose}
@@ -164,7 +222,6 @@ const SuperAdminReviewModal = ({ isOpen, onClose, request, onSuccess }) => {
                         Cancel
                     </button>
                 </div>
-
             </div>
         </div>,
         document.body

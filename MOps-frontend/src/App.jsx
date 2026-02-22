@@ -15,6 +15,7 @@ import { RequestProvider } from './context/RequestContext';
 import ActionQueuePage from './pages/dashboard/admin/ActionQueuePage';
 import VendorsPage from './pages/dashboard/admin/VendorsPage';
 import InventoryPage from './pages/dashboard/admin/InventoryPage';
+import CreateQuotationPage from './pages/dashboard/admin/CreateQuotationPage';
 import ApprovalQueuePage from './pages/dashboard/superadmin/ApprovalQueuePage';
 import EscalationsPage from './pages/dashboard/superadmin/EscalationsPage';
 import SystemAdminsPage from './pages/dashboard/superadmin/SystemAdminsPage';
@@ -47,6 +48,7 @@ function App() {
                 <Route path="queue" element={<ActionQueuePage />} />
                 <Route path="vendors" element={<VendorsPage />} />
                 <Route path="inventory" element={<InventoryPage />} />
+                <Route path="create-quotation/:requestId" element={<CreateQuotationPage />} />
               </Route>
             </Route>
 

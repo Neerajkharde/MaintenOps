@@ -1,23 +1,21 @@
 package com.maintenops.nvcc.services.impls;
 
-import com.maintenops.nvcc.dtos.AdminReviewRequestDto;
-import com.maintenops.nvcc.dtos.RequestRequestDto;
-import com.maintenops.nvcc.dtos.RequestResponseDto;
-import com.maintenops.nvcc.dtos.SuperAdminReviewRequestDto;
-import com.maintenops.nvcc.entities.OrganizationDepartment;
-import com.maintenops.nvcc.entities.Request;
-import com.maintenops.nvcc.entities.ServiceDepartment;
-import com.maintenops.nvcc.entities.User;
+import com.maintenops.nvcc.dtos.*;
+import com.maintenops.nvcc.entities.*;
 import com.maintenops.nvcc.enums.RequestStatus;
 import com.maintenops.nvcc.exceptions.ResourceNotFoundException;
-import com.maintenops.nvcc.repositories.RequestRepository;
-import com.maintenops.nvcc.repositories.ServiceDepartmentRepository;
-import com.maintenops.nvcc.repositories.UserRepository;
+import com.maintenops.nvcc.repositories.*;
 import com.maintenops.nvcc.security.JwtPrincipal;
+import com.maintenops.nvcc.services.QuotationService;
 import com.maintenops.nvcc.services.RequestService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.time.Instant;
+import java.time.LocalDate;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import java.time.Instant;
 import java.time.LocalDate;
@@ -30,6 +28,8 @@ public class RequestServiceImpl implements RequestService {
     private final RequestRepository requestRepository;
     private final UserRepository userRepository;
     private final ServiceDepartmentRepository serviceDeptRepository;
+    private final RequestMaterialRepository requestMaterialRepo;
+    private final QuotationService quotationService;
 
     private RequestResponseDto mapToResponse(Request request) {
 
@@ -45,17 +45,9 @@ public class RequestServiceImpl implements RequestService {
         response.setStatus(request.getStatus().name());
         response.setCreatedAt(request.getCreatedAt());
 
-        response.setRequesterName(
-                request.getRequester().getUsername()
-        );
-
-        response.setOrganizationDepartmentName(
-                request.getOrganizationDepartment().getName()
-        );
-
-        response.setServiceDepartmentName(
-                request.getServiceDepartment().getName()
-        );
+        response.setRequesterName(request.getRequester().getUsername());
+        response.setOrganizationDepartmentName(request.getOrganizationDepartment().getName());
+        response.setServiceDepartmentName(request.getServiceDepartment().getName());
 
         // Admin Review Fields
         if (request.getReviewedByAdmin() != null) {
@@ -71,6 +63,31 @@ public class RequestServiceImpl implements RequestService {
             response.setQuotationAmount(request.getQuotationAmount());
             response.setQuotationDescription(request.getQuotationDescription());
             response.setSuperAdminReviewedAt(request.getSuperAdminReviewedAt());
+        }
+
+        // New quotation fields (from material picker)
+        response.setTotalEstimatedCost(request.getTotalEstimatedCost());
+        response.setEstimatedDays(request.getEstimatedDays());
+
+        // Attach material line items if quotation has been created
+        if (request.getTotalEstimatedCost() != null) {
+            List<RequestMaterial> materials = requestMaterialRepo.findByRequestId(request.getId());
+            if (!materials.isEmpty()) {
+                response.setMaterials(materials.stream().map(rm -> {
+                    MaterialLineItemDTO dto = new MaterialLineItemDTO();
+                    dto.setId(rm.getId());
+                    dto.setMaterialName(rm.getMaterialName());
+                    dto.setSpecification(rm.getSpecificationText());
+                    dto.setQuantity(rm.getQuantityRequired());
+                    dto.setUnit(rm.getUnit());
+                    dto.setUnitPrice(rm.getUnitPrice());
+                    dto.setTotalPrice(rm.getTotalPrice());
+                    dto.setVendorName(rm.getVendorName());
+                    dto.setLastPurchaseRate(rm.getLastPurchaseRate());
+                    dto.setStatus(rm.getStatus());
+                    return dto;
+                }).collect(Collectors.toList()));
+            }
         }
 
         return response;
@@ -214,9 +231,8 @@ public class RequestServiceImpl implements RequestService {
 
         // Update status based on approval
         if (dto.isApproved()) {
-            request.setStatus(RequestStatus.APPROVED); // Approved, ready to start work
+            request.setStatus(RequestStatus.QUOTATION_SENT); // Quotation sent to requester for approval
         } else {
-            // Reject and send back to admin for revision
             request.setStatus(RequestStatus.PENDING_SA_APPROVAL); // Keep for super admin to revise
         }
 
@@ -235,8 +251,10 @@ public class RequestServiceImpl implements RequestService {
 
     @Override
     public List<RequestResponseDto> getAdminRequestHistory(JwtPrincipal principal) {
-        Long adminId = principal.getUserId();
-        List<Request> requests = requestRepository.findByReviewedByAdminId(adminId);
+        // Return all requests that have moved past SUBMITTED status.
+        // This includes: quotation created, assessment submitted, SA approved, user approved, etc.
+        // We use statusNot(SUBMITTED) because "SUBMITTED" = still waiting for admin action.
+        List<Request> requests = requestRepository.findByStatusNot(RequestStatus.SUBMITTED);
         return requests.stream()
                 .map(this::mapToResponse)
                 .toList();
@@ -256,5 +274,47 @@ public class RequestServiceImpl implements RequestService {
         // Format: REQ-YYYY-RandomNumber
         long timestamp = System.currentTimeMillis() % 10000;
         return "REQ-" + LocalDate.now().getYear() + "-" + timestamp;
+    }
+
+    @Override
+    public RequestResponseDto userApproveQuotation(Long requestId, JwtPrincipal principal) {
+        Request request = requestRepository.findById(requestId)
+                .orElseThrow(() -> new ResourceNotFoundException("Request not found: " + requestId));
+
+        // Verify the logged-in user is the requester
+        if (!request.getRequester().getId().equals(principal.getUserId())) {
+            throw new ResourceNotFoundException("You do not have access to this request");
+        }
+
+        if (!request.getStatus().equals(RequestStatus.QUOTATION_SENT)) {
+            throw new RuntimeException("Request is not awaiting your approval. Status: " + request.getStatus());
+        }
+
+        // Process inventory: deduct stock, mark FROM_STOCK vs PENDING_PURCHASE
+        quotationService.processApprovedQuotation(requestId);
+
+        request.setStatus(RequestStatus.APPROVED);
+        return mapToResponse(requestRepository.save(request));
+    }
+
+    @Override
+    public RequestResponseDto generateVendorList(Long requestId) {
+        Request request = requestRepository.findById(requestId)
+                .orElseThrow(() -> new ResourceNotFoundException("Request not found: " + requestId));
+
+        if (!request.getStatus().equals(RequestStatus.APPROVED)) {
+            throw new RuntimeException("Request must be APPROVED before generating vendor list. Status: " + request.getStatus());
+        }
+
+        quotationService.generateVendorPurchaseList(requestId);
+        request.setStatus(RequestStatus.VENDOR_LIST_PREPARED);
+        return mapToResponse(requestRepository.save(request));
+    }
+
+    @Override
+    public RequestResponseDto getRequestByIdForAdmin(Long requestId) {
+        Request request = requestRepository.findById(requestId)
+                .orElseThrow(() -> new ResourceNotFoundException("Request not found: " + requestId));
+        return mapToResponse(request);
     }
 }

@@ -25,4 +25,9 @@ public interface RequestService {
     // History Operations
     List<RequestResponseDto> getAdminRequestHistory(JwtPrincipal principal);
     List<RequestResponseDto> getSuperAdminRequestHistory(JwtPrincipal principal);
+
+    // Quotation Flow
+    RequestResponseDto userApproveQuotation(Long requestId, JwtPrincipal principal);
+    RequestResponseDto generateVendorList(Long requestId);
+    RequestResponseDto getRequestByIdForAdmin(Long requestId);
 }

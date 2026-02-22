@@ -27,10 +27,10 @@ export const RequestProvider = ({ children }) => {
             // Backend keys: id, requestNumber, mobileNumber, itemDescription, requiredDate, status, urgencyRequested, urgencyReason, requesterName, organizationDepartmentName, serviceDepartmentName, adminRemarks, adminName, adminReviewedAt, quotationAmount, quotationDescription, superAdminRemarks, superAdminName, superAdminReviewedAt, createdAt
 
             const transformedRequests = data.map(req => ({
-                id: req.requestNumber, // Use requestNumber for display
-                dbId: req.id, // Keep DB ID just in case
-                dept: req.serviceDepartmentName,
-                desc: req.itemDescription,
+                id: req.id, // Keep the numeric ID as 'id' for service calls
+                requestNumber: req.requestNumber, // Use requestNumber for display
+                serviceDepartmentName: req.serviceDepartmentName,
+                itemDescription: req.itemDescription,
                 date: formatDate(req.createdAt),
                 status: req.status,
                 requesterName: req.requesterName,
@@ -41,6 +41,9 @@ export const RequestProvider = ({ children }) => {
                 requiredDate: req.requiredDate,
                 quotationAmount: req.quotationAmount,
                 quotationDescription: req.quotationDescription,
+                totalEstimatedCost: req.totalEstimatedCost,
+                estimatedDays: req.estimatedDays,
+                materials: req.materials,
                 superAdminRemarks: req.superAdminRemarks,
                 superAdminName: req.superAdminName,
                 superAdminReviewedAt: req.superAdminReviewedAt
@@ -71,10 +74,10 @@ export const RequestProvider = ({ children }) => {
     const addRequest = (newRequestData) => {
         // Transform the newly created request before adding to state
         const formattedNewRequest = {
-            id: newRequestData.requestNumber,
-            dbId: newRequestData.id,
-            dept: newRequestData.serviceDepartmentName,
-            desc: newRequestData.itemDescription,
+            id: newRequestData.id,
+            requestNumber: newRequestData.requestNumber,
+            serviceDepartmentName: newRequestData.serviceDepartmentName,
+            itemDescription: newRequestData.itemDescription,
             date: formatDate(newRequestData.createdAt || Date.now()),
             status: newRequestData.status || 'SUBMITTED',
             createdAt: newRequestData.createdAt || new Date().toISOString()

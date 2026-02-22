@@ -18,7 +18,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
 @RequiredArgsConstructor
-public class Application implements CommandLineRunner {
+public class Application{
 
 	private final RoleRepository repo;
 	private final UserService userService;
@@ -26,33 +26,5 @@ public class Application implements CommandLineRunner {
 
 	public static void main(String[] args) {
 		SpringApplication.run(Application.class, args);
-	}
-
-	@Override
-	public void run(String... args) throws Exception {
-		for (ERole role : ERole.values()) {
-
-			repo.findByName(role)
-					.orElseGet(() -> repo.save(
-							new Role(null, role)));
-		}
-
-		System.out.println("Roles seeded successfully ✅");
-		// DeptDto deptDto = DeptDto.builder()
-		// 		.name("ISKCON")
-		// 		.build();
-		// departmentService.createOrgDepartment(deptDto);
-		// System.out.println("Department created successfully ✅");
-
-//		 UserRequestDto dto = UserRequestDto.builder()
-//		 		.username("Admin")
-//		 		.email("admin@example.com")
-//		 		.password("Admin#1234")
-//		 		.orgDeptName("ISKCON")
-//		 		.roles(Set.of("ADMIN"))
-//		 		.build();
-//
-//		 userService.createUser(dto);
-//		 System.out.println("Admin created successfully ✅");
 	}
 }

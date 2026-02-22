@@ -10,65 +10,85 @@ const Sidebar = ({ role }) => {
 
     const navItems = {
         'REQUESTER': [
-            { label: 'Dashboard', path: '/dashboard', icon: <path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" /> },
-            { label: 'My Requests', path: '/dashboard/requests', icon: <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" /> },
-            { label: 'Profile', path: '/dashboard/profile', icon: <path d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /> },
+            { label: 'Dashboard', path: '/dashboard', icon: <path d="M3 13h1v7c0 1.103.897 2 2 2h12c1.103 0 2-.897 2-2v-7h1a1 1 0 00.707-1.707l-9-9a.999.999 0 00-1.414 0l-9 9A1 1 0 003 13zm7 7v-5h4v5h-4zm2-15.586l7 7V20h-1v-7a1 1 0 00-1-1H7a1 1 0 00-1 1v7H5v-7.586l7-7.414z" /> },
+            { label: 'My Requests', path: '/dashboard/requests', icon: <><path d="M19 4H5c-1.103 0-2 .897-2 2v14c0 1.103.897 2 2 2h14c1.103 0 2-.897 2-2V6c0-1.103-.897-2-2-2zM5 20V6h14l.002 14H5z" /><path d="M7 9h10v2H7zm0 4h10v2H7z" /></> },
+            { label: 'Profile', path: '/dashboard/profile', icon: <><path d="M12 2C6.486 2 2 6.486 2 12s4.486 10 10 10 10-4.486 10-10S17.514 2 12 2zm0 18c-4.411 0-8-3.589-8-8s3.589-8 8-8 8 3.589 8 8-3.589 8-8 8z" /><path d="M12 6c-1.93 0-3.5 1.57-3.5 3.5S10.07 13 12 13s3.5-1.57 3.5-3.5S13.93 6 12 6zm0 12c-2.384 0-4.469-1.258-5.636-3.144a.994.994 0 01.127-1.251c1.189-1.127 2.924-1.605 5.509-1.605s4.32.478 5.509 1.605a.994.994 0 01.127 1.251C16.469 16.742 14.384 18 12 18z" /></> },
         ],
-        // Adding admins etc if needed, but the prompt says REQUESTER role.
         'ADMIN': [
-            { label: 'Admin Dashboard', path: '/admin', icon: <path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" /> },
-            { label: 'Action Queue', path: '/admin/queue', icon: <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" /> },
-            { label: 'Vendors', path: '/admin/vendors', icon: <path d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" /> },
-            { label: 'Inventory', path: '/admin/inventory', icon: <path d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" /> },
+            { label: 'Admin Dashboard', path: '/admin', icon: <path d="M3 13h1v7c0 1.103.897 2 2 2h12c1.103 0 2-.897 2-2v-7h1a1 1 0 00.707-1.707l-9-9a.999.999 0 00-1.414 0l-9 9A1 1 0 003 13zm7 7v-5h4v5h-4z" /> },
+            { label: 'Action Queue', path: '/admin/queue', icon: <path d="M20 6h-3V4c0-1.103-.897-2-2-2H9c-1.103 0-2 .897-2 2v2H4c-1.103 0-2 .897-2 2v11c0 1.103.897 2 2 2h16c1.103 0 2-.897 2-2V8c0-1.103-.897-2-2-2zM9 4h6v2H9V4zm11 15H4V8h3v2h2V8h6v2h2V8h3v11z" /> },
+            { label: 'Vendors', path: '/admin/vendors', icon: <><path d="M19 4H5c-1.103 0-2 .897-2 2v14c0 1.103.897 2 2 2h14c1.103 0 2-.897 2-2V6c0-1.103-.897-2-2-2zM5 20V6h14l.002 14H5z" /><circle cx="8" cy="11" r="2" /><circle cx="16" cy="11" r="2" /><path d="M12 18c-2.757 0-5-2.243-5-5h2c0 1.654 1.346 3 3 3s3-1.346 3-3h2c0 2.757-2.243 5-5 5z" /></> },
+            { label: 'Inventory', path: '/admin/inventory', icon: <path d="M10 3H4a1 1 0 00-1 1v6a1 1 0 001 1h6a1 1 0 001-1V4a1 1 0 00-1-1zm-1 6H5V5h4v4zm11-6h-6a1 1 0 00-1 1v6a1 1 0 001 1h6a1 1 0 001-1V4a1 1 0 00-1-1zm-1 6h-4V5h4v4zm-7 3H4a1 1 0 00-1 1v6a1 1 0 001 1h6a1 1 0 001-1v-6a1 1 0 00-1-1zm-1 6H5v-4h4v4zm11-6h-6a1 1 0 00-1 1v6a1 1 0 001 1h6a1 1 0 001-1v-6a1 1 0 00-1-1zm-1 6h-4v-4h4v4z" /> },
         ],
         'SUPER_ADMIN': [
-            { label: 'System Overview', path: '/super-admin', icon: <path d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" /> },
-            { label: 'Approval Queue', path: '/super-admin/approvals', icon: <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /> },
-            { label: 'Escalations', path: '/super-admin/escalations', icon: <path d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /> },
-            { label: 'System Admins', path: '/super-admin/admins', icon: <path d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" /> },
-            { label: 'Settings', path: '/super-admin/settings', icon: <><path d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" /><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></> },
+            { label: 'System Overview', path: '/super-admin', icon: <path d="M3 13h1v7c0 1.103.897 2 2 2h12c1.103 0 2-.897 2-2v-7h1a1 1 0 00.707-1.707l-9-9a.999.999 0 00-1.414 0l-9 9A1 1 0 003 13zm7 7v-5h4v5h-4z" /> },
+            { label: 'Approval Queue', path: '/super-admin/approvals', icon: <path d="M12 2C6.486 2 2 6.486 2 12s4.486 10 10 10 10-4.486 10-10S17.514 2 12 2zm-1.903 15.607l-4.524-4.524L7.003 11.66l3.148 3.148 6.845-6.845 1.414 1.414-8.259 8.259-.051-.029z" /> },
+            { label: 'Escalations', path: '/super-admin/escalations', icon: <><path d="m21.706 5.292-2.999-2.999A.996.996 0 0 0 18 2H6a.996.996 0 0 0-.707.293L2.294 5.292A.994.994 0 0 0 2 6v12c0 1.103.897 2 2 2h16c1.103 0 2-.897 2-2V6a.994.994 0 0 0-.294-.708zM6.414 4h11.172l1 1H5.414l1-1zM4 18V7h16l.002 11H4z" /><path d="M13 9h-2v4h4v-2h-2z" /></> },
+            { label: 'System Admins', path: '/super-admin/admins', icon: <path d="M12 2a5 5 0 1 0 5 5 5 5 0 0 0-5-5zm0 8a3 3 0 1 1 3-3 3 3 0 0 1-3 3zm9 11v-1a7 7 0 0 0-7-7h-4a7 7 0 0 0-7 7v1h2v-1a5 5 0 0 1 5-5h4a5 5 0 0 1 5 5v1z" /> },
+            { label: 'Settings', path: '/super-admin/settings', icon: <path d="m2.344 15.271 2 3.46a1 1 0 0 0 1.291.37l1.383-.649a.912.912 0 0 1 1.013.145 8.1 8.1 0 0 0 1.969 1.138.931.931 0 0 1 .6 1.107l-.367 1.507A1 1 0 0 0 10.225 23h4.15a1 1 0 0 0 .991-.758l.367-1.507a.931.931 0 0 1 .6-1.107 8.1 8.1 0 0 0 1.969-1.138.912.912 0 0 1 1.013-.145l1.383.649a1 1 0 0 0 1.291-.37l2-3.46a1 1 0 0 0-.107-1.326l-1.169-1.042a.935.935 0 0 1-.219-1.205 7.8 7.8 0 0 0 0-2.276.935.935 0 0 1 .219-1.205l1.169-1.042a1 1 0 0 0 .107-1.326l-2-3.46a1 1 0 0 0-1.291-.37l-1.383.649a.912.912 0 0 1-1.013-.145 8.1 8.1 0 0 0-1.969-1.138.931.931 0 0 1-.6-1.107l.367-1.507A1 1 0 0 0 14.375 1h-4.15a1 1 0 0 0-.991.758l-.367 1.507a.931.931 0 0 1-.6 1.107 8.1 8.1 0 0 0-1.969 1.138.912.912 0 0 1-1.013.145l-1.383-.649a1 1 0 0 0-1.291.37l-2 3.46a1 1 0 0 0 .107 1.326l1.169 1.042a.935.935 0 0 1 .219 1.205 7.8 7.8 0 0 0 0 2.276.935.935 0 0 1-.219 1.205l-1.169 1.042a1 1 0 0 0-.107 1.326zM12.3 8a4 4 0 1 1 0 8 4 4 0 0 1 0-8z" /> },
         ]
     };
 
     const links = navItems[role] && navItems[role].length > 0 ? navItems[role] : navItems['REQUESTER'];
 
     return (
-        <aside className="fixed left-0 top-0 bottom-0 w-[240px] bg-white border-r border-[#dadce0] hidden md:flex md:flex-col z-50">
-            {/* Top Logo */}
-            <div className="h-[64px] flex items-center px-6 border-b border-transparent">
-                <Link to="/" className="flex items-center gap-2 group">
-                    <div className="w-8 h-8 bg-[#1a73e8] rounded-[8px] flex items-center justify-center shadow-sm">
-                        <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
+        <aside className="fixed left-0 top-0 bottom-0 w-[240px] bg-white border-r border-outline hidden md:flex md:flex-col z-50">
+            {/* Logo Section */}
+            <div className="h-[64px] flex items-center px-6">
+                <Link to="/" className="flex items-center gap-3">
+                    <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center">
+                        <svg className="w-6 h-6 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                        </svg>
                     </div>
-                    <span className="text-[20px] font-['Google_Sans_Display',sans-serif] text-[#1a73e8]">
+                    <span className="text-[20px] font-display font-medium tracking-tight text-on-surface">
                         MaintenOps
                     </span>
                 </Link>
             </div>
 
-            {/* Nav Items */}
-            <div className="py-4 flex-grow flex flex-col overflow-y-auto">
-                {links.map((link, index) => {
-                    const active = isActive(link.path);
-                    return (
-                        <div key={index} className="pr-4 mb-1">
+            {/* Navigation Rail */}
+            <div className="py-6 flex-grow flex flex-col overflow-y-auto custom-scrollbar">
+                <div className="px-3 space-y-1">
+                    {links.map((link, index) => {
+                        const active = isActive(link.path);
+                        return (
                             <Link
+                                key={index}
                                 to={link.path}
-                                className={`flex items-center gap-3 px-6 py-3 text-[14px] font-['Google_Sans',sans-serif] transition-all duration-200 ${active
-                                    ? 'bg-[#e8f0fe] text-[#1a73e8] font-medium border-l-[3px] border-[#1a73e8] rounded-r-[50px]'
-                                    : 'text-[#5f6368] hover:bg-[#f1f3f4] border-l-[3px] border-transparent rounded-r-[50px] font-normal'
+                                className={`flex items-center gap-4 px-4 py-3 rounded-pill transition-all duration-200 group
+                                    ${active
+                                        ? 'bg-primary-container text-primary'
+                                        : 'text-on-surface-variant hover:bg-surface-variant'
                                     }`}
                             >
-                                <svg className={`w-5 h-5 ${active ? 'text-[#1a73e8]' : 'text-[#5f6368]'}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                <svg
+                                    className={`w-5 h-5 transition-colors ${active ? 'fill-primary' : 'fill-on-surface-variant group-hover:fill-on-surface'}`}
+                                    viewBox="0 0 24 24"
+                                >
                                     {link.icon}
                                 </svg>
-                                {link.label}
+                                <span className={`text-[14px] font-ui ${active ? 'font-medium' : 'font-normal'}`}>
+                                    {link.label}
+                                </span>
                             </Link>
-                        </div>
-                    );
-                })}
+                        );
+                    })}
+                </div>
             </div>
 
+            {/* Bottom Footer or Info */}
+            <div className="p-4 border-t border-outline">
+                <div className="flex items-center gap-3 px-3 py-2">
+                    <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-white text-[12px] font-bold">
+                        {user?.name?.charAt(0) || 'U'}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                        <div className="text-[13px] font-medium text-on-surface truncate">{user?.name}</div>
+                        <div className="text-[11px] text-on-surface-variant truncate uppercase tracking-wider">{role}</div>
+                    </div>
+                </div>
+            </div>
         </aside>
     );
 };

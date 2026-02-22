@@ -1,15 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { requestService } from '../../../services/requestService';
-import AdminReviewModal from '../../requests/AdminReviewModal';
 import { formatDate } from '../../../utils/dateUtils';
 
 const ActiveRequests = () => {
-    const [filter, setFilter] = useState('Pending'); // Default to Pending
+    const [filter, setFilter] = useState('Pending');
     const [requests, setRequests] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
-    const [selectedRequest, setSelectedRequest] = useState(null);
-    const [isModalOpen, setIsModalOpen] = useState(false);
 
     const tabs = ['Pending', 'Completed', 'All'];
 
@@ -21,13 +18,18 @@ const ActiveRequests = () => {
             if (filter === 'Pending') {
                 data = await requestService.getPendingAdminRequests();
             } else if (filter === 'Completed') {
-                data = await requestService.getAdminRequestHistory();
+                // Fetch history endpoint — returns all non-SUBMITTED requests (after backend restart)
+                // Also filter client-side to be safe
+                const history = await requestService.getAdminRequestHistory().catch(() => []);
+                data = (history || []).filter(r => r.status !== 'SUBMITTED');
             } else if (filter === 'All') {
-                const [pending, history] = await Promise.all([
+                const [pending, history] = await Promise.allSettled([
                     requestService.getPendingAdminRequests(),
-                    requestService.getAdminRequestHistory()
+                    requestService.getAdminRequestHistory(),
                 ]);
-                data = [...pending, ...history];
+                const pendingData = pending.status === 'fulfilled' ? (pending.value || []) : [];
+                const historyData = history.status === 'fulfilled' ? (history.value || []) : [];
+                data = [...pendingData, ...historyData];
             }
 
             // Map the data to fit the table layout
@@ -61,16 +63,6 @@ const ActiveRequests = () => {
     useEffect(() => {
         fetchRequests();
     }, [filter]); // Re-fetch when tab changes
-
-    const openReviewModal = (request) => {
-        setSelectedRequest(request.raw);
-        setIsModalOpen(true);
-    };
-
-    const handleReviewSuccess = () => {
-        setIsModalOpen(false);
-        fetchRequests(); // Refresh the list
-    };
 
     return (
         <div className="bg-white rounded-[16px] shadow-google-1 border border-[#dadce0]/50 overflow-hidden col-span-2">
@@ -113,8 +105,8 @@ const ActiveRequests = () => {
                             <th className="py-3 px-6 text-[12px] font-medium text-[#5f6368] uppercase">Request ID</th>
                             <th className="py-3 px-6 text-[12px] font-medium text-[#5f6368] uppercase">Description</th>
                             <th className="py-3 px-6 text-[12px] font-medium text-[#5f6368] uppercase">Dept</th>
-                            <th className="py-3 px-6 text-[12px] font-medium text-[#5f6368] uppercase">Stage</th>
-                            <th className="py-3 px-6 text-[12px] font-medium text-[#5f6368] uppercase text-right">Action</th>
+                            <th className="py-3 px-6 text-[12px] font-medium text-[#5f6368] uppercase">Submitted</th>
+                            <th className="py-3 px-6 text-[12px] font-medium text-[#5f6368] uppercase text-right">Status</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -125,22 +117,16 @@ const ActiveRequests = () => {
                                     <div className="text-[14px] text-[#202124] font-medium max-w-[300px] truncate" title={req.desc}>{req.desc}</div>
                                     <div className="text-[12px] text-[#5f6368]">by {req.requester} • {req.date}</div>
                                 </td>
-                                <td className="py-4 px-6 text-[13px] text-[#5f6368]">{req.dept}</td>
-                                <td className="py-4 px-6">
-                                    <span className={`inline-flex items-center px-2 py-0.5 rounded-full text-[12px] font-medium ${req.isPending ? 'bg-[#fef9e7] text-[#f9ab00]' : 'bg-[#e6f4ea] text-[#137333]'}`}>
-                                        {req.stage}
-                                    </span>
-                                </td>
+                                <td className="py-4 px-6 text-[12px] text-[#5f6368]">{req.date}</td>
                                 <td className="py-4 px-6 text-right">
                                     {req.isPending ? (
-                                        <button
-                                            onClick={() => openReviewModal(req)}
-                                            className="text-[#1a73e8] hover:bg-[#e8f0fe] px-3 py-1.5 rounded-[8px] text-[13px] font-medium transition-colors border border-[#1a73e8]"
-                                        >
-                                            Review
-                                        </button>
+                                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-[#fff8e1] text-[#f9ab00] text-[11px] font-semibold rounded-[50px]">
+                                            ⏳ Go to Action Queue
+                                        </span>
                                     ) : (
-                                        <span className="text-[13px] text-[#5f6368] italic py-1.5">Processed</span>
+                                        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-[#e6f4ea] text-[#137333] text-[11px] font-semibold rounded-[50px]">
+                                            ✅ Processed
+                                        </span>
                                     )}
                                 </td>
                             </tr>
@@ -148,15 +134,6 @@ const ActiveRequests = () => {
                     </tbody>
                 </table>
             </div>
-
-            {selectedRequest && (
-                <AdminReviewModal
-                    isOpen={isModalOpen}
-                    onClose={() => setIsModalOpen(false)}
-                    request={selectedRequest}
-                    onSuccess={handleReviewSuccess}
-                />
-            )}
         </div>
     );
 };

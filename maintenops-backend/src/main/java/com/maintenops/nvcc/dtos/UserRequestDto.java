@@ -9,7 +9,6 @@ import lombok.Data;
 import java.util.Set;
 
 @Data
- @Builder
 public class UserRequestDto {
     @NotBlank
     private String username;

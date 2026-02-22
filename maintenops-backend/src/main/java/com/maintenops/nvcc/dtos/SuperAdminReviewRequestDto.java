@@ -2,7 +2,6 @@ package com.maintenops.nvcc.dtos;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Positive;
 import lombok.Data;
 
 /**
@@ -15,12 +14,10 @@ public class SuperAdminReviewRequestDto {
     @NotNull(message = "Request ID is required")
     private Long requestId;
 
-    @NotNull(message = "Quotation amount is required")
-    @Positive(message = "Quotation amount must be greater than 0")
-    private Double quotationAmount; // Cost estimate for the maintenance work
+    // Auto-populated from material picker — no validation needed
+    private Double quotationAmount;
 
-    @NotBlank(message = "Quotation description is required")
-    private String quotationDescription; // Detailed breakdown of the quotation
+    private String quotationDescription;
 
     @NotBlank(message = "Super Admin remarks are required")
     private String superAdminRemarks; // Super Admin's approval/comments

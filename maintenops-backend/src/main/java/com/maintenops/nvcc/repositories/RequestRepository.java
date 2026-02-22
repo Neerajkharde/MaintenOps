@@ -18,4 +18,10 @@ public interface RequestRepository extends JpaRepository<Request, Long> {
     List<Request> findByReviewedByAdminId(Long adminId);
 
     List<Request> findByReviewedBySuperAdminId(Long superAdminId);
+
+    // Returns all requests NOT in a given status — used for admin/SA history
+    List<Request> findByStatusNot(RequestStatus status);
+
+    // Returns all requests where status is in the given list
+    List<Request> findByStatusIn(List<RequestStatus> statuses);
 }

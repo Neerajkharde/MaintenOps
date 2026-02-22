@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import { useRequests } from '../../context/RequestContext';
 import NewRequestModal from '../../components/requests/NewRequestModal';
+import Button from '../../components/Button';
 
 const UserDashboard = () => {
     const { user } = useAuth();
@@ -40,284 +41,290 @@ const UserDashboard = () => {
     }, [stats]);
 
     const getDeptChip = (dept) => {
-        switch (dept) {
-            case 'Electrical': return <span className="inline-block px-3 py-[4px] rounded-[50px] bg-[#fce8e6] text-[#c5221f] text-[12px]">Electrical</span>;
-            case 'Carpentry': return <span className="inline-block px-3 py-[4px] rounded-[50px] bg-[#fff8e1] text-[#f9ab00] text-[12px]">Carpentry</span>;
-            case 'Plumbing': return <span className="inline-block px-3 py-[4px] rounded-[50px] bg-[#e6f4ea] text-[#137333] text-[12px]">Plumbing</span>;
-            default: return <span className="inline-block px-3 py-[4px] rounded-[50px] bg-[#f1f3f4] text-[#5f6368] text-[12px]">{dept}</span>;
-        }
+        const styles = {
+            'Electrical': 'text-error bg-error-container/20 border-error/10',
+            'Carpentry': 'text-warning bg-warning-container/20 border-warning/10',
+            'Plumbing': 'text-primary bg-primary-container/20 border-primary/10',
+            'EM': 'text-success bg-success-container/20 border-success/10'
+        };
+        const style = styles[dept] || 'text-on-surface-variant bg-surface-variant border-outline/10';
+        return (
+            <span className={`px-2.5 py-0.5 rounded-md border text-[12px] font-medium font-ui ${style}`}>
+                {dept}
+            </span>
+        );
     };
 
     if (loading) {
         return (
-            <div className="flex flex-col items-center justify-center min-h-[60vh]">
-                <div className="w-12 h-12 border-4 border-[#e8f0fe] border-t-[#1a73e8] rounded-full animate-spin mb-4"></div>
-                <p className="text-[#5f6368] font-['Roboto',sans-serif]">Loading your dashboard...</p>
+            <div className="flex flex-col items-center justify-center min-h-[60vh] animate-pulse">
+                <div className="w-12 h-12 border-4 border-outline/30 border-t-primary rounded-full animate-spin mb-4"></div>
+                <p className="text-on-surface-variant font-ui">Preparing your dashboard...</p>
             </div>
         );
     }
 
     if (error) {
         return (
-            <div className="flex flex-col items-center justify-center min-h-[60vh] text-center">
-                <div className="w-16 h-16 bg-[#fce8e6] text-[#c5221f] rounded-full flex items-center justify-center mb-4">
+            <div className="flex flex-col items-center justify-center min-h-[60vh] text-center px-4">
+                <div className="w-16 h-16 bg-error-container text-error rounded-full flex items-center justify-center mb-6 shadow-sm">
                     <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
                 </div>
-                <h3 className="text-[18px] font-['Google_Sans',sans-serif] text-[#202124] mb-2">Something went wrong</h3>
-                <p className="text-[#5f6368] font-['Roboto',sans-serif] mb-6">{error}</p>
-                <button
-                    onClick={refreshRequests}
-                    className="px-6 py-2 bg-[#1a73e8] text-white rounded-[50px] font-['Google_Sans',sans-serif] text-[14px] hover:bg-[#1557b0] transition-colors"
-                >
-                    Try Again
-                </button>
+                <h3 className="text-[20px] font-display font-medium text-on-surface mb-2">Service Connection Error</h3>
+                <p className="text-on-surface-variant font-ui max-w-sm mb-8">{error}</p>
+                <Button variant="primary" onClick={refreshRequests}>
+                    Reconnect Now
+                </Button>
             </div>
         );
     }
 
+    const currentReq = activeRequests.find(r => r.id === selectedTrackId);
+
     return (
-        <div className="relative pb-24 px-4 sm:px-6 lg:px-8 pt-6 max-w-7xl mx-auto">
-            {/* SECTION 1 — WELCOME BANNER */}
-            <div className="bg-[#e8f0fe] rounded-[16px] px-8 py-6 flex flex-col sm:flex-row justify-between items-start sm:items-center relative overflow-hidden animate-fadeUp" style={{ animationDelay: '0ms' }}>
-                <div className="absolute left-0 top-0 bottom-0 w-[4px] bg-[#1a73e8]"></div>
+        <div className="relative pb-24 px-6 sm:px-8 pt-8 max-w-[1400px] mx-auto animate-fadeUp">
+            {/* Header Section */}
+            <div className="mb-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
                 <div>
-                    <h2 className="text-[24px] font-['Google_Sans_Display',sans-serif] text-[#202124] mb-1">
-                        Hare Krishna, {user?.name?.split(' ')[0] || user?.username || 'User'} 👋
+                    <h2 className="text-[32px] font-display font-medium text-on-surface tracking-tight mb-2">
+                        Welcome, {user?.name?.split(' ')[0] || user?.username || 'User'}
                     </h2>
-                    <p className="text-[14px] font-['Roboto',sans-serif] text-[#5f6368]">
-                        You have {stats.active} submitted request{stats.active !== 1 ? 's' : ''}. {stats.pending} {stats.pending === 1 ? ' is' : ' are'} awaiting SA approval.
+                    <p className="text-[15px] font-ui text-on-surface-variant">
+                        Overview of your recent facility maintenance requests and status updates.
                     </p>
                 </div>
-                <div className="mt-4 sm:mt-0">
-                    <button
-                        onClick={() => setIsModalOpen(true)}
-                        className="bg-[#1a73e8] hover:bg-[#1557b0] text-white px-6 py-[10px] rounded-[50px] font-['Google_Sans',sans-serif] text-[14px] font-medium flex items-center gap-2 transition-all shadow-md hover:shadow-lg transform hover:scale-[1.02]"
-                    >
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" /></svg>
-                        New Request
-                    </button>
-                </div>
+                <Button
+                    variant="primary"
+                    onClick={() => setIsModalOpen(true)}
+                    className="h-12 px-8 shadow-md hover:shadow-lg transition-all"
+                >
+                    <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4v16m8-8H4" /></svg>
+                    New Request
+                </Button>
             </div>
 
-            {/* SECTION 2 — STATS ROW */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-6 animate-fadeUp opacity-0" style={{ animationDelay: '100ms' }}>
-                <div className="bg-white rounded-[16px] p-6 shadow-[0_1px_3px_rgba(0,0,0,0.1)] relative">
-                    <div className="absolute top-6 right-6 w-10 h-10 bg-[#e8f0fe] rounded-full flex items-center justify-center">
-                        <svg className="w-5 h-5 text-[#1a73e8]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>
+            {/* Quick Stats Grid */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
+                {[
+                    { label: 'Total Tickets', val: animatedStats.total, icon: 'M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z', bg: 'bg-primary-container/30', color: 'text-primary' },
+                    { label: 'Active', val: animatedStats.active, icon: 'M13 10V3L4 14h7v7l9-11h-7z', bg: 'bg-primary-container/30', color: 'text-primary' },
+                    { label: 'Awaiting Review', val: animatedStats.pending, icon: 'M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0y', bg: 'bg-warning-container/30', color: 'text-warning' },
+                    { label: 'Resolved', val: animatedStats.completed, icon: 'M5 13l4 4L19 7', bg: 'bg-success-container/30', color: 'text-success' }
+                ].map((s, i) => (
+                    <div key={i} className="google-card p-6 border-outline/30 bg-white hover:bg-surface-variant/10 transition-colors">
+                        <div className={`w-12 h-12 ${s.bg} rounded-xl flex items-center justify-center mb-6`}>
+                            <svg className={`w-6 h-6 ${s.color}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={s.icon} />
+                            </svg>
+                        </div>
+                        <div className="text-[36px] font-display font-medium text-on-surface leading-none mb-2">{s.val}</div>
+                        <div className="text-[14px] font-ui font-medium text-on-surface-variant uppercase tracking-wider">{s.label}</div>
                     </div>
-                    <div className="text-[32px] font-['Google_Sans_Display',sans-serif] text-[#202124] leading-tight">{animatedStats.total}</div>
-                    <div className="text-[13px] font-['Roboto',sans-serif] text-[#5f6368] mt-1">Total Requests</div>
-                </div>
-                <div className="bg-white rounded-[16px] p-6 shadow-[0_1px_3px_rgba(0,0,0,0.1)] relative">
-                    <div className="absolute top-6 right-6 w-10 h-10 bg-[#e8f0fe] rounded-full flex items-center justify-center">
-                        <svg className="w-5 h-5 text-[#1a73e8]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
-                    </div>
-                    <div className="text-[32px] font-['Google_Sans_Display',sans-serif] text-[#1a73e8] leading-tight">{animatedStats.active}</div>
-                    <div className="text-[13px] font-['Roboto',sans-serif] text-[#5f6368] mt-1">Submitted</div>
-                </div>
-                <div className="bg-white rounded-[16px] p-6 shadow-[0_1px_3px_rgba(0,0,0,0.1)] relative">
-                    <div className="absolute top-6 right-6 w-10 h-10 bg-[#fef9e7] rounded-full flex items-center justify-center">
-                        <svg className="w-5 h-5 text-[#f9ab00]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                    </div>
-                    <div className="text-[32px] font-['Google_Sans_Display',sans-serif] text-[#f9ab00] leading-tight">{animatedStats.pending}</div>
-                    <div className="text-[13px] font-['Roboto',sans-serif] text-[#5f6368] mt-1">Pending SA</div>
-                </div>
-                <div className="bg-white rounded-[16px] p-6 shadow-[0_1px_3px_rgba(0,0,0,0.1)] relative">
-                    <div className="absolute top-6 right-6 w-10 h-10 bg-[#e6f4ea] rounded-full flex items-center justify-center">
-                        <svg className="w-5 h-5 text-[#137333]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" /></svg>
-                    </div>
-                    <div className="text-[32px] font-['Google_Sans_Display',sans-serif] text-[#137333] leading-tight">{animatedStats.completed}</div>
-                    <div className="text-[13px] font-['Roboto',sans-serif] text-[#5f6368] mt-1">Approved</div>
-                </div>
+                ))}
             </div>
 
-            {/* SECTION 4 — REQUEST TRACKER */}
-            <div className="flex flex-col lg:flex-row gap-6 mt-6 animate-fadeUp opacity-0" style={{ animationDelay: '300ms' }}>
-                {/* LEFT: Timeline */}
-                <div className="w-full lg:w-[60%] bg-white rounded-[16px] shadow-[0_1px_3px_rgba(0,0,0,0.1)] p-6">
-                    <div className="flex justify-between items-center mb-6">
-                        <h3 className="text-[16px] font-['Google_Sans',sans-serif] font-medium text-[#202124]">Track Active Request</h3>
-                        <div className="relative">
+            {/* Main Content Layout */}
+            <div className="flex flex-col xl:flex-row gap-8">
+                {/* LEFT: Dynamic Tracker */}
+                <div className="flex-1 google-card p-8 border-outline/30 bg-white shadow-sm overflow-hidden">
+                    <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-10 pb-6 border-b border-outline/20">
+                        <div>
+                            <h3 className="text-[18px] font-display font-medium text-on-surface mb-1">Service Tracker</h3>
+                            <p className="text-[14px] text-on-surface-variant font-ui">Track live progress of your active maintenance tickets</p>
+                        </div>
+
+                        <div className="relative w-full sm:w-auto">
                             <button
                                 onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                                className="flex items-center gap-2 px-4 py-2 border border-[#dadce0] rounded-[50px] text-[13px] font-['Google_Sans',sans-serif] text-[#202124] bg-white hover:bg-[#f8f9fa] transition-colors focus:outline-none focus:border-[#1a73e8]"
+                                className="w-full sm:w-56 flex items-center justify-between px-4 py-2.5 bg-surface-variant/40 rounded-lg text-[14px] font-ui text-on-surface hover:bg-surface-variant/60 transition-colors focus:ring-2 focus:ring-primary/20 outline-none"
                             >
-                                {selectedTrackId || 'No Active'}
-                                <svg className={`w-4 h-4 text-[#5f6368] transition-transform duration-200 ${isDropdownOpen ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
+                                <span className="truncate">{currentReq ? `Ticket #${currentReq.id}` : 'No active tickets'}</span>
+                                <svg className={`w-4 h-4 text-on-surface-variant transition-transform duration-300 ${isDropdownOpen ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
                             </button>
 
                             {isDropdownOpen && (
                                 <>
                                     <div className="fixed inset-0 z-10" onClick={() => setIsDropdownOpen(false)}></div>
-                                    <div className="absolute right-0 top-[calc(100%+8px)] w-[180px] bg-white rounded-[12px] shadow-[0_4px_12px_rgba(0,0,0,0.15)] border border-[#dadce0] py-2 z-20 animate-fadeUp origin-top-right">
+                                    <div className="absolute left-0 mt-2 w-full sm:w-64 bg-white rounded-xl shadow-lg border border-outline/30 py-2 z-20 animate-fadeUp origin-top">
                                         {activeRequests.length > 0 ? activeRequests.map(req => (
                                             <button
                                                 key={req.id}
-                                                onClick={() => {
-                                                    setSelectedTrackId(req.id);
-                                                    setIsDropdownOpen(false);
-                                                }}
-                                                className={`w-full text-left px-4 py-2 text-[13px] font-['Roboto',sans-serif] transition-colors flex items-center justify-between ${selectedTrackId === req.id ? 'text-[#1a73e8] bg-[#e8f0fe] hover:bg-[#e8f0fe]' : 'text-[#202124] hover:bg-[#f8f9fa]'}`}
+                                                onClick={() => { setSelectedTrackId(req.id); setIsDropdownOpen(false); }}
+                                                className={`w-full text-left px-5 py-3 hover:bg-surface-variant transition-colors flex items-center gap-3 ${selectedTrackId === req.id ? 'bg-primary-container/20 text-primary font-medium' : 'text-on-surface font-ui'}`}
                                             >
-                                                {req.id}
-                                                {selectedTrackId === req.id && (
-                                                    <svg className="w-4 h-4 text-[#1a73e8]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>
-                                                )}
+                                                <div className={`w-2 h-2 rounded-full ${selectedTrackId === req.id ? 'bg-primary' : 'bg-outline/40'}`}></div>
+                                                <div className="flex-1">
+                                                    <div className="text-[13px]">Ticket #{req.id}</div>
+                                                    <div className="text-[11px] text-on-surface-variant truncate">{req.desc}</div>
+                                                </div>
                                             </button>
                                         )) : (
-                                            <div className="px-4 py-2 text-[13px] text-[#5f6368] font-['Roboto',sans-serif]">No active requests</div>
+                                            <div className="px-5 py-4 text-[13px] text-on-surface-variant font-ui">No active service tickets.</div>
                                         )}
                                     </div>
                                 </>
                             )}
                         </div>
                     </div>
-                    {activeRequests.length > 0 ? (
-                        <div className="mb-6">
-                            <div className="text-[15px] font-medium text-[#202124] mb-2">
-                                {activeRequests.find(r => r.id === selectedTrackId)?.desc || ''}
+
+                    {currentReq ? (
+                        <div className="animate-fadeUp">
+                            <div className="mb-10 bg-primary-container/10 p-5 rounded-xl border border-primary/10">
+                                <h4 className="text-[16px] font-display font-medium text-on-surface mb-2">{currentReq.desc}</h4>
+                                <div className="flex gap-2">
+                                    {getDeptChip(currentReq.dept)}
+                                    <span className="px-2.5 py-0.5 rounded-md border border-outline/20 bg-white text-[12px] font-medium font-ui text-on-surface-variant">
+                                        Submitted on {currentReq.date}
+                                    </span>
+                                </div>
                             </div>
-                            {getDeptChip(activeRequests.find(r => r.id === selectedTrackId)?.dept || '')}
+
+                            <div className="relative pl-12 space-y-12 pb-4">
+                                {/* Vertical Progress Line */}
+                                <div className="absolute left-[18px] top-6 bottom-6 w-[2px] bg-outline/20"></div>
+
+                                {/* Stage Completion logic */}
+                                {(() => {
+                                    const isPendingSA = currentReq.status === 'PENDING_SA_APPROVAL';
+                                    const isApproved = currentReq.status === 'APPROVED';
+
+                                    return (
+                                        <>
+                                            {/* Stage 1: Submitted */}
+                                            <div className="relative flex items-start group">
+                                                <div className="absolute -left-12 flex h-10 w-10 items-center justify-center rounded-full bg-success text-white shadow-sm ring-8 ring-white">
+                                                    <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>
+                                                </div>
+                                                <div>
+                                                    <h5 className="text-[15px] font-display font-medium text-on-surface">Ticket Received</h5>
+                                                    <p className="text-[13px] text-on-surface-variant font-ui mt-1">Successfully logged into the maintenance portal.</p>
+                                                </div>
+                                            </div>
+
+                                            {/* Stage 2: Verification */}
+                                            <div className="relative flex items-start group">
+                                                <div className={`absolute -left-12 flex h-10 w-10 items-center justify-center rounded-full ring-8 ring-white transition-all ${isApproved ? 'bg-success text-white' : isPendingSA ? 'bg-primary text-white shadow-md animate-pulse' : 'bg-surface-variant text-on-surface-variant'}`}>
+                                                    {isApproved ? (
+                                                        <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>
+                                                    ) : (
+                                                        <span className="text-[13px] font-bold">2</span>
+                                                    )}
+                                                </div>
+                                                <div className={!isPendingSA && !isApproved ? 'opacity-40' : ''}>
+                                                    <h5 className="text-[15px] font-display font-medium text-on-surface">Admin Appraisal</h5>
+                                                    <p className="text-[13px] text-on-surface-variant font-ui mt-1">Detailed review by the facility coordinator is in progress.</p>
+                                                    {isPendingSA && (
+                                                        <div className="mt-4 inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-warning-container/30 text-warning text-[12px] font-semibold font-ui uppercase tracking-wide">
+                                                            <div className="w-1.5 h-1.5 rounded-full bg-warning animate-pulse"></div>
+                                                            Reviewing Quotation
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            </div>
+
+                                            {/* Stage 3: Execution */}
+                                            <div className="relative flex items-start group">
+                                                <div className={`absolute -left-12 flex h-10 w-10 items-center justify-center rounded-full ring-8 ring-white ${isApproved ? 'bg-success text-white shadow-md' : 'bg-surface-variant text-on-surface-variant'}`}>
+                                                    {isApproved ? (
+                                                        <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>
+                                                    ) : (
+                                                        <span className="text-[13px] font-bold">3</span>
+                                                    )}
+                                                </div>
+                                                <div className={!isApproved ? 'opacity-40' : ''}>
+                                                    <h5 className="text-[15px] font-display font-medium text-on-surface">Execution Phase</h5>
+                                                    <p className="text-[13px] text-on-surface-variant font-ui mt-1">Materials procured and vendors assigned for site work.</p>
+                                                    {isApproved && (
+                                                        <div className="mt-4 inline-flex items-center gap-2 px-4 py-1.5 rounded-lg bg-success text-white text-[12px] font-semibold font-ui shadow-sm">
+                                                            Work Commencement Ready
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        </>
+                                    );
+                                })()}
+                            </div>
                         </div>
                     ) : (
-                        <div className="mb-6 text-[14px] text-[#5f6368]">
-                            No active requests to track.
+                        <div className="flex flex-col items-center justify-center py-24 text-center">
+                            <div className="w-20 h-20 bg-surface-variant/40 rounded-full flex items-center justify-center mb-6">
+                                <svg className="w-10 h-10 text-on-surface-variant/30" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                            </div>
+                            <h4 className="text-[17px] font-display font-medium text-on-surface mb-2">Queue Clear</h4>
+                            <p className="text-[14px] text-on-surface-variant font-ui max-w-[240px]">You don't have any active requests requiring tracking right now.</p>
                         </div>
                     )}
-
-                    {(() => {
-                        const currentReq = activeRequests.find(r => r.id === selectedTrackId);
-                        const isSubmitted = currentReq?.status === 'SUBMITTED';
-                        const isPendingSA = currentReq?.status === 'PENDING_SA_APPROVAL';
-                        const isApproved = currentReq?.status === 'APPROVED';
-
-                        return (
-                            <div className="relative pl-3 mt-4">
-                                {/* Connecting Line (background) */}
-                                <div className="absolute left-[23.5px] top-4 bottom-4 w-[2px] bg-[#dadce0]"></div>
-                                {/* Connecting Line (progress) */}
-                                <div className={`absolute left-[23.5px] top-4 w-[2px] bg-[#137333] transition-all duration-500 ${isApproved ? 'h-[120px]' : isPendingSA ? 'h-[60px]' : 'h-0'}`}></div>
-
-                                {/* Stage 1 */}
-                                <div className="flex gap-4 mb-8 relative z-10">
-                                    <div className="w-6 h-6 rounded-full bg-[#137333] flex items-center justify-center flex-shrink-0 mt-0.5">
-                                        <svg className="w-3.5 h-3.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>
-                                    </div>
-                                    <div>
-                                        <div className="text-[14px] font-['Google_Sans',sans-serif] font-medium text-[#202124]">Request Submitted</div>
-                                        <div className="text-[12px] font-['Roboto',sans-serif] text-[#5f6368]">{currentReq?.date || 'N/A'}</div>
-                                    </div>
-                                </div>
-
-                                {/* Stage 2 */}
-                                <div className="flex gap-4 mb-8 relative z-10">
-                                    {isApproved ? (
-                                        <div className="w-6 h-6 rounded-full bg-[#137333] flex items-center justify-center flex-shrink-0 mt-0.5">
-                                            <svg className="w-3.5 h-3.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>
-                                        </div>
-                                    ) : isPendingSA ? (
-                                        <div className="w-6 h-6 rounded-full bg-[#1a73e8] flex-shrink-0 mt-0.5 animate-pulseBlue border-2 border-white shadow-[0_0_0_4px_rgba(26,115,232,0.1)]"></div>
-                                    ) : (
-                                        <div className="w-6 h-6 rounded-full border-2 border-[#dadce0] bg-white flex-shrink-0 mt-0.5"></div>
-                                    )}
-                                    <div className={isSubmitted ? 'opacity-70' : ''}>
-                                        <div className={`text-[14px] font-['Google_Sans',sans-serif] ${isPendingSA || isApproved ? 'font-medium text-[#202124]' : 'text-[#9aa0a6]'}`}>Pending SA Approval</div>
-                                        {isPendingSA && (
-                                            <div className="mt-2 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-[50px] bg-[#fef9e7] text-[#f9ab00] text-[12px] font-medium">
-                                                <span>⏳</span> Awaiting super admin review
-                                            </div>
-                                        )}
-                                    </div>
-                                </div>
-
-                                {/* Stage 3 */}
-                                <div className="flex gap-4 relative z-10">
-                                    {isApproved ? (
-                                        <div className="w-6 h-6 rounded-full bg-[#137333] flex items-center justify-center flex-shrink-0 mt-0.5 shadow-[0_0_0_4px_rgba(19,115,51,0.1)]">
-                                            <svg className="w-3.5 h-3.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>
-                                        </div>
-                                    ) : (
-                                        <div className="w-6 h-6 rounded-full border-2 border-[#dadce0] bg-white flex-shrink-0 mt-0.5"></div>
-                                    )}
-                                    <div className={!isApproved ? 'opacity-70' : ''}>
-                                        <div className={`text-[14px] font-['Google_Sans',sans-serif] ${isApproved ? 'font-medium text-[#202124]' : 'text-[#9aa0a6]'}`}>Approved for Work</div>
-                                        {isApproved && (
-                                            <div className="mt-1 text-[13px] font-['Roboto',sans-serif] text-[#137333] font-medium">Ready for execution</div>
-                                        )}
-                                    </div>
-                                </div>
-                            </div>
-                        );
-                    })()}
                 </div>
 
-                {/* RIGHT: Quotation Card */}
-                <div className="w-full lg:w-[40%] bg-white rounded-[16px] shadow-[0_1px_3px_rgba(0,0,0,0.1)] p-6">
-                    <h3 className="text-[16px] font-['Google_Sans',sans-serif] font-medium text-[#202124] mb-6">Quotation Details</h3>
+                {/* RIGHT: Financial Sidebar */}
+                <div className="w-full xl:w-[450px] space-y-8">
+                    <div className="google-card p-8 border-outline/30 bg-white">
+                        <h3 className="text-[18px] font-display font-medium text-on-surface mb-8 pb-4 border-b border-outline/20">Operational Audit</h3>
 
-                    {activeRequests.find(r => r.id === selectedTrackId)?.status === 'APPROVED' ? (
-                        <div>
-                            <div className="text-[32px] font-['Google_Sans_Display',sans-serif] text-[#202124] leading-tight mt-2">₹5,000</div>
-                            <div className="text-[12px] font-['Roboto',sans-serif] text-[#5f6368]">Estimated Cost</div>
-
-                            <hr className="my-4 border-[#dadce0]" />
-
-                            <div className="space-y-2">
-                                <div className="flex justify-between text-[13px] font-['Roboto',sans-serif] text-[#5f6368]">
-                                    <span>Parts: AC compressor</span>
-                                    <span className="border-b border-dotted border-[#dadce0] flex-grow mx-2 relative top-[-6px]"></span>
-                                    <span className="text-[#202124] font-medium">₹3,500</span>
+                        {currentReq?.status === 'APPROVED' ? (
+                            <div className="animate-fadeUp">
+                                <div className="mb-6">
+                                    <div className="text-[12px] font-ui font-bold text-on-surface-variant uppercase tracking-widest mb-1">Approved Estimate</div>
+                                    <div className="text-[42px] font-display font-medium text-primary leading-tight font-ui">₹5,000</div>
                                 </div>
-                                <div className="flex justify-between text-[13px] font-['Roboto',sans-serif] text-[#5f6368]">
-                                    <span>Labor charges</span>
-                                    <span className="border-b border-dotted border-[#dadce0] flex-grow mx-2 relative top-[-6px]"></span>
-                                    <span className="text-[#202124] font-medium">₹1,500</span>
+
+                                <div className="space-y-4 mb-8">
+                                    <div className="flex justify-between items-center text-[14px] font-ui">
+                                        <span className="text-on-surface-variant">Components & Parts</span>
+                                        <span className="font-semibold text-on-surface">₹3,500</span>
+                                    </div>
+                                    <div className="flex justify-between items-center text-[14px] font-ui">
+                                        <span className="text-on-surface-variant">Labor & Logistics</span>
+                                        <span className="font-semibold text-on-surface">₹1,500</span>
+                                    </div>
+                                    <div className="pt-4 border-t border-outline/20 flex justify-between items-center text-[15px] font-display font-medium">
+                                        <span className="text-on-surface">Final Assessment</span>
+                                        <span className="text-success">Verified</span>
+                                    </div>
                                 </div>
-                            </div>
 
-                            <hr className="my-4 border-[#dadce0]" />
-
-                            <div className="flex items-center gap-3 mb-4">
-                                <div className="w-8 h-8 rounded-full bg-[#137333] text-white flex items-center justify-center text-[12px] font-bold">SA</div>
-                                <div>
-                                    <div className="text-[13px] text-[#202124] font-medium">super_admin_user</div>
-                                    <div className="text-[12px] text-[#5f6368]">Feb 22, 2026</div>
+                                <div className="p-4 bg-surface-variant/30 rounded-xl mb-8">
+                                    <div className="flex items-center gap-3 mb-3">
+                                        <div className="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center text-[11px] font-bold">SA</div>
+                                        <div>
+                                            <div className="text-[13px] text-on-surface font-semibold font-ui">Super Admin Verification</div>
+                                            <div className="text-[11px] text-on-surface-variant font-ui">Authored on Feb 22, 2026</div>
+                                        </div>
+                                    </div>
+                                    <p className="text-[13px] text-on-surface-variant leading-relaxed italic">
+                                        "Work proposal approved. Standard maintenance cycles apply. Priority execution assigned."
+                                    </p>
                                 </div>
-                            </div>
 
-                            <div className="bg-[#e6f4ea] border-l-[3px] border-[#137333] p-3 rounded-[8px] text-[13px] font-['Roboto',sans-serif] italic text-[#137333] mb-5">
-                                "Approved for execution. Standard maintenance work."
+                                <Button variant="outline" className="w-full border-outline text-on-surface font-ui">
+                                    Archive Ticket
+                                </Button>
                             </div>
-
-                            <div className="inline-flex py-1.5 px-3 rounded-[50px] bg-[#e6f4ea] text-[#137333] text-[12px] font-medium items-center gap-1.5">
-                                <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" /></svg>
-                                Approved — Work can begin
+                        ) : (
+                            <div className="flex flex-col items-center justify-center py-16 text-center opacity-40 grayscale">
+                                <div className="w-16 h-16 bg-surface-variant rounded-full flex items-center justify-center mb-6">
+                                    <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                                </div>
+                                <h4 className="text-[16px] font-display font-medium text-on-surface mb-1">Price Control</h4>
+                                <p className="text-[13px] font-ui">Financial audit will be active post-review.</p>
                             </div>
-                        </div>
-                    ) : (
-                        <div className="flex flex-col items-center justify-center py-8 text-center h-[300px]">
-                            <div className="w-16 h-16 bg-[#f1f3f4] rounded-full flex items-center justify-center mb-4">
-                                <svg className="w-8 h-8 text-[#9aa0a6]" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                            </div>
-                            <h4 className="text-[16px] font-['Google_Sans',sans-serif] font-medium text-[#202124] mb-2">Quotation Pending</h4>
-                            <p className="text-[13px] font-['Roboto',sans-serif] text-[#5f6368] max-w-[200px]">
-                                Super Admin will review and send a cost estimate soon.
-                            </p>
-                        </div>
-                    )}
+                        )}
+                    </div>
                 </div>
             </div>
 
-            {/* FLOATING ACTION BUTTON */}
+            {/* FAB REDESIGN */}
             <button
                 onClick={() => setIsModalOpen(true)}
-                className="fixed bottom-8 right-8 bg-[#1a73e8] hover:bg-[#1557b0] text-white px-6 py-3.5 rounded-[50px] font-['Google_Sans',sans-serif] text-[14px] font-medium shadow-[0_4px_12px_rgba(26,115,232,0.4)] hover:shadow-[0_6px_16px_rgba(26,115,232,0.5)] transition-all transform hover:scale-[1.02] z-50 flex items-center gap-2"
+                className="fixed bottom-8 right-8 h-14 bg-primary text-white pl-5 pr-7 rounded-2xl font-ui font-medium shadow-2xl hover:shadow-primary/20 transition-all transform hover:-translate-y-1 z-50 flex items-center gap-3 active:scale-95"
             >
-                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}><path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" /></svg>
-                New Request
+                <div className="w-6 h-6 bg-white/20 rounded-lg flex items-center justify-center">
+                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" /></svg>
+                </div>
+                Create New Request
             </button>
 
-            {/* NEW REQUEST MODAL */}
             <NewRequestModal
                 isOpen={isModalOpen}
                 onClose={() => setIsModalOpen(false)}

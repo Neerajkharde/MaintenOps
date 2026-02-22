@@ -109,7 +109,8 @@ export const apiCall = async (endpoint, options = {}) => {
             });
         }
         
-        // If still 401 or refresh failed, clear auth and redirect
+        // ONLY redirect to login if STILL 401 (truly unauthenticated / session expired)
+        // Do NOT redirect on 403 (Forbidden) — that's a role/permission error we handle in the UI
         if (response.status === 401) {
             console.log('[API] Still 401 after refresh attempt, redirecting to login');
             localStorage.removeItem('tokenType');

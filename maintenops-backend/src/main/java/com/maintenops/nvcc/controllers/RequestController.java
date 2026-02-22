@@ -97,4 +97,39 @@ public class RequestController {
         RequestResponseDto request = requestService.getRequestById(id, principal);
         return ResponseEntity.ok(request);
     }
+
+    /**
+     * User approves the quotation sent by Super Admin.
+     * Triggers inventory check and stock deduction.
+     * Status: QUOTATION_SENT → APPROVED
+     */
+    @PostMapping("/{id}/approve-quotation")
+    @PreAuthorize("hasRole('REQUESTER')")
+    public ResponseEntity<RequestResponseDto> approveQuotation(
+            @PathVariable Long id,
+            @AuthenticationPrincipal JwtPrincipal principal) {
+
+        RequestResponseDto updated = requestService.userApproveQuotation(id, principal);
+        return ResponseEntity.ok(updated);
+    }
+
+    /**
+     * Admin/Super Admin triggers vendor list generation after user approval.
+     * Status: APPROVED → VENDOR_LIST_PREPARED
+     */
+    @PostMapping("/{id}/generate-vendor-list")
+    @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN')")
+    public ResponseEntity<RequestResponseDto> generateVendorList(@PathVariable Long id) {
+        RequestResponseDto updated = requestService.generateVendorList(id);
+        return ResponseEntity.ok(updated);
+    }
+
+    /**
+     * Get a specific request by ID (for admin viewing)
+     */
+    @GetMapping("/admin/{id}")
+    @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN')")
+    public ResponseEntity<RequestResponseDto> getRequestByIdForAdmin(@PathVariable Long id) {
+        return ResponseEntity.ok(requestService.getRequestByIdForAdmin(id));
+    }
 }
