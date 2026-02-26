@@ -2,7 +2,7 @@ import { createContext, useContext, useState, useEffect } from 'react';
 import { setTokenGetter } from '../services/api';
 
 const AuthContext = createContext(null);
-const API_BASE_URL = 'http://localhost:8083';
+const API_BASE_URL = import.meta.env.VITE_API_URL || '';
 
 export const AuthProvider = ({ children }) => {
     // Lazy initialization for user state to avoid useEffect and direct storage access
@@ -81,9 +81,9 @@ export const AuthProvider = ({ children }) => {
                     'Content-Type': 'application/json',
                 },
                 credentials: 'include',
-                body: JSON.stringify({ 
+                body: JSON.stringify({
                     username: name,
-                    email, 
+                    email,
                     password,
                     orgDeptName: department,
                     roles: ['REQUESTER']
@@ -108,7 +108,7 @@ export const AuthProvider = ({ children }) => {
     const logout = async () => {
         try {
             console.log('[AuthContext] Calling logout endpoint');
-            
+
             // Backend logout endpoint reads refresh token from HttpOnly cookie
             // Does not require Authorization header
             const response = await fetch(`${API_BASE_URL}/api/auth/logout`, {
@@ -118,7 +118,7 @@ export const AuthProvider = ({ children }) => {
                 },
                 credentials: 'include', // Send refresh token from HttpOnly cookie
             });
-            
+
             console.log('[AuthContext] Logout response:', response.status);
         } catch (error) {
             console.error('[AuthContext] Logout error:', error);
