@@ -53,8 +53,8 @@ public class RequestMaterial {
     private String vendorName; // Denormalized
 
     @Column(nullable = false)
-    private String status = "PENDING_PURCHASE";
-    // PENDING_PURCHASE, FROM_STOCK, PURCHASED, FULFILLED
+    private String status = "PENDING_PROCUREMENT";
+    // PENDING_PROCUREMENT, PROCURED
 
     @Column(name = "last_purchase_rate", precision = 10, scale = 2)
     private BigDecimal lastPurchaseRate; // Reference for SA

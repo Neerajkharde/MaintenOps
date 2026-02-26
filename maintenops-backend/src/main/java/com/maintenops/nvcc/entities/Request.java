@@ -116,7 +116,7 @@ public class Request {
         this.createdAt = Instant.now();
         this.updatedAt = Instant.now();
         if (this.status == null) {
-            this.status = RequestStatus.SUBMITTED;
+            this.status = RequestStatus.REQUEST_CREATED;
         }
     }
 

@@ -14,11 +14,17 @@ const RequestsPage = () => {
 
     const getStatusChip = (status) => {
         const styles = {
-            'SUBMITTED': 'bg-primary-container text-primary border-primary/20',
-            'PENDING_SA_APPROVAL': 'bg-warning-container text-warning border-warning/20',
+            'REQUEST_CREATED': 'bg-primary-container text-primary border-primary/20',
+            'QUOTATION_ADDED': 'bg-warning-container text-warning border-warning/20',
+            'QUOTATION_APPROVED': 'bg-[#e8f5e9] text-[#2e7d32] border-[#2e7d32]/20',
             'APPROVED': 'bg-success-container text-success border-success/20',
-            'REJECTED': 'bg-error-container text-error border-error/20',
-            'COMPLETED': 'bg-success text-white border-transparent'
+            'PENDING_SA_APPROVAL': 'bg-warning-container text-warning border-warning/20',
+            'VENDOR_LIST_APPROVED': 'bg-[#e3f2fd] text-[#1565c0] border-[#1565c0]/20',
+            'ITEMS_READY': 'bg-[#f3e8fd] text-[#9334ea] border-[#9334ea]/20',
+            'IN_PRODUCTION': 'bg-[#fff3e0] text-[#e65100] border-[#e65100]/20',
+            'PAYMENT_PENDING': 'bg-[#fce4ec] text-[#c62828] border-[#c62828]/20',
+            'COMPLETED': 'bg-success text-white border-transparent',
+            'REJECTED': 'bg-error-container text-error border-error/20'
         };
         const style = styles[status] || 'bg-surface-variant text-on-surface-variant border-outline/30';
 

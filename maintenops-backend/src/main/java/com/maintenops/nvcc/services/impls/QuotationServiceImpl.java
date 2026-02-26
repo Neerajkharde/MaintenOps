@@ -74,9 +74,9 @@ public class QuotationServiceImpl implements QuotationService {
             rm.setLastPurchaseRate(lastRate);
 
 
-            //rm.setStatus("PENDING_PURCHASE");
-            // On creating Quotation status is not set to PENDING_PURCHASE yet.
-            // It will be set when admin submits the assessment for super admin approval.
+            //rm.setStatus("PENDING_PROCUREMENT");
+            // On creating Quotation status is not set to PENDING_PROCUREMENT yet.
+            // It will be set when the requester accepts the quotation.
 
             requestMaterials.add(rm);
             totalCost = totalCost.add(itemTotal);
@@ -178,44 +178,14 @@ public class QuotationServiceImpl implements QuotationService {
         return checks;
     }
 
-    @Override
-    @Transactional
-    public void processApprovedQuotation(Long requestId) {
-        List<RequestMaterial> materials = requestMaterialRepo.findByRequestId(requestId);
-
-        for (RequestMaterial rm : materials) {
-            Inventory inventory = inventoryRepo.findByMaterialAndSpec(
-                    rm.getMaterial().getId(),
-                    rm.getSpecification() != null ? rm.getSpecification().getId() : null
-            ).orElse(null);
-
-            if (inventory != null && inventory.getQuantityAvailable().compareTo(rm.getQuantityRequired()) >= 0) {
-                // Fully available in stock — deduct
-                inventory.setQuantityAvailable(inventory.getQuantityAvailable().subtract(rm.getQuantityRequired()));
-                inventory.setLastUpdated(java.time.LocalDateTime.now());
-                inventoryRepo.save(inventory);
-                rm.setStatus("FROM_STOCK");
-            } else if (inventory != null && inventory.getQuantityAvailable().compareTo(BigDecimal.ZERO) > 0) {
-                // Partially available — use what's in stock, mark rest as PENDING_PURCHASE
-                inventory.setQuantityAvailable(BigDecimal.ZERO);
-                inventory.setLastUpdated(java.time.LocalDateTime.now());
-                inventoryRepo.save(inventory);
-                rm.setStatus("PENDING_PURCHASE");
-            } else {
-                // Not in stock at all
-                rm.setStatus("PENDING_PURCHASE");
-            }
-
-            requestMaterialRepo.save(rm);
-        }
-    }
+    // processApprovedQuotation removed — spec says system does not track inventory
 
     @Override
     @Transactional
     public void generateVendorPurchaseList(Long requestId) {
         List<RequestMaterial> pendingItems = requestMaterialRepo.findByRequestId(requestId)
                 .stream()
-                .filter(rm -> "PENDING_PURCHASE".equals(rm.getStatus()))
+                .filter(rm -> "PENDING_PROCUREMENT".equals(rm.getStatus()))
                 .collect(Collectors.toList());
 
         // Group by vendor + material + specification

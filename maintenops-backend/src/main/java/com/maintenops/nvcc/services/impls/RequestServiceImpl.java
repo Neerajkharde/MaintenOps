@@ -17,10 +17,6 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import java.time.Instant;
-import java.time.LocalDate;
-import java.util.List;
-
 @Service
 @RequiredArgsConstructor
 @Transactional
@@ -93,6 +89,8 @@ public class RequestServiceImpl implements RequestService {
         return response;
     }
 
+    // ==================== Phase 1: Request & Quotation ====================
+
     public RequestResponseDto createRequest(RequestRequestDto dto, JwtPrincipal principal) {
 
         Request request = new Request();
@@ -103,44 +101,39 @@ public class RequestServiceImpl implements RequestService {
         request.setUrgencyReason(dto.getUrgencyReason());
         request.setMobileNumber(dto.getMobileNumber());
 
-        // 2. Fetch the Requester
+        // Fetch the Requester
         Long userId = principal.getUserId();
         User requester = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("User not found"));
         request.setRequester(requester);
 
-        // 3. Auto-populate Organization Department from logged-in user
+        // Auto-populate Organization Department from logged-in user
         OrganizationDepartment orgDept = requester.getOrganizationDepartment();
         if (orgDept == null) {
             throw new ResourceNotFoundException("User's organization department not found. Please contact admin.");
         }
         request.setOrganizationDepartment(orgDept);
 
-        // 4. Resolve Service Department by Name (from DTO)
+        // Resolve Service Department by Name (from DTO)
         ServiceDepartment serviceDept = serviceDeptRepository.findByName(dto.getServiceDepartmentName())
                 .orElseThrow(() -> new ResourceNotFoundException("Service Dept not found: " + dto.getServiceDepartmentName()));
         request.setServiceDepartment(serviceDept);
 
-        // 5. Generate unique Request Number
+        // Generate unique Request Number
         request.setRequestNumber(generateRequestNumber());
-        request.setStatus(RequestStatus.SUBMITTED);
+        request.setStatus(RequestStatus.REQUEST_CREATED);
 
         Request savedRequest = requestRepository.save(request);
 
         return mapToResponse(savedRequest);
     }
 
-
     @Override
     public List<RequestResponseDto> getRequestsByUserId(JwtPrincipal principal) {
-
         Long userId = principal.getUserId();
-
-        User user = userRepository.findById(userId)
+        userRepository.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
-
         List<Request> requests = requestRepository.findByRequesterId(userId);
-
         return requests.stream()
                 .map(this::mapToResponse)
                 .toList();
@@ -149,32 +142,26 @@ public class RequestServiceImpl implements RequestService {
     @Override
     public RequestResponseDto getRequestById(Long id, JwtPrincipal principal) {
         Long userId = principal.getUserId();
-
         Request request = requestRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Request not found with id: " + id));
-
-        // Verify that the logged-in user is the requester of this request
         if (!request.getRequester().getId().equals(userId)) {
             throw new ResourceNotFoundException("You do not have access to this request");
         }
-
         return mapToResponse(request);
     }
 
     @Override
     public RequestResponseDto reviewRequestAsAdmin(AdminReviewRequestDto dto, JwtPrincipal adminPrincipal) {
         Long adminId = adminPrincipal.getUserId();
-        // Fetch the admin user
         User admin = userRepository.findById(adminId)
                 .orElseThrow(() -> new ResourceNotFoundException("Admin user not found"));
 
-        // Fetch the request
         Request request = requestRepository.findById(dto.getRequestId())
                 .orElseThrow(() -> new ResourceNotFoundException("Request not found with id: " + dto.getRequestId()));
 
-        // Verify request is in SUBMITTED status (waiting for admin review)
-        if (!request.getStatus().equals(RequestStatus.SUBMITTED)) {
-            throw new RuntimeException("Request is not in SUBMITTED status. Current status: " + request.getStatus());
+        // Verify request is in REQUEST_CREATED status (waiting for admin review)
+        if (!request.getStatus().equals(RequestStatus.REQUEST_CREATED)) {
+            throw new RuntimeException("Request is not in REQUEST_CREATED status. Current status: " + request.getStatus());
         }
 
         // Set admin review details
@@ -185,10 +172,9 @@ public class RequestServiceImpl implements RequestService {
 
         // Update status based on approval
         if (dto.isApproved()) {
-            request.setStatus(RequestStatus.PENDING_SA_APPROVAL); // Move to Super Admin review
+            request.setStatus(RequestStatus.QUOTATION_ADDED); // Move to Super Admin review
         } else {
-            // TODO: Implement rejection logic - notify requester to provide more details
-            request.setStatus(RequestStatus.SUBMITTED); // Keep as submitted for requester to revise
+            request.setStatus(RequestStatus.REQUEST_CREATED); // Keep for requester to revise
         }
 
         Request updatedRequest = requestRepository.save(request);
@@ -197,8 +183,7 @@ public class RequestServiceImpl implements RequestService {
 
     @Override
     public List<RequestResponseDto> getRequestsForAdminReview() {
-        // Get all requests in SUBMITTED status (waiting for admin review)
-        List<Request> requests = requestRepository.findByStatus(RequestStatus.SUBMITTED);
+        List<Request> requests = requestRepository.findByStatus(RequestStatus.REQUEST_CREATED);
         return requests.stream()
                 .map(this::mapToResponse)
                 .toList();
@@ -207,20 +192,16 @@ public class RequestServiceImpl implements RequestService {
     @Override
     public RequestResponseDto reviewRequestAsSuperAdmin(SuperAdminReviewRequestDto dto, JwtPrincipal superAdminPrincipal) {
         Long superAdminId = superAdminPrincipal.getUserId();
-
-        // Fetch the super admin user
         User superAdmin = userRepository.findById(superAdminId)
                 .orElseThrow(() -> new ResourceNotFoundException("Super Admin not found"));
 
-        // Fetch the request
         Request request = requestRepository.findById(dto.getRequestId())
                 .orElseThrow(() -> new ResourceNotFoundException("Request not found with id: " + dto.getRequestId()));
 
-        // Verify request is in PENDING_SA_APPROVAL status
-        if (!request.getStatus().equals(RequestStatus.PENDING_SA_APPROVAL)) {
-            throw new RuntimeException("Request is not in PENDING_SA_APPROVAL status. Current status: " + request.getStatus());
+        // Verify request is in QUOTATION_ADDED status
+        if (!request.getStatus().equals(RequestStatus.QUOTATION_ADDED)) {
+            throw new RuntimeException("Request is not in QUOTATION_ADDED status. Current status: " + request.getStatus());
         }
-
 
         // Set super admin review details
         request.setQuotationAmount(dto.getQuotationAmount());
@@ -231,9 +212,9 @@ public class RequestServiceImpl implements RequestService {
 
         // Update status based on approval
         if (dto.isApproved()) {
-            request.setStatus(RequestStatus.QUOTATION_SENT); // Quotation sent to requester for approval
+            request.setStatus(RequestStatus.QUOTATION_APPROVED); // Quotation sent to requester for approval
         } else {
-            request.setStatus(RequestStatus.PENDING_SA_APPROVAL); // Keep for super admin to revise
+            request.setStatus(RequestStatus.QUOTATION_ADDED); // Keep for SA to revise
         }
 
         Request updatedRequest = requestRepository.save(request);
@@ -242,8 +223,7 @@ public class RequestServiceImpl implements RequestService {
 
     @Override
     public List<RequestResponseDto> getRequestsForSuperAdminReview() {
-        // Get all requests in PENDING_SA_APPROVAL status (waiting for super admin review)
-        List<Request> requests = requestRepository.findByStatus(RequestStatus.PENDING_SA_APPROVAL);
+        List<Request> requests = requestRepository.findByStatus(RequestStatus.QUOTATION_ADDED);
         return requests.stream()
                 .map(this::mapToResponse)
                 .toList();
@@ -251,10 +231,8 @@ public class RequestServiceImpl implements RequestService {
 
     @Override
     public List<RequestResponseDto> getAdminRequestHistory(JwtPrincipal principal) {
-        // Return all requests that have moved past SUBMITTED status.
-        // This includes: quotation created, assessment submitted, SA approved, user approved, etc.
-        // We use statusNot(SUBMITTED) because "SUBMITTED" = still waiting for admin action.
-        List<Request> requests = requestRepository.findByStatusNot(RequestStatus.SUBMITTED);
+        // Return all requests that have moved past REQUEST_CREATED status
+        List<Request> requests = requestRepository.findByStatusNot(RequestStatus.REQUEST_CREATED);
         return requests.stream()
                 .map(this::mapToResponse)
                 .toList();
@@ -269,13 +247,6 @@ public class RequestServiceImpl implements RequestService {
                 .toList();
     }
 
-    // Helper Method
-    private String generateRequestNumber() {
-        // Format: REQ-YYYY-RandomNumber
-        long timestamp = System.currentTimeMillis() % 10000;
-        return "REQ-" + LocalDate.now().getYear() + "-" + timestamp;
-    }
-
     @Override
     public RequestResponseDto userApproveQuotation(Long requestId, JwtPrincipal principal) {
         Request request = requestRepository.findById(requestId)
@@ -286,28 +257,18 @@ public class RequestServiceImpl implements RequestService {
             throw new ResourceNotFoundException("You do not have access to this request");
         }
 
-        if (!request.getStatus().equals(RequestStatus.QUOTATION_SENT)) {
+        if (!request.getStatus().equals(RequestStatus.QUOTATION_APPROVED)) {
             throw new RuntimeException("Request is not awaiting your approval. Status: " + request.getStatus());
         }
 
-        // Process inventory: deduct stock, mark FROM_STOCK vs PENDING_PURCHASE
-        quotationService.processApprovedQuotation(requestId);
-
-        request.setStatus(RequestStatus.APPROVED);
-        return mapToResponse(requestRepository.save(request));
-    }
-
-    @Override
-    public RequestResponseDto generateVendorList(Long requestId) {
-        Request request = requestRepository.findById(requestId)
-                .orElseThrow(() -> new ResourceNotFoundException("Request not found: " + requestId));
-
-        if (!request.getStatus().equals(RequestStatus.APPROVED)) {
-            throw new RuntimeException("Request must be APPROVED before generating vendor list. Status: " + request.getStatus());
+        // Set all material items to PENDING_PROCUREMENT (no inventory deduction per spec)
+        List<RequestMaterial> materials = requestMaterialRepo.findByRequestId(requestId);
+        for (RequestMaterial rm : materials) {
+            rm.setStatus("PENDING_PROCUREMENT");
+            requestMaterialRepo.save(rm);
         }
 
-        quotationService.generateVendorPurchaseList(requestId);
-        request.setStatus(RequestStatus.VENDOR_LIST_PREPARED);
+        request.setStatus(RequestStatus.APPROVED);
         return mapToResponse(requestRepository.save(request));
     }
 
@@ -316,5 +277,132 @@ public class RequestServiceImpl implements RequestService {
         Request request = requestRepository.findById(requestId)
                 .orElseThrow(() -> new ResourceNotFoundException("Request not found: " + requestId));
         return mapToResponse(request);
+    }
+
+    // ==================== Phase 2: List Preparation ====================
+
+    @Override
+    public List<RequestResponseDto> getApprovedRequests() {
+        List<Request> requests = requestRepository.findByStatus(RequestStatus.APPROVED);
+        return requests.stream()
+                .map(this::mapToResponse)
+                .toList();
+    }
+
+    @Override
+    public RequestResponseDto generateLists(Long requestId, JwtPrincipal principal) {
+        Request request = requestRepository.findById(requestId)
+                .orElseThrow(() -> new ResourceNotFoundException("Request not found: " + requestId));
+
+        if (!request.getStatus().equals(RequestStatus.APPROVED)) {
+            throw new RuntimeException("Request must be APPROVED before generating lists. Status: " + request.getStatus());
+        }
+
+        // Generate vendor purchase lists (aggregated by vendor)
+        quotationService.generateVendorPurchaseList(requestId);
+
+        request.setStatus(RequestStatus.PENDING_SA_APPROVAL);
+        return mapToResponse(requestRepository.save(request));
+    }
+
+    @Override
+    public List<RequestResponseDto> getRequestsPendingListApproval() {
+        List<Request> requests = requestRepository.findByStatus(RequestStatus.PENDING_SA_APPROVAL);
+        return requests.stream()
+                .map(this::mapToResponse)
+                .toList();
+    }
+
+    @Override
+    public RequestResponseDto approveVendorLists(Long requestId, JwtPrincipal principal) {
+        Request request = requestRepository.findById(requestId)
+                .orElseThrow(() -> new ResourceNotFoundException("Request not found: " + requestId));
+
+        if (!request.getStatus().equals(RequestStatus.PENDING_SA_APPROVAL)) {
+            throw new RuntimeException("Request is not pending list approval. Status: " + request.getStatus());
+        }
+
+        request.setStatus(RequestStatus.VENDOR_LIST_APPROVED);
+        return mapToResponse(requestRepository.save(request));
+    }
+
+    // ==================== Phase 3: Procurement ====================
+
+    @Override
+    public RequestResponseDto markItemProcured(Long requestMaterialId, JwtPrincipal principal) {
+        RequestMaterial rm = requestMaterialRepo.findById(requestMaterialId)
+                .orElseThrow(() -> new ResourceNotFoundException("Material item not found: " + requestMaterialId));
+
+        Request request = rm.getRequest();
+
+        // Can only mark items as procured when status is VENDOR_LIST_APPROVED
+        if (!request.getStatus().equals(RequestStatus.VENDOR_LIST_APPROVED)) {
+            throw new RuntimeException("Cannot mark items as procured. Request status: " + request.getStatus());
+        }
+
+        rm.setStatus("PROCURED");
+        requestMaterialRepo.save(rm);
+
+        // Check if ALL items for this request are now PROCURED
+        List<RequestMaterial> allMaterials = requestMaterialRepo.findByRequestId(request.getId());
+        boolean allProcured = allMaterials.stream()
+                .allMatch(m -> "PROCURED".equals(m.getStatus()));
+
+        if (allProcured) {
+            request.setStatus(RequestStatus.ITEMS_READY);
+            requestRepository.save(request);
+        }
+
+        return mapToResponse(request);
+    }
+
+    // ==================== Phase 4: Production ====================
+
+    @Override
+    public RequestResponseDto startProduction(Long requestId, JwtPrincipal principal) {
+        Request request = requestRepository.findById(requestId)
+                .orElseThrow(() -> new ResourceNotFoundException("Request not found: " + requestId));
+
+        if (!request.getStatus().equals(RequestStatus.ITEMS_READY)) {
+            throw new RuntimeException("Cannot start production. Request status must be ITEMS_READY. Current: " + request.getStatus());
+        }
+
+        request.setStatus(RequestStatus.IN_PRODUCTION);
+        return mapToResponse(requestRepository.save(request));
+    }
+
+    @Override
+    public RequestResponseDto completeProduction(Long requestId, JwtPrincipal principal) {
+        Request request = requestRepository.findById(requestId)
+                .orElseThrow(() -> new ResourceNotFoundException("Request not found: " + requestId));
+
+        if (!request.getStatus().equals(RequestStatus.IN_PRODUCTION)) {
+            throw new RuntimeException("Cannot complete production. Request status must be IN_PRODUCTION. Current: " + request.getStatus());
+        }
+
+        request.setStatus(RequestStatus.PAYMENT_PENDING);
+        return mapToResponse(requestRepository.save(request));
+    }
+
+    // ==================== Phase 5: Payment & Closure ====================
+
+    @Override
+    public RequestResponseDto confirmPayment(Long requestId, JwtPrincipal principal) {
+        Request request = requestRepository.findById(requestId)
+                .orElseThrow(() -> new ResourceNotFoundException("Request not found: " + requestId));
+
+        if (!request.getStatus().equals(RequestStatus.PAYMENT_PENDING)) {
+            throw new RuntimeException("Cannot confirm payment. Request status must be PAYMENT_PENDING. Current: " + request.getStatus());
+        }
+
+        request.setStatus(RequestStatus.COMPLETED);
+        return mapToResponse(requestRepository.save(request));
+    }
+
+    // ==================== Helpers ====================
+
+    private String generateRequestNumber() {
+        long timestamp = System.currentTimeMillis() % 10000;
+        return "REQ-" + LocalDate.now().getYear() + "-" + timestamp;
     }
 }

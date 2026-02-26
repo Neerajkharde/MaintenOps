@@ -24,11 +24,16 @@ const RequestDetailsModal = ({ isOpen, onClose, request, onSuccess }) => {
     if (!isOpen || !request) return null;
 
     const status = request.status;
-    const isSubmitted = status === 'SUBMITTED';
-    const isPendingSA = status === 'PENDING_SA_APPROVAL';
-    const isQuotationSent = status === 'QUOTATION_SENT';
+    const isRequestCreated = status === 'REQUEST_CREATED';
+    const isQuotationAdded = status === 'QUOTATION_ADDED';
+    const isQuotationApproved = status === 'QUOTATION_APPROVED';
     const isApproved = status === 'APPROVED';
-    const isVendorListPrepared = status === 'VENDOR_LIST_PREPARED';
+    const isPendingSA = status === 'PENDING_SA_APPROVAL';
+    const isVendorListApproved = status === 'VENDOR_LIST_APPROVED';
+    const isItemsReady = status === 'ITEMS_READY';
+    const isInProduction = status === 'IN_PRODUCTION';
+    const isPaymentPending = status === 'PAYMENT_PENDING';
+    const isCompleted = status === 'COMPLETED';
 
     const materials = fetchedMaterials ?? request.materials ?? [];
     const totalCost = request.totalEstimatedCost ?? request.quotationAmount;
@@ -66,12 +71,27 @@ const RequestDetailsModal = ({ isOpen, onClose, request, onSuccess }) => {
     const fmtDate = (d) => d ? new Date(d).toLocaleDateString('en-IN', { day: '2-digit', month: '2-digit', year: 'numeric' }) : '—';
 
     // Timeline steps
+    // Timeline steps covering all 10 statuses
+    const pastQuotationAdded = !isRequestCreated;
+    const pastQuotationApproved = !isRequestCreated && !isQuotationAdded;
+    const pastApproved = isApproved || isPendingSA || isVendorListApproved || isItemsReady || isInProduction || isPaymentPending || isCompleted;
+    const pastListGenerated = isPendingSA || isVendorListApproved || isItemsReady || isInProduction || isPaymentPending || isCompleted;
+    const pastVendorApproved = isVendorListApproved || isItemsReady || isInProduction || isPaymentPending || isCompleted;
+    const pastItemsReady = isItemsReady || isInProduction || isPaymentPending || isCompleted;
+    const pastInProduction = isInProduction || isPaymentPending || isCompleted;
+    const pastPaymentPending = isPaymentPending || isCompleted;
+
     const steps = [
-        { label: 'Request Submitted', sub: request.date, done: true },
-        { label: 'Admin Preparing Quotation', sub: 'Materials, costs being assessed', done: isPendingSA || isQuotationSent || isApproved || isVendorListPrepared },
-        { label: 'Quotation Ready — Your Action Required', sub: isQuotationSent ? '✉️ Please review and approve below' : (isApproved || isVendorListPrepared) ? 'You approved this' : 'Awaiting SA sign-off', done: isQuotationSent || isApproved || isVendorListPrepared, active: isQuotationSent },
-        { label: 'You Approved the Quotation', sub: isApproved || isVendorListPrepared ? 'Procurement started' : 'Pending', done: isApproved || isVendorListPrepared },
-        { label: 'Vendor Procurement', sub: isVendorListPrepared ? '✅ Purchase list ready' : 'Pending', done: isVendorListPrepared },
+        { label: 'Request Created', sub: request.date, done: true },
+        { label: 'Quotation Added by Admin', sub: pastQuotationAdded ? 'Materials & costs assessed' : 'Awaiting admin review', done: pastQuotationAdded },
+        { label: 'Quotation Approved by SA', sub: pastQuotationApproved ? 'Ready for your review' : 'Awaiting SA sign-off', done: pastQuotationApproved, active: isQuotationApproved },
+        { label: 'You Accepted the Quotation', sub: pastApproved ? 'Quotation accepted' : 'Pending your approval', done: pastApproved, active: isQuotationApproved },
+        { label: 'Lists Generated', sub: pastListGenerated ? 'Material & vendor lists created' : 'Pending', done: pastListGenerated },
+        { label: 'Vendor Lists Approved', sub: pastVendorApproved ? 'Procurement authorized' : 'Awaiting SA approval', done: pastVendorApproved },
+        { label: 'Items Procured', sub: pastItemsReady ? '✅ All materials received' : 'Procurement in progress', done: pastItemsReady },
+        { label: 'In Production', sub: pastInProduction ? 'Work in progress' : 'Pending', done: pastInProduction, active: isInProduction },
+        { label: 'Payment Pending', sub: pastPaymentPending ? 'Production complete' : 'Pending', done: pastPaymentPending },
+        { label: 'Completed', sub: isCompleted ? '✅ Request closed' : 'Pending', done: isCompleted },
     ];
 
     const progressFraction = steps.reduce((n, s) => n + (s.done ? 1 : 0), 0) - 1;
@@ -87,7 +107,7 @@ const RequestDetailsModal = ({ isOpen, onClose, request, onSuccess }) => {
                         <div className="flex items-center gap-3 mb-1">
                             <h2 className="text-[22px] font-bold font-['Google_Sans_Display',sans-serif] text-[#1a73e8]">{request.requestNumber || request.id}</h2>
                             {getDeptChip(request.serviceDepartmentName || request.dept)}
-                            {isQuotationSent && (
+                            {isQuotationApproved && (
                                 <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-[50px] bg-[#fff8e1] text-[#f9ab00] text-[12px] font-semibold animate-pulse">
                                     ✉️ Action Required
                                 </span>
@@ -102,8 +122,8 @@ const RequestDetailsModal = ({ isOpen, onClose, request, onSuccess }) => {
                     </button>
                 </div>
 
-                {/* QUOTATION_SENT Banner */}
-                {isQuotationSent && (
+                {/* QUOTATION_APPROVED Banner — user needs to accept */}
+                {isQuotationApproved && (
                     <div className="px-8 py-4 bg-[#fff8e1] border-b border-[#fde68a] flex items-center justify-between gap-4">
                         <div>
                             <div className="text-[14px] font-semibold text-[#b45309]">✉️ Your quotation is ready for review! Please check the details below.</div>
@@ -114,7 +134,7 @@ const RequestDetailsModal = ({ isOpen, onClose, request, onSuccess }) => {
                         </div>
                         <button onClick={handleApproveQuotation} disabled={isApproving}
                             className="flex-shrink-0 bg-[#137333] hover:bg-[#0d652d] text-white px-5 py-[9px] rounded-[50px] text-[13px] font-semibold transition-all shadow-sm disabled:opacity-70">
-                            {isApproving ? 'Approving...' : '✅ Approve Quotation'}
+                            {isApproving ? 'Approving...' : '✅ Accept Quotation'}
                         </button>
                     </div>
                 )}

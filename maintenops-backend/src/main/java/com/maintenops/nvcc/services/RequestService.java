@@ -26,8 +26,23 @@ public interface RequestService {
     List<RequestResponseDto> getAdminRequestHistory(JwtPrincipal principal);
     List<RequestResponseDto> getSuperAdminRequestHistory(JwtPrincipal principal);
 
-    // Quotation Flow
+    // Phase 1: Quotation Flow
     RequestResponseDto userApproveQuotation(Long requestId, JwtPrincipal principal);
-    RequestResponseDto generateVendorList(Long requestId);
     RequestResponseDto getRequestByIdForAdmin(Long requestId);
+
+    // Phase 2: List Preparation
+    RequestResponseDto generateLists(Long requestId, JwtPrincipal principal);
+    List<RequestResponseDto> getApprovedRequests();
+    RequestResponseDto approveVendorLists(Long requestId, JwtPrincipal principal);
+    List<RequestResponseDto> getRequestsPendingListApproval();
+
+    // Phase 3: Procurement
+    RequestResponseDto markItemProcured(Long requestMaterialId, JwtPrincipal principal);
+
+    // Phase 4: Production
+    RequestResponseDto startProduction(Long requestId, JwtPrincipal principal);
+    RequestResponseDto completeProduction(Long requestId, JwtPrincipal principal);
+
+    // Phase 5: Payment & Closure
+    RequestResponseDto confirmPayment(Long requestId, JwtPrincipal principal);
 }

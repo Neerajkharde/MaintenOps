@@ -5,7 +5,7 @@ import { formatDate } from '../../utils/dateUtils';
 
 /**
  * SuperAdminReviewModal — SA reviews the Admin's material-based quotation and approves it.
- * On approval, status transitions to QUOTATION_SENT (user gets the quotation).
+ * On approval, status transitions to QUOTATION_APPROVED (user can accept the quotation).
  */
 const SuperAdminReviewModal = ({ isOpen, onClose, request, onSuccess }) => {
     const [superAdminRemarks, setSuperAdminRemarks] = useState('');

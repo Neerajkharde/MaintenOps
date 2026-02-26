@@ -18,10 +18,10 @@ const ActiveRequests = () => {
             if (filter === 'Pending') {
                 data = await requestService.getPendingAdminRequests();
             } else if (filter === 'Completed') {
-                // Fetch history endpoint — returns all non-SUBMITTED requests (after backend restart)
+                // Fetch history endpoint — returns all non-REQUEST_CREATED requests (after backend restart)
                 // Also filter client-side to be safe
                 const history = await requestService.getAdminRequestHistory().catch(() => []);
-                data = (history || []).filter(r => r.status !== 'SUBMITTED');
+                data = (history || []).filter(r => r.status !== 'REQUEST_CREATED');
             } else if (filter === 'All') {
                 const [pending, history] = await Promise.allSettled([
                     requestService.getPendingAdminRequests(),
@@ -38,9 +38,9 @@ const ActiveRequests = () => {
                 desc: req.itemDescription,
                 requester: req.requesterName,
                 dept: req.organizationDepartmentName,
-                stage: req.status === 'SUBMITTED' ? 'Pending Review' : req.status.replace(/_/g, ' '),
+                stage: req.status === 'REQUEST_CREATED' ? 'Pending Review' : req.status.replace(/_/g, ' '),
                 date: formatDate(req.createdAt),
-                isPending: req.status === 'SUBMITTED',
+                isPending: req.status === 'REQUEST_CREATED',
                 raw: req
             }));
 

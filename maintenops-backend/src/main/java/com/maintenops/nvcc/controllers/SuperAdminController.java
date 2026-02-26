@@ -6,7 +6,6 @@ import com.maintenops.nvcc.security.JwtPrincipal;
 import com.maintenops.nvcc.services.RequestService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -15,8 +14,8 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 /**
- * SuperAdminController handles super admin-specific operations
- * Super Admin can send quotations, approve requests, and manage work allocation
+ * SuperAdminController handles super admin-specific operations.
+ * Super Admin has approval authority before financial commitment stages.
  */
 @RestController
 @RequiredArgsConstructor
@@ -24,70 +23,62 @@ import java.util.List;
 public class SuperAdminController {
     private final RequestService requestService;
 
+    // ==================== Phase 1: Quotation Approval ====================
+
     /**
-     * Get all requests waiting for super admin review
-     * Returns all PENDING_SA_APPROVAL requests that need super admin examination and quotation
-     *
-     * @param principal the authenticated super admin user
-     * @return ResponseEntity with list of requests pending super admin review and HTTP 200 (OK) status
+     * Get all requests waiting for super admin quotation review (QUOTATION_ADDED status)
      */
     @GetMapping("/requests/pending-review")
     @PreAuthorize("hasRole('SUPER_ADMIN')")
     public ResponseEntity<List<RequestResponseDto>> getRequestsForReview(
             @AuthenticationPrincipal JwtPrincipal principal) {
-
-        List<RequestResponseDto> requests = requestService.getRequestsForSuperAdminReview();
-        return ResponseEntity.ok(requests);
+        return ResponseEntity.ok(requestService.getRequestsForSuperAdminReview());
     }
 
     /**
-     * Review a request as Super Admin and send quotation
-     * Super Admin examines admin's review, provides cost estimate and quotation details
-     *
-     * Request Body Example:
-     * {
-     *   "requestId": 1,
-     *   "quotationAmount": 5000.00,
-     *   "quotationDescription": "Parts: AC compressor (₹3500), Labor (₹1500)",
-     *   "superAdminRemarks": "Approved for procurement. Standard maintenance.",
-     *   "approved": true
-     * }
-     *
-     * Notes:
-     * - approved=true: Moves request to APPROVED status, ready to start work
-     * - approved=false: Keeps request as PENDING_SA_APPROVAL for super admin to revise quotation
-     * - quotationAmount: Total estimated cost for the maintenance work
-     * - quotationDescription: Itemized breakdown of costs
-     *
-     * @param dto the super admin review details (requestId, quotationAmount, quotationDescription, superAdminRemarks, approved)
-     * @param principal the authenticated super admin user
-     * @return ResponseEntity with updated request details and HTTP 200 (OK) status
+     * Review (approve/reject) a quotation as Super Admin.
+     * Status: QUOTATION_ADDED → QUOTATION_APPROVED
      */
     @PutMapping("/requests/review")
     @PreAuthorize("hasRole('SUPER_ADMIN')")
     public ResponseEntity<RequestResponseDto> reviewRequest(
-            @Valid
-            @RequestBody SuperAdminReviewRequestDto dto,
+            @Valid @RequestBody SuperAdminReviewRequestDto dto,
             @AuthenticationPrincipal JwtPrincipal principal) {
-
-        RequestResponseDto updatedRequest = requestService.reviewRequestAsSuperAdmin(dto, principal);
-        return ResponseEntity.ok(updatedRequest);
+        return ResponseEntity.ok(requestService.reviewRequestAsSuperAdmin(dto, principal));
     }
 
     /**
      * Get review history for the logged-in Super Admin
-     * Returns requests that the super admin has already reviewed and quoted
-     *
-     * @param principal the authenticated super admin user
-     * @return ResponseEntity with list of requests and HTTP 200 (OK) status
      */
     @GetMapping("/requests/history")
     @PreAuthorize("hasRole('SUPER_ADMIN')")
     public ResponseEntity<List<RequestResponseDto>> getSuperAdminHistory(
             @AuthenticationPrincipal JwtPrincipal principal) {
+        return ResponseEntity.ok(requestService.getSuperAdminRequestHistory(principal));
+    }
 
-        List<RequestResponseDto> requests = requestService.getSuperAdminRequestHistory(principal);
-        return ResponseEntity.ok(requests);
+    // ==================== Phase 2: Vendor List Approval ====================
+
+    /**
+     * Get all requests pending vendor list approval (PENDING_SA_APPROVAL status)
+     */
+    @GetMapping("/requests/pending-list-approval")
+    @PreAuthorize("hasRole('SUPER_ADMIN')")
+    public ResponseEntity<List<RequestResponseDto>> getRequestsPendingListApproval(
+            @AuthenticationPrincipal JwtPrincipal principal) {
+        return ResponseEntity.ok(requestService.getRequestsPendingListApproval());
+    }
+
+    /**
+     * Approve vendor lists for a request.
+     * Status: PENDING_SA_APPROVAL → VENDOR_LIST_APPROVED
+     * Procurement cannot begin before this approval.
+     */
+    @PostMapping("/requests/{id}/approve-vendor-lists")
+    @PreAuthorize("hasRole('SUPER_ADMIN')")
+    public ResponseEntity<RequestResponseDto> approveVendorLists(
+            @PathVariable Long id,
+            @AuthenticationPrincipal JwtPrincipal principal) {
+        return ResponseEntity.ok(requestService.approveVendorLists(id, principal));
     }
 }
-

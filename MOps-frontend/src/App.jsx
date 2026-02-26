@@ -17,9 +17,8 @@ import VendorsPage from './pages/dashboard/admin/VendorsPage';
 import InventoryPage from './pages/dashboard/admin/InventoryPage';
 import CreateQuotationPage from './pages/dashboard/admin/CreateQuotationPage';
 import ApprovalQueuePage from './pages/dashboard/superadmin/ApprovalQueuePage';
-import EscalationsPage from './pages/dashboard/superadmin/EscalationsPage';
 import SystemAdminsPage from './pages/dashboard/superadmin/SystemAdminsPage';
-import SettingsPage from './pages/dashboard/superadmin/SettingsPage';
+import SAVendorListsPage from './pages/dashboard/superadmin/SAVendorListsPage';
 
 function App() {
   return (
@@ -57,9 +56,8 @@ function App() {
               <Route path="/super-admin" element={<DashboardLayout />}>
                 <Route index element={<SuperAdminDashboard />} />
                 <Route path="approvals" element={<ApprovalQueuePage />} />
-                <Route path="escalations" element={<EscalationsPage />} />
                 <Route path="admins" element={<SystemAdminsPage />} />
-                <Route path="settings" element={<SettingsPage />} />
+                <Route path="vendor-lists" element={<SAVendorListsPage />} />
               </Route>
             </Route>
 

@@ -5,6 +5,24 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { get } from '../../../services/api';
 import Button from '../../../components/Button';
 
+/**
+ * Statuses where the admin must take an action:
+ *   REQUEST_CREATED  → Draft / Finalize quotation
+ *   APPROVED         → Generate Lists
+ *   VENDOR_LIST_APPROVED → Mark items as Procured
+ *   ITEMS_READY      → Start Production
+ *   IN_PRODUCTION    → Complete Production
+ *   PAYMENT_PENDING  → Confirm Payment
+ */
+const ADMIN_ACTIONABLE = [
+    'REQUEST_CREATED',
+    'APPROVED',
+    'VENDOR_LIST_APPROVED',
+    'ITEMS_READY',
+    'IN_PRODUCTION',
+    'PAYMENT_PENDING',
+];
+
 const ActionQueuePage = () => {
     const navigate = useNavigate();
     const location = useLocation();
@@ -12,6 +30,7 @@ const ActionQueuePage = () => {
     const [pendingRequests, setPendingRequests] = useState([]);
     const [completedRequests, setCompletedRequests] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [actionLoading, setActionLoading] = useState(null); // id of request being acted on
     const [selectedRequest, setSelectedRequest] = useState(null);
     const [showReviewModal, setShowReviewModal] = useState(false);
 
@@ -23,13 +42,20 @@ const ActionQueuePage = () => {
         ]);
 
         const pending = pendingResult.status === 'fulfilled' ? (pendingResult.value || []) : [];
-        let processed = [];
+        let history = [];
         if (historyResult.status === 'fulfilled') {
-            processed = historyResult.value || [];
+            history = historyResult.value || [];
         }
 
-        setPendingRequests(pending);
-        setCompletedRequests(processed.filter(r => r.status !== 'SUBMITTED'));
+        // Actionable = REQUEST_CREATED requests + any history requests with an admin-actionable status
+        const actionableFromHistory = history.filter(r => ADMIN_ACTIONABLE.includes(r.status) && r.status !== 'REQUEST_CREATED');
+        const allActionable = [...pending, ...actionableFromHistory];
+
+        // Completed = history items NOT in an actionable status
+        const done = history.filter(r => !ADMIN_ACTIONABLE.includes(r.status));
+
+        setPendingRequests(allActionable);
+        setCompletedRequests(done);
         setLoading(false);
     }, []);
 
@@ -56,17 +82,75 @@ const ActionQueuePage = () => {
         fetchData();
     };
 
-    const statusConfig = {
-        SUBMITTED: { label: 'Submitted', bg: 'bg-primary-container', text: 'text-primary' },
-        PENDING_SA_APPROVAL: { label: 'Awaiting SA', bg: 'bg-warning-container', text: 'text-warning' },
-        QUOTATION_SENT: { label: 'Quotation Mode', bg: 'bg-primary-container', text: 'text-primary' },
-        APPROVED: { label: 'Approved', bg: 'bg-success-container', text: 'text-success' },
-        VENDOR_LIST_PREPARED: { label: 'Vendor Assigned', bg: 'bg-[#f3e8fd]', text: 'text-[#9334ea]' },
+    // ==================== Phase-specific actions ====================
+
+    const handleGenerateLists = async (reqId) => {
+        setActionLoading(reqId);
+        try {
+            await requestService.generateLists(reqId);
+            fetchData();
+        } catch (e) { alert(e.message); }
+        setActionLoading(null);
     };
 
-    const RequestCard = ({ req, isPending }) => {
+    const handleStartProduction = async (reqId) => {
+        setActionLoading(reqId);
+        try {
+            await requestService.startProduction(reqId);
+            fetchData();
+        } catch (e) { alert(e.message); }
+        setActionLoading(null);
+    };
+
+    const handleCompleteProduction = async (reqId) => {
+        setActionLoading(reqId);
+        try {
+            await requestService.completeProduction(reqId);
+            fetchData();
+        } catch (e) { alert(e.message); }
+        setActionLoading(null);
+    };
+
+    const handleConfirmPayment = async (reqId) => {
+        setActionLoading(reqId);
+        try {
+            await requestService.confirmPayment(reqId);
+            fetchData();
+        } catch (e) { alert(e.message); }
+        setActionLoading(null);
+    };
+
+    const handleMarkItemProcured = async (materialId) => {
+        setActionLoading(materialId);
+        try {
+            await requestService.markItemProcured(materialId);
+            fetchData();
+        } catch (e) { alert(e.message); }
+        setActionLoading(null);
+    };
+
+    // ==================== Status Config ====================
+
+    const statusConfig = {
+        REQUEST_CREATED: { label: 'Submitted', bg: 'bg-primary-container', text: 'text-primary' },
+        QUOTATION_ADDED: { label: 'Awaiting SA', bg: 'bg-warning-container', text: 'text-warning' },
+        QUOTATION_APPROVED: { label: 'Quotation Approved', bg: 'bg-[#e8f5e9]', text: 'text-[#2e7d32]' },
+        APPROVED: { label: 'User Accepted', bg: 'bg-success-container', text: 'text-success' },
+        PENDING_SA_APPROVAL: { label: 'Lists Pending SA', bg: 'bg-warning-container', text: 'text-warning' },
+        VENDOR_LIST_APPROVED: { label: 'Vendor Approved', bg: 'bg-[#e3f2fd]', text: 'text-[#1565c0]' },
+        ITEMS_READY: { label: 'Items Ready', bg: 'bg-[#f3e8fd]', text: 'text-[#9334ea]' },
+        IN_PRODUCTION: { label: 'In Production', bg: 'bg-[#fff3e0]', text: 'text-[#e65100]' },
+        PAYMENT_PENDING: { label: 'Payment Pending', bg: 'bg-[#fce4ec]', text: 'text-[#c62828]' },
+        COMPLETED: { label: 'Completed', bg: 'bg-success', text: 'text-white' },
+    };
+
+    // ==================== Request Card ====================
+
+    const RequestCard = ({ req }) => {
         const cfg = statusConfig[req.status] || { label: req.status, bg: 'bg-surface-variant', text: 'text-on-surface-variant' };
         const quotationReady = !!req.estimatedDays;
+        const isActing = actionLoading === req.id;
+        const st = req.status;
 
         return (
             <div className="google-card p-6 hover:shadow-md transition-all group border-outline/30 bg-white">
@@ -116,8 +200,44 @@ const ActionQueuePage = () => {
                     </div>
                 )}
 
+                {/* ===== Material list with Procure buttons (VENDOR_LIST_APPROVED) ===== */}
+                {st === 'VENDOR_LIST_APPROVED' && req.materials && req.materials.length > 0 && (
+                    <div className="mb-6 border border-outline/20 rounded-lg overflow-hidden">
+                        <div className="px-4 py-2.5 bg-[#e3f2fd]/40 border-b border-outline/20 text-[12px] font-bold font-ui text-[#1565c0] uppercase tracking-wider">
+                            Procurement Checklist
+                        </div>
+                        <div className="divide-y divide-outline/10">
+                            {req.materials.map(m => (
+                                <div key={m.id} className="flex items-center justify-between px-4 py-3">
+                                    <div className="flex-1">
+                                        <div className="text-[13px] font-medium text-on-surface">{m.materialName}</div>
+                                        <div className="text-[11px] text-on-surface-variant">
+                                            {m.quantity} {m.unit} · {m.vendorName || 'No vendor'} · ₹{Number(m.totalPrice ?? 0).toFixed(2)}
+                                        </div>
+                                    </div>
+                                    {m.status === 'PROCURED' ? (
+                                        <span className="text-[11px] font-semibold text-success px-2.5 py-1 bg-success-container rounded-pill">✓ Procured</span>
+                                    ) : (
+                                        <Button
+                                            variant="outline"
+                                            onClick={() => handleMarkItemProcured(m.id)}
+                                            disabled={actionLoading === m.id}
+                                            className="!rounded-md text-[12px] h-8 px-3 border-[#1565c0] text-[#1565c0] hover:bg-[#e3f2fd]"
+                                        >
+                                            {actionLoading === m.id ? 'Marking...' : 'Mark Procured'}
+                                        </Button>
+                                    )}
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                )}
+
+                {/* ===== Phase-specific action buttons ===== */}
                 <div className="flex gap-3 flex-wrap">
-                    {isPending && (
+
+                    {/* Phase 1: REQUEST_CREATED — Draft / Finalize / Details */}
+                    {st === 'REQUEST_CREATED' && (
                         <>
                             {!quotationReady ? (
                                 <Button
@@ -156,9 +276,60 @@ const ActionQueuePage = () => {
                             </Button>
                         </>
                     )}
+
+                    {/* Phase 2: APPROVED — Generate Lists */}
+                    {st === 'APPROVED' && (
+                        <Button
+                            variant="primary"
+                            onClick={() => handleGenerateLists(req.id)}
+                            disabled={isActing}
+                            className="!rounded-md px-6 bg-[#1565c0] hover:bg-[#0d47a1]"
+                        >
+                            {isActing ? 'Generating...' : '📋 Generate Lists'}
+                        </Button>
+                    )}
+
+                    {/* Phase 3: VENDOR_LIST_APPROVED — individual procure buttons are above */}
+
+                    {/* Phase 4a: ITEMS_READY — Start Production */}
+                    {st === 'ITEMS_READY' && (
+                        <Button
+                            variant="primary"
+                            onClick={() => handleStartProduction(req.id)}
+                            disabled={isActing}
+                            className="!rounded-md px-6 bg-[#e65100] hover:bg-[#bf360c]"
+                        >
+                            {isActing ? 'Starting...' : '🏭 Start Production'}
+                        </Button>
+                    )}
+
+                    {/* Phase 4b: IN_PRODUCTION — Complete Production */}
+                    {st === 'IN_PRODUCTION' && (
+                        <Button
+                            variant="primary"
+                            onClick={() => handleCompleteProduction(req.id)}
+                            disabled={isActing}
+                            className="!rounded-md px-6 bg-[#c62828] hover:bg-[#b71c1c]"
+                        >
+                            {isActing ? 'Completing...' : '✅ Complete Production'}
+                        </Button>
+                    )}
+
+                    {/* Phase 5: PAYMENT_PENDING — Confirm Payment */}
+                    {st === 'PAYMENT_PENDING' && (
+                        <Button
+                            variant="primary"
+                            onClick={() => handleConfirmPayment(req.id)}
+                            disabled={isActing}
+                            className="!rounded-md px-6 bg-success hover:bg-success/90"
+                        >
+                            {isActing ? 'Confirming...' : '💰 Confirm Payment'}
+                        </Button>
+                    )}
                 </div>
 
-                {!isPending && req.adminRemarks && (
+                {/* Admin audit note (shown on completed tab) */}
+                {!ADMIN_ACTIONABLE.includes(st) && req.adminRemarks && (
                     <div className="mt-4 bg-background rounded-lg p-4 border border-outline/20">
                         <div className="text-[10px] text-on-surface-variant mb-2 font-bold uppercase tracking-widest font-ui">Admin Audit Note</div>
                         <p className="text-[13px] text-on-surface leading-relaxed font-body">{req.adminRemarks}</p>
@@ -201,7 +372,7 @@ const ActionQueuePage = () => {
             <div className="flex gap-2 p-1 bg-surface-variant/40 rounded-pill w-fit mb-10">
                 {[
                     { key: 'pending', label: 'Awaiting Action', count: pendingRequests.length, urgent: pendingRequests.filter(r => r.urgencyRequested).length },
-                    { key: 'completed', label: 'Resolved by Me', count: completedRequests.length },
+                    { key: 'completed', label: 'Resolved', count: completedRequests.length },
                 ].map(tab_ => (
                     <button
                         key={tab_.key}
@@ -242,7 +413,7 @@ const ActionQueuePage = () => {
             ) : (
                 <div className="grid gap-6">
                     {activeList.map(req => (
-                        <RequestCard key={req.id} req={req} isPending={tab === 'pending'} />
+                        <RequestCard key={req.id} req={req} />
                     ))}
                 </div>
             )}

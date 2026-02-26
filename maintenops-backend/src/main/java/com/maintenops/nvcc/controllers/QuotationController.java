@@ -55,7 +55,7 @@ public class QuotationController {
     }
 
     /**
-     * Get all vendor purchase lists (aggregated PENDING_PURCHASE items by vendor)
+     * Get all vendor purchase lists (aggregated PENDING_PROCUREMENT items by vendor)
      * GET /api/vendor-lists
      */
     @GetMapping("/vendor-lists")

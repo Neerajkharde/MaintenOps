@@ -185,62 +185,50 @@ const UserDashboard = () => {
 
                                 {/* Stage Completion logic */}
                                 {(() => {
-                                    const isPendingSA = currentReq.status === 'PENDING_SA_APPROVAL';
-                                    const isApproved = currentReq.status === 'APPROVED';
+                                    const st = currentReq.status;
+                                    const trackerSteps = [
+                                        { label: 'Request Created', desc: 'Successfully logged into the maintenance portal.', key: 'REQUEST_CREATED' },
+                                        { label: 'Quotation Added', desc: 'Admin assessed materials & costs.', key: 'QUOTATION_ADDED' },
+                                        { label: 'Quotation Approved', desc: 'Super Admin approved the quotation.', key: 'QUOTATION_APPROVED' },
+                                        { label: 'You Accepted', desc: 'Quotation accepted, lists being prepared.', key: 'APPROVED' },
+                                        { label: 'Lists Pending SA', desc: 'Material & vendor lists awaiting approval.', key: 'PENDING_SA_APPROVAL' },
+                                        { label: 'Vendor Lists Approved', desc: 'Procurement authorized by SA.', key: 'VENDOR_LIST_APPROVED' },
+                                        { label: 'Items Ready', desc: 'All materials procured.', key: 'ITEMS_READY' },
+                                        { label: 'In Production', desc: 'Work underway on your request.', key: 'IN_PRODUCTION' },
+                                        { label: 'Payment Pending', desc: 'Production complete, awaiting payment.', key: 'PAYMENT_PENDING' },
+                                        { label: 'Completed', desc: 'Request fulfilled and closed.', key: 'COMPLETED' },
+                                    ];
+                                    const statusOrder = trackerSteps.map(s => s.key);
+                                    const currentIdx = statusOrder.indexOf(st);
 
                                     return (
                                         <>
-                                            {/* Stage 1: Submitted */}
-                                            <div className="relative flex items-start group">
-                                                <div className="absolute -left-12 flex h-10 w-10 items-center justify-center rounded-full bg-success text-white shadow-sm ring-8 ring-white">
-                                                    <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>
-                                                </div>
-                                                <div>
-                                                    <h5 className="text-[15px] font-display font-medium text-on-surface">Ticket Received</h5>
-                                                    <p className="text-[13px] text-on-surface-variant font-ui mt-1">Successfully logged into the maintenance portal.</p>
-                                                </div>
-                                            </div>
-
-                                            {/* Stage 2: Verification */}
-                                            <div className="relative flex items-start group">
-                                                <div className={`absolute -left-12 flex h-10 w-10 items-center justify-center rounded-full ring-8 ring-white transition-all ${isApproved ? 'bg-success text-white' : isPendingSA ? 'bg-primary text-white shadow-md animate-pulse' : 'bg-surface-variant text-on-surface-variant'}`}>
-                                                    {isApproved ? (
-                                                        <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>
-                                                    ) : (
-                                                        <span className="text-[13px] font-bold">2</span>
-                                                    )}
-                                                </div>
-                                                <div className={!isPendingSA && !isApproved ? 'opacity-40' : ''}>
-                                                    <h5 className="text-[15px] font-display font-medium text-on-surface">Admin Appraisal</h5>
-                                                    <p className="text-[13px] text-on-surface-variant font-ui mt-1">Detailed review by the facility coordinator is in progress.</p>
-                                                    {isPendingSA && (
-                                                        <div className="mt-4 inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-warning-container/30 text-warning text-[12px] font-semibold font-ui uppercase tracking-wide">
-                                                            <div className="w-1.5 h-1.5 rounded-full bg-warning animate-pulse"></div>
-                                                            Reviewing Quotation
+                                            {trackerSteps.map((step, i) => {
+                                                const isDone = i <= currentIdx;
+                                                const isCurrent = i === currentIdx;
+                                                return (
+                                                    <div key={step.key} className="relative flex items-start group">
+                                                        <div className={`absolute -left-12 flex h-10 w-10 items-center justify-center rounded-full ring-8 ring-white transition-all ${isDone ? 'bg-success text-white' : isCurrent ? 'bg-primary text-white shadow-md animate-pulse' : 'bg-surface-variant text-on-surface-variant'
+                                                            }`}>
+                                                            {isDone ? (
+                                                                <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>
+                                                            ) : (
+                                                                <span className="text-[13px] font-bold">{i + 1}</span>
+                                                            )}
                                                         </div>
-                                                    )}
-                                                </div>
-                                            </div>
-
-                                            {/* Stage 3: Execution */}
-                                            <div className="relative flex items-start group">
-                                                <div className={`absolute -left-12 flex h-10 w-10 items-center justify-center rounded-full ring-8 ring-white ${isApproved ? 'bg-success text-white shadow-md' : 'bg-surface-variant text-on-surface-variant'}`}>
-                                                    {isApproved ? (
-                                                        <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>
-                                                    ) : (
-                                                        <span className="text-[13px] font-bold">3</span>
-                                                    )}
-                                                </div>
-                                                <div className={!isApproved ? 'opacity-40' : ''}>
-                                                    <h5 className="text-[15px] font-display font-medium text-on-surface">Execution Phase</h5>
-                                                    <p className="text-[13px] text-on-surface-variant font-ui mt-1">Materials procured and vendors assigned for site work.</p>
-                                                    {isApproved && (
-                                                        <div className="mt-4 inline-flex items-center gap-2 px-4 py-1.5 rounded-lg bg-success text-white text-[12px] font-semibold font-ui shadow-sm">
-                                                            Work Commencement Ready
+                                                        <div className={!isDone && !isCurrent ? 'opacity-40' : ''}>
+                                                            <h5 className="text-[15px] font-display font-medium text-on-surface">{step.label}</h5>
+                                                            <p className="text-[13px] text-on-surface-variant font-ui mt-1">{step.desc}</p>
+                                                            {isCurrent && (
+                                                                <div className="mt-4 inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-primary-container/30 text-primary text-[12px] font-semibold font-ui uppercase tracking-wide">
+                                                                    <div className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse"></div>
+                                                                    Current Stage
+                                                                </div>
+                                                            )}
                                                         </div>
-                                                    )}
-                                                </div>
-                                            </div>
+                                                    </div>
+                                                );
+                                            })}
                                         </>
                                     );
                                 })()}
@@ -262,7 +250,7 @@ const UserDashboard = () => {
                     <div className="google-card p-8 border-outline/30 bg-white">
                         <h3 className="text-[18px] font-display font-medium text-on-surface mb-8 pb-4 border-b border-outline/20">Operational Audit</h3>
 
-                        {currentReq?.status === 'APPROVED' ? (
+                        {currentReq?.totalEstimatedCost ? (
                             <div className="animate-fadeUp">
                                 <div className="mb-6">
                                     <div className="text-[12px] font-ui font-bold text-on-surface-variant uppercase tracking-widest mb-1">Approved Estimate</div>

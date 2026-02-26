@@ -88,7 +88,7 @@ export const quotationService = {
     },
 
     /**
-     * User approves the quotation (QUOTATION_SENT → APPROVED)
+     * User approves the quotation (QUOTATION_APPROVED → APPROVED)
      * @param {number} requestId
      */
     userApproveQuotation: async (requestId) => {
@@ -101,7 +101,7 @@ export const quotationService = {
     },
 
     /**
-     * Generate vendor purchase list (APPROVED → VENDOR_LIST_PREPARED)
+     * Generate vendor purchase list (APPROVED → PENDING_SA_APPROVAL)
      * @param {number} requestId
      */
     generateVendorList: async (requestId) => {

@@ -65,11 +65,11 @@ export const RequestProvider = ({ children }) => {
         fetchRequests();
     }, [user]); // Re-fetch when user changes (e.g., login/logout)
 
-    const activeRequests = requests.filter(req => req.status !== 'APPROVED');
+    const activeRequests = requests.filter(req => req.status !== 'COMPLETED');
     const totalRequests = requests.length;
-    const submittedRequests = requests.filter(req => req.status === 'SUBMITTED').length;
-    const pendingSARequests = requests.filter(req => req.status === 'PENDING_SA_APPROVAL').length;
-    const approvedRequests = requests.filter(req => req.status === 'APPROVED').length;
+    const submittedRequests = requests.filter(req => req.status === 'REQUEST_CREATED').length;
+    const pendingSARequests = requests.filter(req => req.status === 'QUOTATION_ADDED').length;
+    const completedRequests = requests.filter(req => req.status === 'COMPLETED').length;
 
     const addRequest = (newRequestData) => {
         // Transform the newly created request before adding to state
@@ -79,7 +79,7 @@ export const RequestProvider = ({ children }) => {
             serviceDepartmentName: newRequestData.serviceDepartmentName,
             itemDescription: newRequestData.itemDescription,
             date: formatDate(newRequestData.createdAt || Date.now()),
-            status: newRequestData.status || 'SUBMITTED',
+            status: newRequestData.status || 'REQUEST_CREATED',
             createdAt: newRequestData.createdAt || new Date().toISOString()
         };
 
@@ -94,7 +94,7 @@ export const RequestProvider = ({ children }) => {
             error,
             refreshRequests: fetchRequests,
             addRequest,
-            stats: { total: totalRequests, active: submittedRequests, pending: pendingSARequests, completed: approvedRequests }
+            stats: { total: totalRequests, active: submittedRequests, pending: pendingSARequests, completed: completedRequests }
         }}>
             {children}
         </RequestContext.Provider>
