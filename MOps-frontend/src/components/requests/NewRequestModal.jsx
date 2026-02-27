@@ -180,7 +180,7 @@ const NewRequestModal = ({ isOpen, onClose }) => {
                 </div>
 
                 {/* Content Area (Scrollable sliding container) */}
-                <div className="flex-grow overflow-x-hidden overflow-y-auto">
+                <div className={`flex-grow overflow-x-hidden ${step === 2 ? 'overflow-y-auto' : 'overflow-y-hidden'}`}>
                     <div
                         className="flex w-[200%] transition-transform duration-300 ease-[cubic-bezier(0.4,0,0.2,1)]"
                         style={{ transform: `translateX(-${(step - 1) * 50}%)` }}

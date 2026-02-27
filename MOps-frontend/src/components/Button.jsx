@@ -8,14 +8,15 @@ const Button = ({
     loading = false,
     ...props
 }) => {
-    const baseStyles = "h-10 px-6 rounded-pill font-ui text-[14px] font-medium transition-all duration-200 flex items-center justify-center gap-2 disabled:opacity-40 disabled:cursor-not-allowed focus:outline-none";
+    const baseStyles = "h-11 px-7 rounded-pill font-ui text-[14px] font-bold transition-all duration-300 flex items-center justify-center gap-2.5 disabled:opacity-30 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-primary/20 hover:scale-[1.02] active:scale-[0.96] select-none shadow-sm";
 
     const variants = {
-        primary: "bg-primary text-white hover:shadow-sm hover:brightness-110",
-        secondary: "bg-primary-container text-primary hover:brightness-95",
-        outline: "border border-outline text-primary hover:bg-primary-container/20",
-        ghost: "bg-transparent text-on-surface-variant hover:bg-surface-variant",
-        danger: "bg-error text-white hover:brightness-110 shadow-sm",
+        primary: "bg-primary text-white border-t border-white/20 shadow-lg shadow-primary/25",
+        secondary: "bg-primary-container text-primary border border-primary/10",
+        outline: "border border-outline text-on-surface-variant hover:bg-surface-variant/40 hover:border-on-surface-variant",
+        ghost: "bg-transparent text-on-surface-variant hover:bg-surface-variant/50 shadow-none hover:shadow-sm",
+        danger: "bg-error text-white border-t border-white/20 shadow-lg shadow-error/25",
+        vanguard: "bg-on-surface text-surface border-t border-white/10 shadow-2xl shadow-on-surface/20",
     };
 
     return (

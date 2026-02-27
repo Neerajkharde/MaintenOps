@@ -10,12 +10,12 @@ const Input = ({ label, error, className = '', ...props }) => {
             )}
             <input
                 className={`
-          w-full h-11 px-4 rounded-md border text-[15px] outline-none transition-all duration-200 font-body
+          w-full h-12 px-4 rounded-xl border text-[15px] outline-none transition-all duration-300 font-body
           ${error
-                        ? 'border-error focus:border-error focus:ring-1 focus:ring-error bg-error-container/5'
-                        : 'border-outline focus:border-primary focus:ring-1 focus:ring-primary hover:border-on-surface-variant'
+                        ? 'border-error ring-1 ring-error/20 bg-error-container/5'
+                        : 'border-outline focus:border-primary focus:ring-4 focus:ring-primary/10 hover:border-on-surface-variant/40 bg-white'
                     }
-          bg-white text-on-surface placeholder:text-on-surface-variant/50
+          text-on-surface placeholder:text-on-surface-variant/40 shadow-sm focus:shadow-md
           ${className}
         `}
                 {...props}

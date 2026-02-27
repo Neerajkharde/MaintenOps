@@ -7,6 +7,7 @@ import com.maintenops.nvcc.exceptions.ResourceNotFoundException;
 import com.maintenops.nvcc.repositories.*;
 import com.maintenops.nvcc.security.JwtPrincipal;
 import com.maintenops.nvcc.services.QuotationService;
+import com.maintenops.nvcc.entities.VendorPurchaseList;
 import com.maintenops.nvcc.services.RequestService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -26,6 +27,7 @@ public class RequestServiceImpl implements RequestService {
     private final ServiceDepartmentRepository serviceDeptRepository;
     private final RequestMaterialRepository requestMaterialRepo;
     private final QuotationService quotationService;
+    private final VendorPurchaseListRepository vendorPurchaseListRepo;
 
     private RequestResponseDto mapToResponse(Request request) {
 
@@ -343,6 +345,19 @@ public class RequestServiceImpl implements RequestService {
         rm.setStatus("PROCURED");
         requestMaterialRepo.save(rm);
 
+        // Also update the matching VendorPurchaseList entry so Super Admin sees procured status
+        if (rm.getVendor() != null && rm.getMaterial() != null) {
+            List<VendorPurchaseList> vpls = vendorPurchaseListRepo.findByMaterialIdAndVendorId(
+                    rm.getMaterial().getId(), rm.getVendor().getId());
+            for (VendorPurchaseList vpl : vpls) {
+                if (!Boolean.TRUE.equals(vpl.getIsPurchased())) {
+                    vpl.setIsPurchased(true);
+                    vpl.setPurchasedAt(java.time.LocalDateTime.now());
+                    vendorPurchaseListRepo.save(vpl);
+                }
+            }
+        }
+
         // Check if ALL items for this request are now PROCURED
         List<RequestMaterial> allMaterials = requestMaterialRepo.findByRequestId(request.getId());
         boolean allProcured = allMaterials.stream()
@@ -354,6 +369,14 @@ public class RequestServiceImpl implements RequestService {
         }
 
         return mapToResponse(request);
+    }
+
+    @Override
+    public List<RequestResponseDto> getItemsReadyRequests() {
+        List<Request> requests = requestRepository.findByStatus(RequestStatus.ITEMS_READY);
+        return requests.stream()
+                .map(this::mapToResponse)
+                .toList();
     }
 
     // ==================== Phase 4: Production ====================
@@ -382,6 +405,14 @@ public class RequestServiceImpl implements RequestService {
 
         request.setStatus(RequestStatus.PAYMENT_PENDING);
         return mapToResponse(requestRepository.save(request));
+    }
+
+    @Override
+    public List<RequestResponseDto> getInProductionRequests() {
+        List<Request> requests = requestRepository.findByStatus(RequestStatus.IN_PRODUCTION);
+        return requests.stream()
+                .map(this::mapToResponse)
+                .toList();
     }
 
     // ==================== Phase 5: Payment & Closure ====================

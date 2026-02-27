@@ -267,6 +267,38 @@ export const requestService = {
         }
     },
 
+    /**
+     * Get all requests with ITEMS_READY status (Super Admin monitoring)
+     */
+    getItemsReadyRequests: async () => {
+        try {
+            const response = await get(`/api/super-admin/requests/items-ready`);
+            if (!response.ok) {
+                throw new Error('Failed to fetch items ready requests');
+            }
+            return await response.json();
+        } catch (error) {
+            console.error('[RequestService] Error fetching items ready requests:', error);
+            throw error;
+        }
+    },
+
+    /**
+     * Get all requests with IN_PRODUCTION status (Super Admin monitoring)
+     */
+    getInProductionRequests: async () => {
+        try {
+            const response = await get(`/api/super-admin/requests/in-production`);
+            if (!response.ok) {
+                throw new Error('Failed to fetch in-production requests');
+            }
+            return await response.json();
+        } catch (error) {
+            console.error('[RequestService] Error fetching in-production requests:', error);
+            throw error;
+        }
+    },
+
     // ==================== Phase 4: Production ====================
 
     /**

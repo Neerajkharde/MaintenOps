@@ -19,6 +19,8 @@ import CreateQuotationPage from './pages/dashboard/admin/CreateQuotationPage';
 import ApprovalQueuePage from './pages/dashboard/superadmin/ApprovalQueuePage';
 import SystemAdminsPage from './pages/dashboard/superadmin/SystemAdminsPage';
 import SAVendorListsPage from './pages/dashboard/superadmin/SAVendorListsPage';
+import SAItemsReadyPage from './pages/dashboard/superadmin/SAItemsReadyPage';
+import SAInProductionPage from './pages/dashboard/superadmin/SAInProductionPage';
 
 function App() {
   return (
@@ -58,6 +60,8 @@ function App() {
                 <Route path="approvals" element={<ApprovalQueuePage />} />
                 <Route path="admins" element={<SystemAdminsPage />} />
                 <Route path="vendor-lists" element={<SAVendorListsPage />} />
+                <Route path="items-ready" element={<SAItemsReadyPage />} />
+                <Route path="in-production" element={<SAInProductionPage />} />
               </Route>
             </Route>
 

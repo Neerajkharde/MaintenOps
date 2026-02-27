@@ -7,6 +7,7 @@ import com.maintenops.nvcc.services.QuotationService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -58,6 +59,7 @@ public class QuotationController {
      * Get all vendor purchase lists (aggregated PENDING_PROCUREMENT items by vendor)
      * GET /api/vendor-lists
      */
+    @Transactional(readOnly = true)
     @GetMapping("/vendor-lists")
     @PreAuthorize("hasAnyRole('ADMIN', 'SUPER_ADMIN')")
     public ResponseEntity<List<VendorPurchaseList>> getVendorLists(

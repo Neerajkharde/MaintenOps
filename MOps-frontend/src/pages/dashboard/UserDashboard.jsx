@@ -57,9 +57,28 @@ const UserDashboard = () => {
 
     if (loading) {
         return (
-            <div className="flex flex-col items-center justify-center min-h-[60vh] animate-pulse">
-                <div className="w-12 h-12 border-4 border-outline/30 border-t-primary rounded-full animate-spin mb-4"></div>
-                <p className="text-on-surface-variant font-ui">Preparing your dashboard...</p>
+            <div className="pb-24 px-6 sm:px-8 pt-8 max-w-[1400px] mx-auto animate-fadeUp">
+                <div className="mb-10 w-64 h-12 animate-skeleton rounded-2xl"></div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
+                    {[1, 2, 3, 4].map(i => (
+                        <div key={i} className="vanguard-card p-6 min-h-[160px] flex flex-col justify-between">
+                            <div className="w-12 h-12 animate-skeleton rounded-2xl"></div>
+                            <div className="w-24 h-10 animate-skeleton rounded-2xl"></div>
+                        </div>
+                    ))}
+                </div>
+                <div className="flex flex-col xl:flex-row gap-8">
+                    <div className="flex-1 vanguard-card p-8 min-h-[500px]">
+                        <div className="w-1/3 h-8 animate-skeleton rounded-xl mb-8"></div>
+                        <div className="w-full h-24 animate-skeleton rounded-2xl mb-12"></div>
+                        <div className="w-full h-40 animate-skeleton rounded-2xl"></div>
+                    </div>
+                    <div className="w-full xl:w-[450px] vanguard-card p-8 min-h-[500px]">
+                        <div className="w-1/2 h-8 animate-skeleton rounded-xl mb-8"></div>
+                        <div className="w-full h-40 animate-skeleton rounded-2xl mb-8"></div>
+                        <div className="w-full h-14 animate-skeleton rounded-2xl"></div>
+                    </div>
+                </div>
             </div>
         );
     }
@@ -82,242 +101,275 @@ const UserDashboard = () => {
     const currentReq = activeRequests.find(r => r.id === selectedTrackId);
 
     return (
-        <div className="relative pb-24 px-6 sm:px-8 pt-8 max-w-[1400px] mx-auto animate-fadeUp">
-            {/* Header Section */}
-            <div className="mb-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
-                <div>
-                    <h2 className="text-[32px] font-display font-medium text-on-surface tracking-tight mb-2">
-                        Welcome, {user?.name?.split(' ')[0] || user?.username || 'User'}
-                    </h2>
-                    <p className="text-[15px] font-ui text-on-surface-variant">
-                        Overview of your recent facility maintenance requests and status updates.
-                    </p>
+        <>
+            <div className="relative pb-24 px-6 sm:px-8 pt-8 max-w-[1400px] mx-auto animate-fadeUp">
+                {/* Header Section */}
+                <div className="mb-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
+                    <div>
+                        <h2 className="text-[32px] font-display font-medium text-on-surface tracking-tight mb-2">
+                            Hare Krishna, {user?.name?.split(' ')[0] || user?.username || 'User'}
+                        </h2>
+                        <p className="text-[15px] font-ui text-on-surface-variant">
+                            Overview of your recent facility maintenance requests and status updates.
+                        </p>
+                    </div>
                 </div>
-                <Button
-                    variant="primary"
-                    onClick={() => setIsModalOpen(true)}
-                    className="h-12 px-8 shadow-md hover:shadow-lg transition-all"
-                >
-                    <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 4v16m8-8H4" /></svg>
-                    New Request
-                </Button>
-            </div>
 
-            {/* Quick Stats Grid */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
-                {[
-                    { label: 'Total Tickets', val: animatedStats.total, icon: 'M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z', bg: 'bg-primary-container/30', color: 'text-primary' },
-                    { label: 'Active', val: animatedStats.active, icon: 'M13 10V3L4 14h7v7l9-11h-7z', bg: 'bg-primary-container/30', color: 'text-primary' },
-                    { label: 'Awaiting Review', val: animatedStats.pending, icon: 'M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0y', bg: 'bg-warning-container/30', color: 'text-warning' },
-                    { label: 'Resolved', val: animatedStats.completed, icon: 'M5 13l4 4L19 7', bg: 'bg-success-container/30', color: 'text-success' }
-                ].map((s, i) => (
-                    <div key={i} className="google-card p-6 border-outline/30 bg-white hover:bg-surface-variant/10 transition-colors">
-                        <div className={`w-12 h-12 ${s.bg} rounded-xl flex items-center justify-center mb-6`}>
-                            <svg className={`w-6 h-6 ${s.color}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={s.icon} />
-                            </svg>
+                {/* Quick Stats Grid */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
+                    {[
+                        { label: 'Total Tickets', val: animatedStats.total, icon: 'M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z', bg: 'bg-primary/5', color: 'text-primary' },
+                        { label: 'Active', val: animatedStats.active, icon: 'M13 10V3L4 14h7v7l9-11h-7z', bg: 'bg-primary/5', color: 'text-primary' },
+                        { label: 'Awaiting Review', val: animatedStats.pending, icon: 'M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0y', bg: 'bg-warning/5', color: 'text-warning' },
+                        { label: 'Resolved', val: animatedStats.completed, icon: 'M5 13l4 4L19 7', bg: 'bg-success/5', color: 'text-success' }
+                    ].map((s, i) => (
+                        <div key={i} className="vanguard-card p-6 border-white/40 flex flex-col justify-between min-h-[160px]">
+                            <div className={`w-12 h-12 ${s.bg} rounded-2xl flex items-center justify-center mb-6 border border-white/20 shadow-inner`}>
+                                <svg className={`w-6 h-6 ${s.color}`} fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d={s.icon} />
+                                </svg>
+                            </div>
+                            <div>
+                                <div className="text-[32px] font-display font-black text-on-surface leading-none mb-1">{s.val}</div>
+                                <div className="text-[12px] font-ui font-black text-on-surface-variant/40 uppercase tracking-[0.15em]">{s.label}</div>
+                            </div>
                         </div>
-                        <div className="text-[36px] font-display font-medium text-on-surface leading-none mb-2">{s.val}</div>
-                        <div className="text-[14px] font-ui font-medium text-on-surface-variant uppercase tracking-wider">{s.label}</div>
-                    </div>
-                ))}
-            </div>
+                    ))}
+                </div>
 
-            {/* Main Content Layout */}
-            <div className="flex flex-col xl:flex-row gap-8">
-                {/* LEFT: Dynamic Tracker */}
-                <div className="flex-1 google-card p-8 border-outline/30 bg-white shadow-sm overflow-hidden">
-                    <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-10 pb-6 border-b border-outline/20">
-                        <div>
-                            <h3 className="text-[18px] font-display font-medium text-on-surface mb-1">Service Tracker</h3>
-                            <p className="text-[14px] text-on-surface-variant font-ui">Track live progress of your active maintenance tickets</p>
-                        </div>
-
-                        <div className="relative w-full sm:w-auto">
-                            <button
-                                onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                                className="w-full sm:w-56 flex items-center justify-between px-4 py-2.5 bg-surface-variant/40 rounded-lg text-[14px] font-ui text-on-surface hover:bg-surface-variant/60 transition-colors focus:ring-2 focus:ring-primary/20 outline-none"
-                            >
-                                <span className="truncate">{currentReq ? `Ticket #${currentReq.id}` : 'No active tickets'}</span>
-                                <svg className={`w-4 h-4 text-on-surface-variant transition-transform duration-300 ${isDropdownOpen ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
-                            </button>
-
-                            {isDropdownOpen && (
-                                <>
-                                    <div className="fixed inset-0 z-10" onClick={() => setIsDropdownOpen(false)}></div>
-                                    <div className="absolute left-0 mt-2 w-full sm:w-64 bg-white rounded-xl shadow-lg border border-outline/30 py-2 z-20 animate-fadeUp origin-top">
-                                        {activeRequests.length > 0 ? activeRequests.map(req => (
-                                            <button
-                                                key={req.id}
-                                                onClick={() => { setSelectedTrackId(req.id); setIsDropdownOpen(false); }}
-                                                className={`w-full text-left px-5 py-3 hover:bg-surface-variant transition-colors flex items-center gap-3 ${selectedTrackId === req.id ? 'bg-primary-container/20 text-primary font-medium' : 'text-on-surface font-ui'}`}
-                                            >
-                                                <div className={`w-2 h-2 rounded-full ${selectedTrackId === req.id ? 'bg-primary' : 'bg-outline/40'}`}></div>
-                                                <div className="flex-1">
-                                                    <div className="text-[13px]">Ticket #{req.id}</div>
-                                                    <div className="text-[11px] text-on-surface-variant truncate">{req.desc}</div>
-                                                </div>
-                                            </button>
-                                        )) : (
-                                            <div className="px-5 py-4 text-[13px] text-on-surface-variant font-ui">No active service tickets.</div>
-                                        )}
-                                    </div>
-                                </>
-                            )}
-                        </div>
-                    </div>
-
-                    {currentReq ? (
-                        <div className="animate-fadeUp">
-                            <div className="mb-10 bg-primary-container/10 p-5 rounded-xl border border-primary/10">
-                                <h4 className="text-[16px] font-display font-medium text-on-surface mb-2">{currentReq.desc}</h4>
-                                <div className="flex gap-2">
-                                    {getDeptChip(currentReq.dept)}
-                                    <span className="px-2.5 py-0.5 rounded-md border border-outline/20 bg-white text-[12px] font-medium font-ui text-on-surface-variant">
-                                        Submitted on {currentReq.date}
-                                    </span>
-                                </div>
+                {/* Main Content Layout */}
+                <div className="flex flex-col xl:flex-row gap-8">
+                    {/* LEFT: Dynamic Tracker */}
+                    <div className="flex-1 vanguard-card p-8 border-white/40 shadow-xl overflow-hidden">
+                        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8 pb-6 border-b border-on-surface/5">
+                            <div>
+                                <h3 className="text-[20px] font-display font-black text-on-surface tracking-tight mb-1">Service Progress</h3>
+                                <p className="text-[13px] text-on-surface-variant/60 font-bold uppercase tracking-[0.1em]">Intelligence Ops Hub</p>
                             </div>
 
-                            <div className="relative pl-12 space-y-12 pb-4">
-                                {/* Vertical Progress Line */}
-                                <div className="absolute left-[18px] top-6 bottom-6 w-[2px] bg-outline/20"></div>
+                            <div className="relative w-full sm:w-auto">
+                                <button
+                                    onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+                                    className="w-full sm:w-60 flex items-center justify-between px-5 py-3 bg-on-surface text-surface rounded-xl text-[13px] font-bold hover:bg-on-surface/90 transition-all shadow-lg shadow-on-surface/10 outline-none focus:ring-4 focus:ring-on-surface/10"
+                                >
+                                    <span className="truncate">{currentReq ? `TICKET_${currentReq.id}` : 'SELECT_TICKET'}</span>
+                                    <svg className={`w-4 h-4 transition-transform duration-500 ${isDropdownOpen ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M19 9l-7 7-7-7" /></svg>
+                                </button>
 
-                                {/* Stage Completion logic */}
-                                {(() => {
-                                    const st = currentReq.status;
-                                    const trackerSteps = [
-                                        { label: 'Request Created', desc: 'Successfully logged into the maintenance portal.', key: 'REQUEST_CREATED' },
-                                        { label: 'Quotation Added', desc: 'Admin assessed materials & costs.', key: 'QUOTATION_ADDED' },
-                                        { label: 'Quotation Approved', desc: 'Super Admin approved the quotation.', key: 'QUOTATION_APPROVED' },
-                                        { label: 'You Accepted', desc: 'Quotation accepted, lists being prepared.', key: 'APPROVED' },
-                                        { label: 'Lists Pending SA', desc: 'Material & vendor lists awaiting approval.', key: 'PENDING_SA_APPROVAL' },
-                                        { label: 'Vendor Lists Approved', desc: 'Procurement authorized by SA.', key: 'VENDOR_LIST_APPROVED' },
-                                        { label: 'Items Ready', desc: 'All materials procured.', key: 'ITEMS_READY' },
-                                        { label: 'In Production', desc: 'Work underway on your request.', key: 'IN_PRODUCTION' },
-                                        { label: 'Payment Pending', desc: 'Production complete, awaiting payment.', key: 'PAYMENT_PENDING' },
-                                        { label: 'Completed', desc: 'Request fulfilled and closed.', key: 'COMPLETED' },
-                                    ];
-                                    const statusOrder = trackerSteps.map(s => s.key);
-                                    const currentIdx = statusOrder.indexOf(st);
-
-                                    return (
-                                        <>
-                                            {trackerSteps.map((step, i) => {
-                                                const isDone = i <= currentIdx;
-                                                const isCurrent = i === currentIdx;
-                                                return (
-                                                    <div key={step.key} className="relative flex items-start group">
-                                                        <div className={`absolute -left-12 flex h-10 w-10 items-center justify-center rounded-full ring-8 ring-white transition-all ${isDone ? 'bg-success text-white' : isCurrent ? 'bg-primary text-white shadow-md animate-pulse' : 'bg-surface-variant text-on-surface-variant'
-                                                            }`}>
-                                                            {isDone ? (
-                                                                <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>
-                                                            ) : (
-                                                                <span className="text-[13px] font-bold">{i + 1}</span>
-                                                            )}
-                                                        </div>
-                                                        <div className={!isDone && !isCurrent ? 'opacity-40' : ''}>
-                                                            <h5 className="text-[15px] font-display font-medium text-on-surface">{step.label}</h5>
-                                                            <p className="text-[13px] text-on-surface-variant font-ui mt-1">{step.desc}</p>
-                                                            {isCurrent && (
-                                                                <div className="mt-4 inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-primary-container/30 text-primary text-[12px] font-semibold font-ui uppercase tracking-wide">
-                                                                    <div className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse"></div>
-                                                                    Current Stage
-                                                                </div>
-                                                            )}
-                                                        </div>
+                                {isDropdownOpen && (
+                                    <>
+                                        <div className="fixed inset-0 z-10" onClick={() => setIsDropdownOpen(false)}></div>
+                                        <div className="absolute left-0 mt-3 w-full sm:w-64 vanguard-card bg-white/95 border-white shadow-2xl py-2 z-20 animate-fadeUp origin-top border border-outline/10 overflow-hidden">
+                                            {activeRequests.length > 0 ? activeRequests.map(req => (
+                                                <button
+                                                    key={req.id}
+                                                    onClick={() => { setSelectedTrackId(req.id); setIsDropdownOpen(false); }}
+                                                    className={`w-full text-left px-5 py-3.5 hover:bg-surface-variant transition-colors flex items-center gap-4 border-b border-on-surface/5 last:border-none ${selectedTrackId === req.id ? 'bg-primary/5 text-primary font-black' : 'text-on-surface/70 font-bold'}`}
+                                                >
+                                                    <div className={`w-2 h-2 rounded-full transition-all duration-500 ${selectedTrackId === req.id ? 'bg-primary scale-150 rotate-in' : 'bg-outline/40'}`}></div>
+                                                    <div className="flex-1 overflow-hidden">
+                                                        <div className="text-[13px] tracking-tight">TICKET_{req.id}</div>
+                                                        <div className="text-[10px] text-on-surface-variant/60 truncate uppercase font-bold tracking-wider">{req.desc}</div>
                                                     </div>
-                                                );
-                                            })}
-                                        </>
-                                    );
-                                })()}
-                            </div>
-                        </div>
-                    ) : (
-                        <div className="flex flex-col items-center justify-center py-24 text-center">
-                            <div className="w-20 h-20 bg-surface-variant/40 rounded-full flex items-center justify-center mb-6">
-                                <svg className="w-10 h-10 text-on-surface-variant/30" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                            </div>
-                            <h4 className="text-[17px] font-display font-medium text-on-surface mb-2">Queue Clear</h4>
-                            <p className="text-[14px] text-on-surface-variant font-ui max-w-[240px]">You don't have any active requests requiring tracking right now.</p>
-                        </div>
-                    )}
-                </div>
-
-                {/* RIGHT: Financial Sidebar */}
-                <div className="w-full xl:w-[450px] space-y-8">
-                    <div className="google-card p-8 border-outline/30 bg-white">
-                        <h3 className="text-[18px] font-display font-medium text-on-surface mb-8 pb-4 border-b border-outline/20">Operational Audit</h3>
-
-                        {currentReq?.totalEstimatedCost ? (
-                            <div className="animate-fadeUp">
-                                <div className="mb-6">
-                                    <div className="text-[12px] font-ui font-bold text-on-surface-variant uppercase tracking-widest mb-1">Approved Estimate</div>
-                                    <div className="text-[42px] font-display font-medium text-primary leading-tight font-ui">₹5,000</div>
-                                </div>
-
-                                <div className="space-y-4 mb-8">
-                                    <div className="flex justify-between items-center text-[14px] font-ui">
-                                        <span className="text-on-surface-variant">Components & Parts</span>
-                                        <span className="font-semibold text-on-surface">₹3,500</span>
-                                    </div>
-                                    <div className="flex justify-between items-center text-[14px] font-ui">
-                                        <span className="text-on-surface-variant">Labor & Logistics</span>
-                                        <span className="font-semibold text-on-surface">₹1,500</span>
-                                    </div>
-                                    <div className="pt-4 border-t border-outline/20 flex justify-between items-center text-[15px] font-display font-medium">
-                                        <span className="text-on-surface">Final Assessment</span>
-                                        <span className="text-success">Verified</span>
-                                    </div>
-                                </div>
-
-                                <div className="p-4 bg-surface-variant/30 rounded-xl mb-8">
-                                    <div className="flex items-center gap-3 mb-3">
-                                        <div className="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center text-[11px] font-bold">SA</div>
-                                        <div>
-                                            <div className="text-[13px] text-on-surface font-semibold font-ui">Super Admin Verification</div>
-                                            <div className="text-[11px] text-on-surface-variant font-ui">Authored on Feb 22, 2026</div>
+                                                </button>
+                                            )) : (
+                                                <div className="px-5 py-4 text-[13px] text-on-surface-variant font-ui">No active service tickets.</div>
+                                            )}
                                         </div>
+                                    </>
+                                )}
+                            </div>
+                        </div>
+
+                        {currentReq ? (
+                            <div className="animate-fadeUp">
+                                <div className="mb-10 bg-primary-container/10 p-5 rounded-xl border border-primary/10">
+                                    <h4 className="text-[16px] font-display font-medium text-on-surface mb-2">{currentReq.desc}</h4>
+                                    <div className="flex gap-2">
+                                        {getDeptChip(currentReq.dept)}
+                                        <span className="px-2.5 py-0.5 rounded-md border border-outline/20 bg-white text-[12px] font-medium font-ui text-on-surface-variant">
+                                            Submitted on {currentReq.date}
+                                        </span>
                                     </div>
-                                    <p className="text-[13px] text-on-surface-variant leading-relaxed italic">
-                                        "Work proposal approved. Standard maintenance cycles apply. Priority execution assigned."
-                                    </p>
                                 </div>
 
-                                <Button variant="outline" className="w-full border-outline text-on-surface font-ui">
-                                    Archive Ticket
-                                </Button>
+                                {/* Compact Horizontal Stepper */}
+                                <div className="py-8 px-2 mt-4">
+                                    <div className="relative">
+                                        {/* Line background */}
+                                        <div className="absolute top-5 left-0 w-full h-0.5 bg-outline/20"></div>
+
+                                        {/* Progress line */}
+                                        {(() => {
+                                            const st = currentReq.status;
+                                            const phases = [
+                                                { label: 'Logged', keys: ['REQUEST_CREATED'] },
+                                                { label: 'Reviewed', keys: ['QUOTATION_ADDED', 'QUOTATION_APPROVED'] },
+                                                { label: 'Production', keys: ['APPROVED', 'PENDING_SA_APPROVAL', 'VENDOR_LIST_APPROVED', 'ITEMS_READY', 'IN_PRODUCTION', 'PAYMENT_PENDING'] },
+                                                { label: 'Complete', keys: ['COMPLETED'] }
+                                            ];
+                                            const currentIdx = phases.findIndex(p => p.keys.includes(st));
+                                            const progressWidth = currentIdx === -1 ? 0 : (currentIdx / (phases.length - 1)) * 100;
+                                            const isActionRequired = st === 'QUOTATION_APPROVED';
+
+                                            return (
+                                                <>
+                                                    <div
+                                                        className="absolute top-5 left-0 h-0.5 bg-primary transition-all duration-700 ease-in-out"
+                                                        style={{ width: `${progressWidth}%` }}
+                                                    ></div>
+
+                                                    <div className="grid grid-cols-4 relative">
+                                                        {phases.map((phase, i) => {
+                                                            const isDone = i <= currentIdx;
+                                                            const isNow = i === currentIdx;
+                                                            return (
+                                                                <div key={i} className="flex flex-col items-center">
+                                                                    <div className={`w-10 h-10 rounded-full flex items-center justify-center border-4 bg-white transition-all duration-300 z-10 
+                                                                        ${isDone ? 'border-primary text-primary shadow-sm' : 'border-outline/20 text-on-surface-variant/40'}`}>
+                                                                        {isDone ? (
+                                                                            <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" /></svg>
+                                                                        ) : (
+                                                                            <span className="text-[13px] font-bold">{i + 1}</span>
+                                                                        )}
+                                                                    </div>
+                                                                    <div className={`mt-3 text-[11px] font-bold uppercase tracking-wider text-center transition-all duration-300 ${isDone ? 'text-on-surface' : 'text-on-surface-variant/40'}`}>
+                                                                        {phase.label}
+                                                                    </div>
+                                                                    {isNow && (
+                                                                        <div className="mt-1 text-[9px] font-bold text-white px-2 py-0.5 bg-primary rounded-md shadow-sm">
+                                                                            ACTIVE
+                                                                        </div>
+                                                                    )}
+                                                                </div>
+                                                            );
+                                                        })}
+                                                    </div>
+
+                                                    {/* Premium Action Alert */}
+                                                    {isActionRequired && (
+                                                        <div className="mt-16 p-6 bg-primary/5 border border-primary/20 rounded-2xl flex items-center justify-between animate-fadeUp">
+                                                            <div className="flex items-center gap-4">
+                                                                <div className="relative">
+                                                                    <div className="absolute inset-0 bg-primary rounded-full animate-ping opacity-25"></div>
+                                                                    <div className="relative w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center text-primary">
+                                                                        <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                                                                    </div>
+                                                                </div>
+                                                                <div>
+                                                                    <div className="text-[16px] font-bold text-on-surface">Action Required: Your approval needed</div>
+                                                                    <div className="text-[13px] text-on-surface-variant">Review the maintenance cost estimate and approve to proceed.</div>
+                                                                </div>
+                                                            </div>
+                                                            <button className="bg-primary text-white px-6 py-2.5 rounded-xl font-bold text-[14px] shadow-lg shadow-primary/20 hover:scale-105 active:scale-95 transition-all">
+                                                                View Details
+                                                            </button>
+                                                        </div>
+                                                    )}
+
+                                                    {/* Contextual Status Info */}
+                                                    {!isActionRequired && (
+                                                        <div className="mt-16 flex-grow flex flex-col justify-center items-center text-center p-8 border border-dashed border-outline/30 rounded-2xl bg-surface-variant/5">
+                                                            <div className="text-[14px] font-medium text-on-surface-variant mb-3">Live Status</div>
+                                                            <div className="inline-flex items-center gap-2.5 px-5 py-2.5 bg-white rounded-xl border border-outline/10 shadow-sm text-primary font-bold text-[14px]">
+                                                                <div className="w-2.5 h-2.5 rounded-full bg-primary animate-pulse shadow-[0_0_8px_rgba(26,115,232,0.6)]"></div>
+                                                                {st.replace(/_/g, ' ')}
+                                                            </div>
+                                                            <p className="mt-4 text-[13px] text-on-surface-variant/60 max-w-sm leading-relaxed">No actions needed from your end yet. We'll update you as soon as the next phase begins.</p>
+                                                        </div>
+                                                    )}
+                                                </>
+                                            );
+                                        })()}
+                                    </div>
+                                </div>
                             </div>
                         ) : (
-                            <div className="flex flex-col items-center justify-center py-16 text-center opacity-40 grayscale">
-                                <div className="w-16 h-16 bg-surface-variant rounded-full flex items-center justify-center mb-6">
-                                    <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                            <div className="flex flex-col items-center justify-center py-24 text-center">
+                                <div className="w-20 h-20 bg-surface-variant/40 rounded-full flex items-center justify-center mb-6">
+                                    <svg className="w-10 h-10 text-on-surface-variant/30" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
                                 </div>
-                                <h4 className="text-[16px] font-display font-medium text-on-surface mb-1">Price Control</h4>
-                                <p className="text-[13px] font-ui">Financial audit will be active post-review.</p>
+                                <h4 className="text-[17px] font-display font-medium text-on-surface mb-2">Queue Clear</h4>
+                                <p className="text-[14px] text-on-surface-variant font-ui max-w-[240px]">You don't have any active requests requiring tracking right now.</p>
                             </div>
                         )}
                     </div>
-                </div>
-            </div>
 
-            {/* FAB REDESIGN */}
-            <button
-                onClick={() => setIsModalOpen(true)}
-                className="fixed bottom-8 right-8 h-14 bg-primary text-white pl-5 pr-7 rounded-2xl font-ui font-medium shadow-2xl hover:shadow-primary/20 transition-all transform hover:-translate-y-1 z-50 flex items-center gap-3 active:scale-95"
-            >
-                <div className="w-6 h-6 bg-white/20 rounded-lg flex items-center justify-center">
-                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" /></svg>
+                    {/* RIGHT: Financial Sidebar */}
+                    <div className="w-full xl:w-[450px] space-y-8 animate-fadeUp" style={{ animationDelay: '200ms' }}>
+                        <div className="vanguard-card p-8 border-white/40 shadow-xl overflow-hidden">
+                            <h3 className="text-[18px] font-display font-black text-on-surface mb-8 pb-4 border-b border-on-surface/5">Operational Audit</h3>
+
+                            {currentReq?.totalEstimatedCost ? (
+                                <div>
+                                    <div className="mb-6">
+                                        <div className="text-[11px] font-black text-on-surface-variant/40 uppercase tracking-[0.2em] mb-2">Approved Financial Estimate</div>
+                                        <div className="text-[44px] font-display font-black text-primary leading-tight font-ui tracking-tight italic">₹5,000</div>
+                                    </div>
+
+                                    <div className="space-y-4 mb-8">
+                                        <div className="flex justify-between items-center text-[14px]">
+                                            <span className="text-on-surface-variant font-bold uppercase tracking-wider text-[11px]">Components & Parts</span>
+                                            <span className="font-black text-on-surface">₹3,500</span>
+                                        </div>
+                                        <div className="flex justify-between items-center text-[14px]">
+                                            <span className="text-on-surface-variant font-bold uppercase tracking-wider text-[11px]">Labor & Logistics</span>
+                                            <span className="font-black text-on-surface">₹1,500</span>
+                                        </div>
+                                        <div className="pt-4 border-t border-on-surface/5 flex justify-between items-center">
+                                            <span className="text-[13px] font-black text-on-surface uppercase tracking-widest leading-none">Status</span>
+                                            <span className="px-3 py-1 bg-success/10 text-success text-[10px] font-black uppercase tracking-widest border border-success/20 rounded-pill">Verified Authority</span>
+                                        </div>
+                                    </div>
+
+                                    <div className="p-5 bg-on-surface/5 rounded-2xl mb-8 border border-white/40">
+                                        <div className="flex items-center gap-3 mb-4">
+                                            <div className="w-9 h-9 rounded-xl bg-on-surface text-surface flex items-center justify-center text-[12px] font-black shadow-lg shadow-on-surface/10 ring-4 ring-on-surface/5">SA</div>
+                                            <div>
+                                                <div className="text-[13px] text-on-surface font-black uppercase tracking-tight">Executive Verification</div>
+                                                <div className="text-[10px] text-on-surface-variant/60 font-bold uppercase">Authored Feb 22, 2026</div>
+                                            </div>
+                                        </div>
+                                        <p className="text-[13px] text-on-surface-variant/80 leading-relaxed font-ui italic">
+                                            "Work proposal approved. Standard maintenance cycles apply. Priority execution assigned."
+                                        </p>
+                                    </div>
+
+                                    <Button variant="outline" fullWidth className="h-14 font-black text-[13px] uppercase tracking-[0.15em] border-on-surface/10">
+                                        Archive Ticket_
+                                    </Button>
+                                </div>
+                            ) : (
+                                <div className="flex flex-col items-center justify-center py-20 text-center opacity-40 grayscale group">
+                                    <div className="w-20 h-20 bg-on-surface/5 rounded-full flex items-center justify-center mb-6 border border-dashed border-on-surface/20 group-hover:scale-110 transition-transform">
+                                        <svg className="w-10 h-10 text-on-surface-variant/30" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                                    </div>
+                                    <h4 className="text-[16px] font-display font-black text-on-surface uppercase tracking-tight mb-2">Price Control</h4>
+                                    <p className="text-[12px] font-bold text-on-surface-variant uppercase tracking-widest">Financial audit post-review</p>
+                                </div>
+                            )}
+                        </div>
+                    </div>
                 </div>
-                Create New Request
-            </button>
+
+                {/* FAB REDESIGN */}
+                <button
+                    onClick={() => setIsModalOpen(true)}
+                    className="fixed bottom-10 right-10 h-16 bg-on-surface text-surface pl-6 pr-8 rounded-2xl font-display font-black text-[13px] shadow-[0_20px_40px_rgba(0,0,0,0.3)] hover:shadow-primary/40 transition-all transform hover:-translate-y-2 z-50 flex items-center gap-4 active:scale-90 select-none border-t border-white/10 uppercase tracking-[0.1em]"
+                >
+                    <div className="w-8 h-8 bg-surface/20 rounded-xl flex items-center justify-center shadow-inner">
+                        <svg className="w-5 h-5 text-surface" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" /></svg>
+                    </div>
+                    Create Request
+                </button>
+
+            </div>
 
             <NewRequestModal
                 isOpen={isModalOpen}
                 onClose={() => setIsModalOpen(false)}
             />
-        </div>
+        </>
     );
 };
 

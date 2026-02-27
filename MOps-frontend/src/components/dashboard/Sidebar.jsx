@@ -2,7 +2,7 @@ import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 
-const Sidebar = ({ role }) => {
+const Sidebar = ({ role, isOpen, onClose }) => {
     const location = useLocation();
     const { user } = useAuth();
 
@@ -25,70 +25,97 @@ const Sidebar = ({ role }) => {
             { label: 'Approval Queue', path: '/super-admin/approvals', icon: <path d="M12 2C6.486 2 2 6.486 2 12s4.486 10 10 10 10-4.486 10-10S17.514 2 12 2zm-1.903 15.607l-4.524-4.524L7.003 11.66l3.148 3.148 6.845-6.845 1.414 1.414-8.259 8.259-.051-.029z" /> },
             { label: 'System Admins', path: '/super-admin/admins', icon: <path d="M12 2a5 5 0 1 0 5 5 5 5 0 0 0-5-5zm0 8a3 3 0 1 1 3-3 3 3 0 0 1-3 3zm9 11v-1a7 7 0 0 0-7-7h-4a7 7 0 0 0-7 7v1h2v-1a5 5 0 0 1 5-5h4a5 5 0 0 1 5 5v1z" /> },
             { label: 'Vendor Lists', path: '/super-admin/vendor-lists', icon: <><path d="M19 4H5c-1.103 0-2 .897-2 2v14c0 1.103.897 2 2 2h14c1.103 0 2-.897 2-2V6c0-1.103-.897-2-2-2zM5 20V6h14l.002 14H5z" /><path d="M7 9h10v2H7zm0 4h7v2H7z" /></> },
+            { label: 'Items Ready', path: '/super-admin/items-ready', icon: <><path d="M12 2C6.486 2 2 6.486 2 12s4.486 10 10 10 10-4.486 10-10S17.514 2 12 2zm0 18c-4.411 0-8-3.589-8-8s3.589-8 8-8 8 3.589 8 8-3.589 8-8 8z" /><path d="M9.999 13.587L7.7 11.292l-1.412 1.416 3.713 3.705 6.706-6.706-1.414-1.414z" /></> },
+            { label: 'In Production', path: '/super-admin/in-production', icon: <><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.07-.94l2.03-1.58a.49.49 0 00.12-.61l-1.92-3.32a.488.488 0 00-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54c-.04-.24-.24-.41-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54c-.59.24-1.13.57-1.62.94l-2.39-.96c-.22-.08-.47 0-.59.22L2.74 8.87c-.12.21-.08.47.12.61l2.03 1.58c-.05.3-.09.63-.09.94s.02.64.07.94l-2.03 1.58a.49.49 0 00-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .44-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32c.12-.22.07-.49-.12-.61l-2.01-1.58zM12 15.6A3.6 3.6 0 1115.6 12 3.611 3.611 0 0112 15.6z" /></> },
         ]
     };
 
     const links = navItems[role] && navItems[role].length > 0 ? navItems[role] : navItems['REQUESTER'];
 
     return (
-        <aside className="fixed left-0 top-0 bottom-0 w-[240px] bg-white border-r border-outline hidden md:flex md:flex-col z-50">
-            {/* Logo Section */}
-            <div className="h-[64px] flex items-center px-6">
-                <Link to="/" className="flex items-center gap-3">
-                    <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center">
-                        <svg className="w-6 h-6 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 10V3L4 14h7v7l9-11h-7z" />
+        <>
+            {/* Mobile Backdrop */}
+            {isOpen && (
+                <div
+                    className="fixed inset-0 bg-black/20 backdrop-blur-[2px] z-[45] md:hidden transition-opacity duration-300"
+                    onClick={onClose}
+                ></div>
+            )}
+
+            <aside
+                className={`fixed left-0 top-0 bottom-0 w-[280px] md:w-[240px] bg-white border-r border-outline flex flex-col z-50 transition-transform duration-300 md:translate-x-0 
+                ${isOpen ? 'translate-x-0 shadow-2xl' : '-translate-x-full md:translate-x-0'}`}
+            >
+                {/* Logo Section */}
+                <div className="h-[64px] flex items-center justify-between px-6">
+                    <Link to="/" onClick={onClose} className="flex items-center gap-3">
+                        <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center">
+                            <svg className="w-6 h-6 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                            </svg>
+                        </div>
+                        <span className="text-[20px] font-display font-medium tracking-tight text-on-surface">
+                            MaintenOps
+                        </span>
+                    </Link>
+
+                    {/* Mobile Close Button */}
+                    <button
+                        onClick={onClose}
+                        className="md:hidden w-8 h-8 rounded-lg hover:bg-surface-variant flex items-center justify-center text-on-surface-variant"
+                    >
+                        <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                         </svg>
-                    </div>
-                    <span className="text-[20px] font-display font-medium tracking-tight text-on-surface">
-                        MaintenOps
-                    </span>
-                </Link>
-            </div>
+                    </button>
+                </div>
 
-            {/* Navigation Rail */}
-            <div className="py-6 flex-grow flex flex-col overflow-y-auto custom-scrollbar">
-                <div className="px-3 space-y-1">
-                    {links.map((link, index) => {
-                        const active = isActive(link.path);
-                        return (
-                            <Link
-                                key={index}
-                                to={link.path}
-                                className={`flex items-center gap-4 px-4 py-3 rounded-pill transition-all duration-200 group
-                                    ${active
-                                        ? 'bg-primary-container text-primary'
-                                        : 'text-on-surface-variant hover:bg-surface-variant'
-                                    }`}
-                            >
-                                <svg
-                                    className={`w-5 h-5 transition-colors ${active ? 'fill-primary' : 'fill-on-surface-variant group-hover:fill-on-surface'}`}
-                                    viewBox="0 0 24 24"
+                {/* Navigation Rail */}
+                <div className="py-6 flex-grow flex flex-col overflow-y-auto custom-scrollbar">
+                    <div className="px-3 space-y-1">
+                        {links.map((link, index) => {
+                            const active = isActive(link.path);
+                            return (
+                                <Link
+                                    key={index}
+                                    to={link.path}
+                                    onClick={onClose}
+                                    className={`flex items-center gap-4 px-4 py-2.5 rounded-lg transition-all duration-300 group relative
+                                        ${active
+                                            ? 'bg-primary/5 text-primary'
+                                            : 'text-on-surface-variant hover:bg-surface-variant/50 hover:text-on-surface'
+                                        }`}
                                 >
-                                    {link.icon}
-                                </svg>
-                                <span className={`text-[14px] font-ui ${active ? 'font-medium' : 'font-normal'}`}>
-                                    {link.label}
-                                </span>
-                            </Link>
-                        );
-                    })}
+                                    {active && (
+                                        <div className="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-primary rounded-r-full shadow-[0_0_8px_rgba(26,115,232,0.4)]"></div>
+                                    )}
+                                    <svg
+                                        className={`w-5 h-5 transition-all duration-300 ${active ? 'fill-primary scale-110' : 'fill-on-surface-variant group-hover:fill-on-surface'}`}
+                                        viewBox="0 0 24 24"
+                                    >
+                                        {link.icon}
+                                    </svg>
+                                    <span className={`text-[14px] font-ui transition-all duration-300 ${active ? 'font-semibold tracking-wide' : 'font-normal opacity-80 group-hover:opacity-100'}`}>
+                                        {link.label}
+                                    </span>
+                                </Link>
+                            );
+                        })}
+                    </div>
                 </div>
-            </div>
 
-            {/* Bottom Footer or Info */}
-            <div className="p-4 border-t border-outline">
-                <div className="flex items-center gap-3 px-3 py-2">
-                    <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-white text-[12px] font-bold">
-                        {user?.name?.charAt(0) || 'U'}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                        <div className="text-[13px] font-medium text-on-surface truncate">{user?.name}</div>
-                        <div className="text-[11px] text-on-surface-variant truncate uppercase tracking-wider">{role}</div>
+                {/* Bottom Section */}
+                <div className="p-6 border-t border-outline/10">
+                    <div className="bg-surface-variant/30 rounded-2xl p-4">
+                        <div className="text-[10px] font-bold text-on-surface-variant uppercase tracking-widest mb-1">Signed in as</div>
+                        <div className="text-[13px] font-medium text-on-surface truncate mb-1">{user?.name}</div>
+                        <div className="inline-flex items-center px-2 py-0.5 rounded-pill bg-primary/10 text-primary text-[10px] font-bold uppercase tracking-wider">
+                            {role?.replace('_', ' ')}
+                        </div>
                     </div>
                 </div>
-            </div>
-        </aside>
+            </aside>
+        </>
     );
 };
 

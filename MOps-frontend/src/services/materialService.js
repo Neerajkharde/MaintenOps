@@ -105,7 +105,7 @@ export const quotationService = {
      * @param {number} requestId
      */
     generateVendorList: async (requestId) => {
-        const response = await post(`/api/request/${requestId}/generate-vendor-list`, {});
+        const response = await post(`/api/admin/requests/${requestId}/generate-lists`, {});
         if (!response.ok) {
             const err = await response.json().catch(() => ({}));
             throw new Error(err.message || 'Failed to generate vendor list');

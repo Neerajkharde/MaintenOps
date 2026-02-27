@@ -3,7 +3,7 @@ import { useAuth } from '../../context/AuthContext';
 import { Link, useNavigate } from 'react-router-dom';
 import { getRoleDisplayName } from '../../utils/roleUtils';
 
-const Topbar = () => {
+const Topbar = ({ onMenuClick }) => {
     const { user, logout } = useAuth();
     const navigate = useNavigate();
     const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -27,20 +27,31 @@ const Topbar = () => {
 
     return (
         <>
-            <header className="fixed top-0 right-0 left-0 md:left-[240px] h-[64px] bg-white border-b border-outline z-40 flex items-center justify-between px-8">
-                <div className="flex items-center">
-                    <h1 className="text-[20px] font-display text-on-surface tracking-tight">
-                        Dashboard
-                    </h1>
+            <header className="fixed top-0 right-0 left-0 md:left-[240px] h-[64px] glass-panel border-b border-outline/10 z-40 flex items-center justify-between px-4 sm:px-8">
+                <div className="flex items-center gap-3 sm:gap-4">
+                    <button
+                        onClick={onMenuClick}
+                        className="md:hidden w-10 h-10 rounded-xl hover:bg-surface-variant flex items-center justify-center transition-colors text-on-surface-variant"
+                    >
+                        <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                        </svg>
+                    </button>
+                    <div>
+                        <h1 className="text-[17px] sm:text-[18px] font-display font-semibold text-on-surface tracking-tight leading-tight">
+                            Dashboard
+                        </h1>
+                        <p className="hidden sm:block text-[11px] text-on-surface-variant font-ui mt-0.5 uppercase tracking-wider font-bold opacity-60">Maintenance Management System</p>
+                    </div>
                 </div>
 
-                <div className="flex items-center gap-2">
-                    {/* Search Bar Placeholder (Google Style) */}
-                    <div className="hidden lg:flex items-center bg-surface-variant px-4 py-2 rounded-md border border-transparent focus-within:bg-white focus-within:border-primary focus-within:shadow-sm transition-all mr-4 w-[300px]">
-                        <svg className="w-5 h-5 text-on-surface-variant" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                <div className="flex items-center gap-4">
+                    {/* Search Bar (Premium Style) */}
+                    <div className="hidden lg:flex items-center bg-surface-variant/40 hover:bg-surface-variant/60 focus-within:bg-white focus-within:shadow-md border border-transparent focus-within:border-primary/20 px-4 py-2 rounded-xl transition-all duration-300 w-[320px]">
+                        <svg className="w-4 h-4 text-on-surface-variant" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                         </svg>
-                        <input type="text" placeholder="Search requests..." className="bg-transparent border-none outline-none px-3 text-[14px] w-full" />
+                        <input type="text" placeholder="Search tasks, items, or users..." className="bg-transparent border-none outline-none px-3 text-[14px] w-full placeholder:text-on-surface-variant/50" />
                     </div>
 
                     {/* Notification Bell */}

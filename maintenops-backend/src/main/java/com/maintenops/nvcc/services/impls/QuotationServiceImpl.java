@@ -206,12 +206,15 @@ public class QuotationServiceImpl implements QuotationService {
 
             VendorPurchaseList vpl = new VendorPurchaseList();
             vpl.setVendor(first.getVendor());
+            vpl.setVendorName(first.getVendorName());
             vpl.setMaterial(first.getMaterial());
             vpl.setSpecification(first.getSpecification());
             vpl.setMaterialName(first.getMaterialName());
             vpl.setSpecificationText(first.getSpecificationText());
             vpl.setTotalQuantity(totalQty);
             vpl.setUnit(first.getUnit());
+            vpl.setRatePerUnit(first.getUnitPrice());
+            vpl.setTotalPrice(first.getUnitPrice().multiply(totalQty));
             vpl.setIsPurchased(false);
 
             purchaseLists.add(vpl);

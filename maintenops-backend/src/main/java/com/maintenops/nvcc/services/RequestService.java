@@ -38,10 +38,12 @@ public interface RequestService {
 
     // Phase 3: Procurement
     RequestResponseDto markItemProcured(Long requestMaterialId, JwtPrincipal principal);
+    List<RequestResponseDto> getItemsReadyRequests();
 
     // Phase 4: Production
     RequestResponseDto startProduction(Long requestId, JwtPrincipal principal);
     RequestResponseDto completeProduction(Long requestId, JwtPrincipal principal);
+    List<RequestResponseDto> getInProductionRequests();
 
     // Phase 5: Payment & Closure
     RequestResponseDto confirmPayment(Long requestId, JwtPrincipal principal);

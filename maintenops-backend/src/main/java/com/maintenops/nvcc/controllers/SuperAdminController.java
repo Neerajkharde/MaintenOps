@@ -81,4 +81,28 @@ public class SuperAdminController {
             @AuthenticationPrincipal JwtPrincipal principal) {
         return ResponseEntity.ok(requestService.approveVendorLists(id, principal));
     }
+
+    // ==================== Phase 3: Items Ready (Monitoring) ====================
+
+    /**
+     * Get all requests with ITEMS_READY status (all materials procured)
+     */
+    @GetMapping("/requests/items-ready")
+    @PreAuthorize("hasRole('SUPER_ADMIN')")
+    public ResponseEntity<List<RequestResponseDto>> getItemsReadyRequests(
+            @AuthenticationPrincipal JwtPrincipal principal) {
+        return ResponseEntity.ok(requestService.getItemsReadyRequests());
+    }
+
+    // ==================== Phase 4: In Production (Monitoring) ====================
+
+    /**
+     * Get all requests with IN_PRODUCTION status
+     */
+    @GetMapping("/requests/in-production")
+    @PreAuthorize("hasRole('SUPER_ADMIN')")
+    public ResponseEntity<List<RequestResponseDto>> getInProductionRequests(
+            @AuthenticationPrincipal JwtPrincipal principal) {
+        return ResponseEntity.ok(requestService.getInProductionRequests());
+    }
 }

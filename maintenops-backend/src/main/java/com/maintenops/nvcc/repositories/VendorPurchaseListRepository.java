@@ -12,6 +12,8 @@ public interface VendorPurchaseListRepository extends JpaRepository<VendorPurcha
 
     List<VendorPurchaseList> findByVendorId(Long vendorId);
 
+    List<VendorPurchaseList> findByMaterialIdAndVendorId(Long materialId, Long vendorId);
+
     @Query("SELECT vpl FROM VendorPurchaseList vpl " +
            "WHERE (:vendorId IS NULL OR vpl.vendor.id = :vendorId) " +
            "ORDER BY vpl.listDate DESC, vpl.vendor.name ASC")
