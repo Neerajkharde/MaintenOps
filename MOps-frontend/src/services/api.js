@@ -1,4 +1,4 @@
-const API_BASE_URL = 'http://localhost:8083';
+const API_BASE_URL = import.meta.env.VITE_API_URL || '';
 
 let isRefreshing = false;
 let refreshPromise = null;
@@ -38,13 +38,13 @@ const refreshAccessToken = async () => {
             if (response.ok) {
                 const data = await response.json();
                 const { accessToken, expiresIn } = data;
-                
+
                 // Update token in React state and localStorage
                 if (setAccessToken) {
                     setAccessToken(accessToken);
                 }
                 localStorage.setItem('expiresIn', expiresIn);
-                
+
                 console.log('[API] Access token refreshed successfully');
                 return accessToken;
             } else {
@@ -93,14 +93,14 @@ export const apiCall = async (endpoint, options = {}) => {
     if (response.status === 401) {
         console.log('[API] Got 401, attempting token refresh');
         const refreshedToken = await refreshAccessToken();
-        
+
         if (refreshedToken) {
             // Retry the original request with new token directly from refresh
             const newHeaders = {
                 ...headers,
                 'Authorization': `${tokenType} ${refreshedToken}`,
             };
-            
+
             console.log('[API] Retrying request with new token');
             response = await fetch(`${API_BASE_URL}${endpoint}`, {
                 ...options,
@@ -108,7 +108,7 @@ export const apiCall = async (endpoint, options = {}) => {
                 credentials: 'include',
             });
         }
-        
+
         // ONLY redirect to login if STILL 401 (truly unauthenticated / session expired)
         // Do NOT redirect on 403 (Forbidden) — that's a role/permission error we handle in the UI
         if (response.status === 401) {

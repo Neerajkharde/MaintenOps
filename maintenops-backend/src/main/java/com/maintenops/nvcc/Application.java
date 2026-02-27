@@ -17,7 +17,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
 @RequiredArgsConstructor
-public class Application{
+public class Application {
 
 	private final RoleRepository repo;
 	private final UserService userService;
