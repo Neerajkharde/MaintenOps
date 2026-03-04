@@ -2,7 +2,7 @@ spring:
   application:
     name: com.maintenops.nvcc
   profiles:
-    active: dev
+    active: prod
 
 server:
   port: 8082
