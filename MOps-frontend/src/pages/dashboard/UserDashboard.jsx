@@ -194,8 +194,8 @@ const UserDashboard = () => {
                                 </div>
 
                                 {/* Compact Horizontal Stepper */}
-                                <div className="py-8 px-2 mt-4">
-                                    <div className="relative">
+                                <div className="py-8 px-2 mt-4 overflow-x-auto custom-scrollbar">
+                                    <div className="relative min-w-[500px] px-4">
                                         {/* Line background */}
                                         <div className="absolute top-5 left-0 w-full h-0.5 bg-outline/20"></div>
 
@@ -224,7 +224,7 @@ const UserDashboard = () => {
                                                             const isDone = i <= currentIdx;
                                                             const isNow = i === currentIdx;
                                                             return (
-                                                                <div key={i} className="flex flex-col items-center">
+                                                                <div key={i} className="flex flex-col items-center shrink-0">
                                                                     <div className={`w-10 h-10 rounded-full flex items-center justify-center border-4 bg-white transition-all duration-300 z-10 
                                                                         ${isDone ? 'border-primary text-primary shadow-sm' : 'border-outline/20 text-on-surface-variant/40'}`}>
                                                                         {isDone ? (
@@ -245,44 +245,52 @@ const UserDashboard = () => {
                                                             );
                                                         })}
                                                     </div>
-
-                                                    {/* Premium Action Alert */}
-                                                    {isActionRequired && (
-                                                        <div className="mt-16 p-6 bg-primary/5 border border-primary/20 rounded-2xl flex items-center justify-between animate-fadeUp">
-                                                            <div className="flex items-center gap-4">
-                                                                <div className="relative">
-                                                                    <div className="absolute inset-0 bg-primary rounded-full animate-ping opacity-25"></div>
-                                                                    <div className="relative w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center text-primary">
-                                                                        <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                                                                    </div>
-                                                                </div>
-                                                                <div>
-                                                                    <div className="text-[16px] font-bold text-on-surface">Action Required: Your approval needed</div>
-                                                                    <div className="text-[13px] text-on-surface-variant">Review the maintenance cost estimate and approve to proceed.</div>
-                                                                </div>
-                                                            </div>
-                                                            <button className="bg-primary text-white px-6 py-2.5 rounded-xl font-bold text-[14px] shadow-lg shadow-primary/20 hover:scale-105 active:scale-95 transition-all">
-                                                                View Details
-                                                            </button>
-                                                        </div>
-                                                    )}
-
-                                                    {/* Contextual Status Info */}
-                                                    {!isActionRequired && (
-                                                        <div className="mt-16 flex-grow flex flex-col justify-center items-center text-center p-8 border border-dashed border-outline/30 rounded-2xl bg-surface-variant/5">
-                                                            <div className="text-[14px] font-medium text-on-surface-variant mb-3">Live Status</div>
-                                                            <div className="inline-flex items-center gap-2.5 px-5 py-2.5 bg-white rounded-xl border border-outline/10 shadow-sm text-primary font-bold text-[14px]">
-                                                                <div className="w-2.5 h-2.5 rounded-full bg-primary animate-pulse shadow-[0_0_8px_rgba(26,115,232,0.6)]"></div>
-                                                                {st.replace(/_/g, ' ')}
-                                                            </div>
-                                                            <p className="mt-4 text-[13px] text-on-surface-variant/60 max-w-sm leading-relaxed">No actions needed from your end yet. We'll update you as soon as the next phase begins.</p>
-                                                        </div>
-                                                    )}
                                                 </>
                                             );
                                         })()}
                                     </div>
                                 </div>
+
+                                {(() => {
+                                    const st = currentReq.status;
+                                    const isActionRequired = st === 'QUOTATION_APPROVED';
+                                    return (
+                                        <>
+                                            {/* Premium Action Alert */}
+                                            {isActionRequired && (
+                                                <div className="mt-8 p-6 bg-primary/5 border border-primary/20 rounded-2xl flex flex-col sm:flex-row items-center justify-between gap-6 animate-fadeUp">
+                                                    <div className="flex items-center gap-4">
+                                                        <div className="relative shrink-0">
+                                                            <div className="absolute inset-0 bg-primary rounded-full animate-ping opacity-25"></div>
+                                                            <div className="relative w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center text-primary">
+                                                                <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                                                            </div>
+                                                        </div>
+                                                        <div>
+                                                            <div className="text-[16px] font-bold text-on-surface leading-tight mb-1">Action Required: Your approval needed</div>
+                                                            <div className="text-[13px] text-on-surface-variant">Review the maintenance cost estimate and approve to proceed.</div>
+                                                        </div>
+                                                    </div>
+                                                    <button className="w-full sm:w-auto bg-primary text-white px-6 py-2.5 rounded-xl font-bold text-[14px] shadow-lg shadow-primary/20 hover:scale-105 active:scale-95 transition-all">
+                                                        View Details
+                                                    </button>
+                                                </div>
+                                            )}
+
+                                            {/* Contextual Status Info */}
+                                            {!isActionRequired && (
+                                                <div className="mt-8 flex-grow flex flex-col justify-center items-center text-center p-8 border border-dashed border-outline/30 rounded-2xl bg-surface-variant/5">
+                                                    <div className="text-[14px] font-medium text-on-surface-variant mb-3">Live Status</div>
+                                                    <div className="inline-flex items-center gap-2.5 px-5 py-2.5 bg-white rounded-xl border border-outline/10 shadow-sm text-primary font-bold text-[14px]">
+                                                        <div className="w-2.5 h-2.5 rounded-full bg-primary animate-pulse shadow-[0_0_8px_rgba(26,115,232,0.6)]"></div>
+                                                        {st.replace(/_/g, ' ')}
+                                                    </div>
+                                                    <p className="mt-4 text-[13px] text-on-surface-variant/60 max-w-sm leading-relaxed">No actions needed from your end yet. We'll update you as soon as the next phase begins.</p>
+                                                </div>
+                                            )}
+                                        </>
+                                    );
+                                })()}
                             </div>
                         ) : (
                             <div className="flex flex-col items-center justify-center py-24 text-center">
@@ -355,10 +363,10 @@ const UserDashboard = () => {
                 {/* FAB REDESIGN */}
                 <button
                     onClick={() => setIsModalOpen(true)}
-                    className="fixed bottom-10 right-10 h-16 bg-on-surface text-surface pl-6 pr-8 rounded-2xl font-display font-black text-[13px] shadow-[0_20px_40px_rgba(0,0,0,0.3)] hover:shadow-primary/40 transition-all transform hover:-translate-y-2 z-50 flex items-center gap-4 active:scale-90 select-none border-t border-white/10 uppercase tracking-[0.1em]"
+                    className="fixed bottom-6 sm:bottom-10 right-6 sm:right-10 h-14 sm:h-16 bg-on-surface text-surface pl-5 sm:pl-6 pr-6 sm:pr-8 rounded-2xl font-display font-black text-[12px] sm:text-[13px] shadow-[0_20px_40px_rgba(0,0,0,0.3)] hover:shadow-primary/40 transition-all transform hover:-translate-y-2 z-50 flex items-center gap-3 sm:gap-4 active:scale-90 select-none border-t border-white/10 uppercase tracking-[0.1em]"
                 >
-                    <div className="w-8 h-8 bg-surface/20 rounded-xl flex items-center justify-center shadow-inner">
-                        <svg className="w-5 h-5 text-surface" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" /></svg>
+                    <div className="w-7 h-7 sm:w-8 sm:h-8 bg-surface/20 rounded-xl flex items-center justify-center shadow-inner">
+                        <svg className="w-4 h-4 sm:w-5 sm:h-5 text-surface" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}><path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" /></svg>
                     </div>
                     Create Request
                 </button>

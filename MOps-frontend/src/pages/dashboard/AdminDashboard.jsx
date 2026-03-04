@@ -174,45 +174,45 @@ const AdminDashboard = () => {
                                         const daysLabel = diff === 0 ? 'Today' : `${diff}d ago`;
 
                                         return (
-                                            <div key={req.id} className={`vanguard-card group relative p-6 border-white/40 transition-all duration-500 flex flex-col justify-between min-h-[340px] ${isUrgent ? 'ring-2 ring-red-500/20 shadow-2xl shadow-red-500/5' : ''}`}>
+                                            <div key={req.id} className={`vanguard-card group relative p-5 sm:p-6 border-white/40 transition-all duration-500 flex flex-col justify-between min-h-[340px] ${isUrgent ? 'ring-2 ring-red-500/20 shadow-2xl shadow-red-500/5' : ''}`}>
                                                 {isUrgent && <div className="absolute top-6 right-6 w-3 h-3 rounded-full bg-red-500 animate-ping shadow-[0_0_15px_rgba(239,68,68,0.5)]"></div>}
 
                                                 <div>
-                                                    <div className="flex items-center justify-between mb-5">
-                                                        <div className="flex items-center gap-3">
-                                                            <div className="w-10 h-10 rounded-xl flex items-center justify-center text-[20px] shadow-inner bg-on-surface/5">
+                                                    <div className="flex flex-wrap items-center justify-between gap-3 mb-5">
+                                                        <div className="flex flex-wrap items-center gap-2 sm:gap-3">
+                                                            <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center text-[18px] sm:text-[20px] shadow-inner bg-on-surface/5 shrink-0">
                                                                 {cfg.icon}
                                                             </div>
-                                                            <span className="text-[11px] font-black uppercase tracking-[0.2em] px-3 py-1.5 rounded-pill border border-white/50" style={{ background: cfg.bg, color: cfg.color }}>
+                                                            <span className="text-[10px] sm:text-[11px] font-black uppercase tracking-[0.15em] sm:tracking-[0.2em] px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-pill border border-white/50" style={{ background: cfg.bg, color: cfg.color }}>
                                                                 {cfg.label}
                                                             </span>
                                                         </div>
-                                                        <span className="text-[12px] font-black text-on-surface-variant/30 uppercase tracking-widest">#{req.requestNumber}</span>
+                                                        <span className="text-[11px] sm:text-[12px] font-black text-on-surface-variant/30 uppercase tracking-widest">#{req.requestNumber}</span>
                                                     </div>
 
-                                                    <h3 className="text-[21px] font-display font-black text-on-surface line-clamp-2 mb-6 leading-tight group-hover:text-primary transition-colors tracking-tight italic">{req.itemDescription}</h3>
+                                                    <h3 className="text-[19px] sm:text-[21px] font-display font-black text-on-surface line-clamp-2 mb-6 leading-tight group-hover:text-primary transition-colors tracking-tight italic">{req.itemDescription}</h3>
 
-                                                    <div className="grid grid-cols-2 gap-2 mb-5">
-                                                        <div className="flex items-center gap-2 px-2.5 py-1.5 bg-surface-variant/30 rounded-xl">
-                                                            <div className="w-5 h-5 rounded-full bg-white flex items-center justify-center text-[10px] font-bold shadow-sm">
+                                                    <div className="grid grid-cols-1 xs:grid-cols-2 gap-2 mb-5">
+                                                        <div className="flex items-center gap-2 px-2.5 py-1.5 bg-surface-variant/30 rounded-xl min-w-0">
+                                                            <div className="w-5 h-5 rounded-full bg-white flex items-center justify-center text-[10px] font-bold shadow-sm shrink-0">
                                                                 {(req.requesterName || 'U').charAt(0)}
                                                             </div>
-                                                            <span className="text-[12px] font-medium text-on-surface truncate">{req.requesterName}</span>
+                                                            <span className="text-[11px] sm:text-[12px] font-medium text-on-surface truncate">{req.requesterName}</span>
                                                         </div>
                                                         <div className="flex items-center gap-2 px-2.5 py-1.5 bg-surface-variant/30 rounded-xl">
-                                                            <svg className="w-3.5 h-3.5 text-on-surface-variant" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                                                            <span className="text-[12px] font-bold text-on-surface-variant">{daysLabel}</span>
+                                                            <svg className="w-3.5 h-3.5 text-on-surface-variant shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                                                            <span className="text-[11px] sm:text-[12px] font-bold text-on-surface-variant">{daysLabel}</span>
                                                         </div>
                                                     </div>
 
-                                                    <div className="flex items-center justify-between gap-3 pt-3 border-t border-outline/10">
-                                                        <div className="text-[14px] font-black text-[#137333]">
+                                                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pt-4 border-t border-outline/10">
+                                                        <div className="text-[14px] sm:text-[15px] font-black text-[#137333]">
                                                             {req.totalEstimatedCost ? `₹${Number(req.totalEstimatedCost).toLocaleString('en-IN')}` : 'Estimating...'}
                                                         </div>
                                                         <button
                                                             onClick={handler}
                                                             disabled={isActing}
-                                                            className="px-6 py-2 rounded-xl text-[13px] font-black text-white transition-all hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 shadow-lg"
+                                                            className="w-full sm:w-auto px-6 py-2.5 rounded-xl text-[13px] font-black text-white transition-all hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 shadow-lg"
                                                             style={{ background: isUrgent ? '#ef4444' : cfg.color }}
                                                         >
                                                             {isActing ? '...' : getActionLabel(req)}

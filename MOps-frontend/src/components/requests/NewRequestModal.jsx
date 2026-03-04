@@ -139,19 +139,19 @@ const NewRequestModal = ({ isOpen, onClose }) => {
                 </button>
 
                 {/* Sticky Header with Stepper */}
-                <div className="sticky top-0 bg-white/95 backdrop-blur-md z-10 px-10 py-6 border-b border-[#dadce0]">
+                <div className="sticky top-0 bg-white/95 backdrop-blur-md z-10 px-8 py-6 border-b border-[#dadce0]">
                     <div className="flex items-center justify-between max-w-[400px] mx-auto relative pt-2">
                         {/* Connector Background */}
-                        <div className="absolute left-[30px] right-[30px] top-[18px] h-[2px] bg-[#dadce0] z-0"></div>
+                        <div className="absolute left-[60px] right-[60px] top-[18px] h-[2px] bg-[#dadce0] z-0"></div>
 
                         {/* Connector Progress */}
                         <div
-                            className="absolute left-[30px] top-[18px] h-[2px] bg-[#1a73e8] z-0 transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)]"
-                            style={{ width: step === 2 ? 'calc(100% - 60px)' : '0%' }}
+                            className="absolute left-[60px] top-[18px] h-[2px] bg-[#1a73e8] z-0 transition-all duration-300 ease-[cubic-bezier(0.4,0,0.2,1)]"
+                            style={{ width: step === 2 ? 'calc(100% - 120px)' : '0%' }}
                         ></div>
 
                         {/* Step 1 Indicator */}
-                        <div className="relative z-10 flex flex-col items-center gap-2">
+                        <div className="relative z-10 flex flex-col items-center gap-2 shrink-0">
                             {step === 2 ? (
                                 <div className="w-8 h-8 rounded-full bg-[#137333] flex items-center justify-center transition-colors">
                                     <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
@@ -163,24 +163,24 @@ const NewRequestModal = ({ isOpen, onClose }) => {
                                     1
                                 </div>
                             )}
-                            <span className={`text-[13px] font-['Google_Sans',sans-serif] ${step === 2 ? 'text-[#137333]' : 'text-[#1a73e8] font-medium'}`}>Choose Department</span>
+                            <span className={`text-[13px] font-['Google_Sans',sans-serif] whitespace-nowrap ${step === 2 ? 'text-[#137333]' : 'text-[#1a73e8] font-medium'}`}>Choose Department</span>
                         </div>
 
                         {/* Step 2 Indicator */}
-                        <div className="relative z-10 flex flex-col items-center gap-2">
+                        <div className="relative z-10 flex flex-col items-center gap-2 shrink-0">
                             <div className={`w-8 h-8 rounded-full border-2 flex items-center justify-center text-[13px] font-medium transition-colors ${step === 2
                                 ? 'bg-[#1a73e8] border-[#1a73e8] text-white'
                                 : 'bg-white border-[#dadce0] text-[#5f6368]'
                                 }`}>
                                 2
                             </div>
-                            <span className={`text-[13px] font-['Google_Sans',sans-serif] ${step === 2 ? 'text-[#1a73e8] font-medium' : 'text-[#5f6368]'}`}>Request Details</span>
+                            <span className={`text-[13px] font-['Google_Sans',sans-serif] whitespace-nowrap ${step === 2 ? 'text-[#1a73e8] font-medium' : 'text-[#5f6368]'}`}>Request Details</span>
                         </div>
                     </div>
                 </div>
 
                 {/* Content Area (Scrollable sliding container) */}
-                <div className={`flex-grow overflow-x-hidden ${step === 2 ? 'overflow-y-auto' : 'overflow-y-hidden'}`}>
+                <div className="flex-grow overflow-x-hidden overflow-y-auto custom-scrollbar">
                     <div
                         className="flex w-[200%] transition-transform duration-300 ease-[cubic-bezier(0.4,0,0.2,1)]"
                         style={{ transform: `translateX(-${(step - 1) * 50}%)` }}
@@ -234,9 +234,11 @@ const NewRequestModal = ({ isOpen, onClose }) => {
                         {/* STEP 2: Request Details */}
                         <div className="w-1/2 flex-shrink-0 px-8 py-8 max-w-[680px] mx-auto">
                             {/* Read-only Header */}
-                            <div className="flex items-center gap-4 mb-6 bg-[#f8f9fa] p-3 rounded-[12px] border border-[#f1f3f4]">
-                                <div className="border-[1.5px] border-[#dadce0] rounded-[8px] px-3 py-1.5 bg-white">
-                                    <span className="text-[20px] font-['Google_Sans_Display',sans-serif] font-bold text-[#1a73e8]">#3802</span>
+                            <div className="flex items-center gap-4 mb-6 bg-[#f8f9fa] p-4 rounded-[16px] border border-[#f1f3f4] shadow-sm">
+                                <div className="w-10 h-10 rounded-full flex items-center justify-center bg-[#e8f0fe] text-[#1a73e8]">
+                                    <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                        <path strokeLinecap="round" strokeLinejoin="round" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16l3.5-2 3.5 2 3.5-2 3.5 2z" />
+                                    </svg>
                                 </div>
                                 <div>
                                     <div className="text-[18px] font-['Google_Sans',sans-serif] font-medium text-[#202124]">

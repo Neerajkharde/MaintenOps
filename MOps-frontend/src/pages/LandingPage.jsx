@@ -27,17 +27,17 @@ const LandingPage = () => {
             <section className="relative pt-[140px] pb-[120px] px-6 overflow-hidden max-w-[1440px] mx-auto min-h-[90vh] flex flex-col justify-center">
                 <div className="max-w-[1200px] mx-auto grid grid-cols-1 lg:grid-cols-2 gap-[80px] items-center">
                     {/* Hero Text */}
-                    <div className="flex flex-col gap-8 z-10 animate-fade-in-up">
-                        <h1 className="text-[56px] leading-[1.1] font-display font-medium tracking-[-1.5px] text-[#202124]">
+                    <div className="flex flex-col gap-6 sm:gap-8 z-10 animate-fade-in-up">
+                        <h1 className="text-[32px] sm:text-[42px] lg:text-[56px] leading-[1.1] font-display font-medium tracking-[-1.5px] text-[#202124]">
                             Maintenance requests, <br />
                             <span className="text-[#1a73e8] relative inline-block">
                                 reimagined.
-                                <svg className="absolute w-full h-[12px] -bottom-2 left-0 text-[#e8f0fe] -z-10" viewBox="0 0 100 10" preserveAspectRatio="none">
+                                <svg className="absolute w-full h-[8px] sm:h-[12px] -bottom-1 sm:bottom-[-8px] left-0 text-[#e8f0fe] -z-10" viewBox="0 0 100 10" preserveAspectRatio="none">
                                     <path d="M0 5 Q 50 10 100 5" stroke="currentColor" strokeWidth="8" fill="none" />
                                 </svg>
                             </span>
                         </h1>
-                        <p className="text-[20px] leading-[1.6] text-[#5f6368] font-google-sans max-w-[540px]">
+                        <p className="text-[16px] sm:text-[18px] lg:text-[20px] leading-[1.6] text-[#5f6368] font-google-sans max-w-[540px]">
                             Streamline your facility operations with intelligent workflows. Google-class reliability for your maintenance team.
                         </p>
 
@@ -49,14 +49,14 @@ const LandingPage = () => {
                             </div>
                             <input
                                 type="text"
-                                className="w-full h-[56px] pl-12 pr-24 rounded-full border border-[#dadce0] bg-white text-[16px] placeholder-[#9aa0a6] focus:outline-none focus:ring-4 focus:ring-[#1a73e8]/20 focus:border-[#1a73e8] shadow-sm transition-all hover:shadow-md"
+                                className="w-full h-[48px] sm:h-[56px] pl-12 pr-20 sm:pr-24 rounded-full border border-[#dadce0] bg-white text-[14px] sm:text-[16px] placeholder-[#9aa0a6] focus:outline-none focus:ring-4 focus:ring-[#1a73e8]/20 focus:border-[#1a73e8] shadow-sm transition-all hover:shadow-md"
                                 placeholder="Search for 'Air conditioning'"
                                 value={searchQuery}
                                 onChange={(e) => setSearchQuery(e.target.value)}
                             />
                             <button
                                 type="submit"
-                                className="absolute right-2 top-2 h-[40px] px-6 bg-[#1a73e8] hover:bg-[#1557b0] text-white rounded-full text-[14px] font-medium font-google-sans transition-colors"
+                                className="absolute right-1.5 sm:right-2 top-1.5 sm:top-2 h-[36px] sm:h-[40px] px-4 sm:px-6 bg-[#1a73e8] hover:bg-[#1557b0] text-white rounded-full text-[13px] sm:text-[14px] font-medium font-google-sans transition-colors"
                             >
                                 Go
                             </button>
@@ -136,11 +136,11 @@ const LandingPage = () => {
             {/* SECTION 1: TRUST BAR */}
             <FadeInSection>
                 <div className="w-full bg-[#f8f9fa] border-y border-[#dadce0] py-[20px]">
-                    <div className="max-w-[1200px] mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-6">
-                        <span className="text-[13px] font-medium text-[#5f6368]">Trusted by 200+ facility teams</span>
-                        <div className="flex items-center gap-8 md:gap-12 opacity-60 grayscale hover:grayscale-0 transition-all duration-300">
+                    <div className="max-w-[1200px] mx-auto px-6 flex flex-col md:flex-row items-center justify-between gap-8 md:gap-6">
+                        <span className="text-[13px] font-medium text-[#5f6368] whitespace-nowrap">Trusted by 200+ facility teams</span>
+                        <div className="flex flex-wrap items-center justify-center md:justify-end gap-x-8 gap-y-4 md:gap-12 opacity-60 grayscale hover:grayscale-0 transition-all duration-300">
                             {['Acme Corp', 'Global Logistics', 'TechSpace', 'Urban Living', 'BuildWell'].map((company, i) => (
-                                <span key={i} className="text-[14px] font-bold font-google-sans text-[#5f6368] hover:text-[#1a73e8] cursor-default">
+                                <span key={i} className="text-[13px] sm:text-[14px] font-bold font-google-sans text-[#5f6368] hover:text-[#1a73e8] cursor-default whitespace-nowrap">
                                     {company}
                                 </span>
                             ))}
@@ -221,15 +221,15 @@ const LandingPage = () => {
                     <FadeInSection>
                         <div className="flex flex-col md:flex-row justify-center gap-4">
                             {[
-                                { role: 'Requester', desc: 'Submit and track your maintenance requests', color: '#1a73e8', bg: 'bg-[#1a73e8]' },
-                                { role: 'Admin', desc: 'Manage quotations, vendors, and procurement', color: '#137333', bg: 'bg-[#137333]' },
-                                { role: 'Super Admin', desc: 'Full system control, alerts, and approvals', color: '#f9ab00', bg: 'bg-[#f9ab00]' }
+                                { role: 'Requester', desc: 'Submit and track requests', color: '#1a73e8', bg: 'bg-[#1a73e8]' },
+                                { role: 'Admin', desc: 'Manage quotations & vendors', color: '#137333', bg: 'bg-[#137333]' },
+                                { role: 'Super Admin', desc: 'Full system control & alerts', color: '#f9ab00', bg: 'bg-[#f9ab00]' }
                             ].map((item, i) => (
-                                <div key={i} className="flex-1 flex items-center gap-4 border-[1.5px] border-[#dadce0] rounded-[50px] px-8 py-5 hover:border-[#1a73e8] hover:bg-[#e8f0fe] transition-all duration-200 cursor-default group">
-                                    <div className={`w-[10px] h-[10px] rounded-full ${item.bg}`}></div>
-                                    <div>
-                                        <div className="text-[15px] font-medium font-google-sans text-[#202124] group-hover:text-[#1a73e8] transition-colors">{item.role}</div>
-                                        <div className="text-[13px] text-[#5f6368] leading-tight">{item.desc}</div>
+                                <div key={i} className="flex-1 flex items-center gap-4 border-[1.5px] border-[#dadce0] rounded-2xl md:rounded-[50px] px-6 md:px-8 py-4 md:py-5 hover:border-[#1a73e8] hover:bg-[#e8f0fe] transition-all duration-200 cursor-default group">
+                                    <div className={`w-[10px] h-[10px] shrink-0 rounded-full ${item.bg}`}></div>
+                                    <div className="min-w-0">
+                                        <div className="text-[14px] md:text-[15px] font-medium font-google-sans text-[#202124] group-hover:text-[#1a73e8] transition-colors truncate">{item.role}</div>
+                                        <div className="text-[12px] md:text-[13px] text-[#5f6368] leading-tight line-clamp-1">{item.desc}</div>
                                     </div>
                                 </div>
                             ))}
@@ -245,35 +245,37 @@ const LandingPage = () => {
                         <h2 className="text-[36px] font-display text-[#202124] mb-2">Track every request like a shipment</h2>
                         <p className="text-[16px] text-[#5f6368] mb-12">From submission to completion — full visibility at every stage.</p>
 
-                        <div className="max-w-[720px] mx-auto bg-white rounded-[20px] p-10 shadow-[0_10px_25px_rgba(0,0,0,0.1)]">
-                            <div className="flex items-center justify-between relative">
-                                {/* Connector Line Background */}
-                                <div className="absolute top-[12px] left-0 w-full h-[2px] bg-[#dadce0] -z-10"></div>
-                                {/* Active Connector Line */}
-                                <div className="absolute top-[12px] left-0 w-[58%] h-[2px] bg-[#1a73e8] -z-10"></div>
+                        <div className="max-w-[720px] mx-auto bg-white rounded-[20px] p-6 sm:p-10 shadow-[0_10px_25px_rgba(0,0,0,0.1)] overflow-hidden">
+                            <div className="overflow-x-auto pb-4 custom-scrollbar">
+                                <div className="flex items-center justify-between relative min-w-[600px] px-4">
+                                    {/* Connector Line Background */}
+                                    <div className="absolute top-[12px] left-0 w-full h-[2px] bg-[#dadce0] -z-10"></div>
+                                    {/* Active Connector Line */}
+                                    <div className="absolute top-[12px] left-0 w-[58%] h-[2px] bg-[#1a73e8] -z-10"></div>
 
-                                {[
-                                    { label: 'Submitted', active: true, completed: true },
-                                    { label: 'Quotation', active: true, completed: true },
-                                    { label: 'Approved', active: true, completed: true },
-                                    { label: 'Sourced', active: true, completed: true },
-                                    { label: 'In Production', active: true, pulse: true },
-                                    { label: 'Ready', active: false },
-                                    { label: 'Payment', active: false },
-                                    { label: 'Completed', active: false }
-                                ].map((step, i) => (
-                                    <div key={i} className="flex flex-col items-center gap-3">
-                                        <div className={`w-6 h-6 rounded-full flex items-center justify-center border-[2px] bg-white z-10 
-                                            ${step.completed ? 'border-[#1a73e8] bg-[#1a73e8] text-white' :
-                                                step.pulse ? 'border-[#1a73e8] shadow-[0_0_0_4px_rgba(26,115,232,0.2)]' : 'border-[#dadce0]'}`}>
-                                            {step.completed && <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" /></svg>}
-                                            {step.pulse && <div className="w-2.5 h-2.5 bg-[#1a73e8] rounded-full animate-pulse"></div>}
+                                    {[
+                                        { label: 'Submitted', active: true, completed: true },
+                                        { label: 'Quotation', active: true, completed: true },
+                                        { label: 'Approved', active: true, completed: true },
+                                        { label: 'Sourced', active: true, completed: true },
+                                        { label: 'In Production', active: true, pulse: true },
+                                        { label: 'Ready', active: false },
+                                        { label: 'Payment', active: false },
+                                        { label: 'Completed', active: false }
+                                    ].map((step, i) => (
+                                        <div key={i} className="flex flex-col items-center gap-3 shrink-0">
+                                            <div className={`w-6 h-6 rounded-full flex items-center justify-center border-[2px] bg-white z-10 
+                                                ${step.completed ? 'border-[#1a73e8] bg-[#1a73e8] text-white' :
+                                                    step.pulse ? 'border-[#1a73e8] shadow-[0_0_0_4px_rgba(26,115,232,0.2)]' : 'border-[#dadce0]'}`}>
+                                                {step.completed && <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" /></svg>}
+                                                {step.pulse && <div className="w-2.5 h-2.5 bg-[#1a73e8] rounded-full animate-pulse"></div>}
+                                            </div>
+                                            <span className={`text-[11px] font-medium ${step.active ? 'text-[#1a73e8]' : 'text-[#5f6368]'}`}>
+                                                {step.label}
+                                            </span>
                                         </div>
-                                        <span className={`text-[11px] font-medium ${step.active ? 'text-[#1a73e8]' : 'text-[#5f6368]'}`}>
-                                            {step.label}
-                                        </span>
-                                    </div>
-                                ))}
+                                    ))}
+                                </div>
                             </div>
                         </div>
                     </FadeInSection>

@@ -113,39 +113,39 @@ const SAVendorListsPage = () => {
                             <div key={vendorName} className="bg-white border border-[#dadce0]/60 rounded-2xl shadow-sm overflow-hidden transition-all">
                                 {/* Vendor Header */}
                                 <div
-                                    className="flex items-center justify-between px-6 py-5 cursor-pointer hover:bg-[#f8f9fa] transition-colors"
+                                    className="flex flex-col sm:flex-row sm:items-start justify-between px-6 py-5 cursor-pointer hover:bg-[#f8f9fa] transition-colors gap-4"
                                     onClick={() => setExpandedVendor(isExpanded ? null : vendorName)}
                                 >
                                     <div className="flex items-center gap-4">
-                                        <div className="w-11 h-11 rounded-xl bg-[#e8f0fe] flex items-center justify-center text-[#1a73e8] font-bold text-[15px]">
+                                        <div className="w-11 h-11 rounded-xl bg-[#e8f0fe] flex items-center justify-center text-[#1a73e8] font-bold text-[15px] shrink-0">
                                             {vendorName.charAt(0).toUpperCase()}
                                         </div>
-                                        <div>
-                                            <div className="text-[16px] font-semibold text-[#202124]">{vendorName}</div>
-                                            <div className="flex items-center gap-3 text-[12px] text-[#5f6368]">
+                                        <div className="min-w-0">
+                                            <div className="text-[16px] font-semibold text-[#202124] truncate">{vendorName}</div>
+                                            <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[12px] text-[#5f6368]">
                                                 <span>{data.items.length} items</span>
-                                                <span>·</span>
+                                                <span className="hidden xs:inline">·</span>
                                                 <span className="font-medium text-[#1a73e8]">₹{data.totalCost.toLocaleString('en-IN')}</span>
                                                 {data.pending > 0 && (
                                                     <>
-                                                        <span>·</span>
+                                                        <span className="hidden xs:inline">·</span>
                                                         <span className="text-[#e65100] font-medium">{data.pending} pending</span>
                                                     </>
                                                 )}
                                             </div>
                                         </div>
                                     </div>
-                                    <div className="flex items-center gap-3">
+                                    <div className="flex items-center justify-between sm:justify-end gap-3 border-t sm:border-0 pt-3 sm:pt-0">
                                         <button
                                             onClick={(e) => { e.stopPropagation(); downloadVendorListPDF(vendorName, data.items); }}
-                                            className="flex items-center gap-1.5 px-4 py-2 rounded-lg text-[13px] font-medium text-[#1a73e8] hover:bg-[#e8f0fe] transition-colors border border-[#1a73e8]/20"
+                                            className="flex-1 sm:flex-none flex items-center justify-center gap-1.5 px-4 py-2 rounded-lg text-[13px] font-medium text-[#1a73e8] hover:bg-[#e8f0fe] transition-colors border border-[#1a73e8]/20"
                                         >
                                             <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                                                 <path strokeLinecap="round" strokeLinejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
                                             </svg>
-                                            Download
+                                            <span>Download</span>
                                         </button>
-                                        <svg className={`w-5 h-5 text-[#5f6368] transition-transform ${isExpanded ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                        <svg className={`shrink-0 w-5 h-5 text-[#5f6368] transition-transform ${isExpanded ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                                             <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
                                         </svg>
                                     </div>
@@ -153,43 +153,34 @@ const SAVendorListsPage = () => {
 
                                 {/* Expanded Material Table */}
                                 {isExpanded && (
-                                    <div className="border-t border-[#dadce0]">
-                                        <table className="w-full text-[13px]">
+                                    <div className="border-t border-[#dadce0] overflow-x-auto custom-scrollbar">
+                                        <table className="w-full text-[13px] min-w-[800px]">
                                             <thead className="bg-[#f1f3f4]">
                                                 <tr>
                                                     <th className="px-6 py-2.5 text-left text-[11px] font-bold text-[#5f6368] uppercase tracking-wider">#</th>
-                                                    <th className="px-4 py-2.5 text-left text-[11px] font-bold text-[#5f6368] uppercase tracking-wider">Material</th>
-                                                    <th className="px-4 py-2.5 text-right text-[11px] font-bold text-[#5f6368] uppercase tracking-wider">Qty</th>
-                                                    <th className="px-4 py-2.5 text-left text-[11px] font-bold text-[#5f6368] uppercase tracking-wider">Request</th>
-                                                    <th className="px-4 py-2.5 text-right text-[11px] font-bold text-[#5f6368] uppercase tracking-wider">Rate</th>
-                                                    <th className="px-4 py-2.5 text-right text-[11px] font-bold text-[#5f6368] uppercase tracking-wider">Total</th>
-                                                    <th className="px-4 py-2.5 text-center text-[11px] font-bold text-[#5f6368] uppercase tracking-wider">Status</th>
+                                                    <th className="px-6 py-2.5 text-left text-[11px] font-bold text-[#5f6368] uppercase tracking-wider">Material Name</th>
+                                                    <th className="px-6 py-2.5 text-left text-[11px] font-bold text-[#5f6368] uppercase tracking-wider">Specification</th>
+                                                    <th className="px-6 py-2.5 text-right text-[11px] font-bold text-[#5f6368] uppercase tracking-wider">Quantity</th>
+                                                    <th className="px-6 py-2.5 text-right text-[11px] font-bold text-[#5f6368] uppercase tracking-wider">Price (Est.)</th>
+                                                    <th className="px-6 py-2.5 text-center text-[11px] font-bold text-[#5f6368] uppercase tracking-wider">Status</th>
                                                 </tr>
                                             </thead>
                                             <tbody className="divide-y divide-[#f1f3f4]">
-                                                {data.items.map((item, i) => (
-                                                    <tr key={item.id || i} className={`hover:bg-[#f8f9fa] ${(item.isPurchased || item.status === 'PROCURED') ? 'opacity-60' : ''}`}>
-                                                        <td className="px-6 py-3 text-[#5f6368]">{i + 1}</td>
-                                                        <td className="px-4 py-3">
-                                                            <div className="font-medium text-[#202124]">{item.materialName || item.name}</div>
-                                                            {item.specificationText && (
-                                                                <div className="text-[11px] text-[#5f6368]">{item.specificationText}</div>
-                                                            )}
-                                                        </td>
-                                                        <td className="px-4 py-3 text-right font-medium">{item.totalQuantity ?? item.quantity} {item.unit || ''}</td>
-                                                        <td className="px-4 py-3 text-[#5f6368]">{item.requestNumber || item.requestId || '—'}</td>
-                                                        <td className="px-4 py-3 text-right">₹{Number(item.ratePerUnit ?? item.unitPrice ?? 0).toLocaleString('en-IN')}</td>
-                                                        <td className="px-4 py-3 text-right font-semibold">₹{Number(item.totalPrice ?? item.estimatedCost ?? 0).toLocaleString('en-IN')}</td>
-                                                        <td className="px-4 py-3 text-center">
-                                                            {(item.isPurchased || item.status === 'PROCURED') ? (
-                                                                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-[#e6f4ea] text-[#137333] text-[11px] font-medium">
-                                                                    ✓ Procured
-                                                                </span>
-                                                            ) : (
-                                                                <span className="inline-block px-2.5 py-0.5 rounded-full bg-[#fff3e0] text-[#e65100] text-[11px] font-medium">
-                                                                    Pending
-                                                                </span>
-                                                            )}
+                                                {data.items.map((mat, i) => (
+                                                    <tr key={mat._id || i} className="hover:bg-[#f8f9fa] transition-colors">
+                                                        <td className="px-6 py-3.5 text-[#5f6368] font-medium">{i + 1}</td>
+                                                        <td className="px-6 py-3.5 font-medium text-[#202124]">{mat.materialName}</td>
+                                                        <td className="px-6 py-3.5 text-[#5f6368] italic">{mat.specification || '—'}</td>
+                                                        <td className="px-6 py-3.5 text-right font-medium text-[#202124]">{mat.quantity} {mat.unit}</td>
+                                                        <td className="px-6 py-3.5 text-right font-semibold text-[#1a73e8]">₹{Number(mat.totalPrice || 0).toLocaleString('en-IN')}</td>
+                                                        <td className="px-6 py-3.5 text-center">
+                                                            <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-medium ${mat.isPurchased || mat.status === 'PROCURED'
+                                                                ? 'bg-[#e6f4ea] text-[#137333] border border-[#137333]/10'
+                                                                : 'bg-[#fef7e0] text-[#e65100] border border-[#e65100]/10'
+                                                                }`}>
+                                                                <span className={`w-1.5 h-1.5 rounded-full ${mat.isPurchased || mat.status === 'PROCURED' ? 'bg-[#137333]' : 'bg-[#e65100] animate-pulse'}`}></span>
+                                                                {mat.isPurchased || mat.status === 'PROCURED' ? 'Procured' : 'Pending'}
+                                                            </span>
                                                         </td>
                                                     </tr>
                                                 ))}

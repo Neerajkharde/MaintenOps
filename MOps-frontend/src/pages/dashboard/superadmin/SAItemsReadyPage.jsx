@@ -101,55 +101,56 @@ const SAItemsReadyPage = () => {
                         return (
                             <div key={req.id} className="bg-white border border-[#dadce0]/60 rounded-2xl shadow-sm overflow-hidden transition-all">
                                 <div
-                                    className="flex items-center justify-between px-6 py-5 cursor-pointer hover:bg-[#f8f9fa] transition-colors"
+                                    className="flex flex-col sm:flex-row sm:items-center justify-between px-6 py-5 cursor-pointer hover:bg-[#f8f9fa] transition-colors gap-4"
                                     onClick={() => setExpandedId(isExpanded ? null : req.id)}
                                 >
                                     <div className="flex items-center gap-4">
-                                        <div className="w-11 h-11 rounded-xl bg-[#e6f4ea] flex items-center justify-center text-[#137333] font-bold text-[15px]">
+                                        <div className="w-11 h-11 rounded-xl bg-[#e6f4ea] flex items-center justify-center text-[#137333] font-bold text-[15px] shrink-0">
                                             ✅
                                         </div>
-                                        <div>
-                                            <div className="text-[16px] font-semibold text-[#202124]">
+                                        <div className="min-w-0">
+                                            <div className="text-[16px] font-semibold text-[#202124] truncate">
                                                 {req.requestNumber || `Request #${req.id}`}
                                             </div>
-                                            <div className="flex items-center gap-3 text-[12px] text-[#5f6368]">
+                                            <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-[12px] text-[#5f6368]">
                                                 <span>{req.serviceDepartmentName}</span>
-                                                <span>·</span>
+                                                <span className="hidden xs:inline">·</span>
                                                 <span>By {req.requesterName}</span>
-                                                <span>·</span>
+                                                <span className="hidden xs:inline">·</span>
                                                 <span>{req.materials?.length || 0} materials</span>
                                                 {req.totalEstimatedCost && (
                                                     <>
-                                                        <span>·</span>
+                                                        <span className="hidden xs:inline">·</span>
                                                         <span className="font-medium text-[#137333]">₹{Number(req.totalEstimatedCost).toLocaleString('en-IN')}</span>
                                                     </>
                                                 )}
                                             </div>
                                         </div>
                                     </div>
-                                    <div className="flex items-center gap-3">
+                                    <div className="flex items-center justify-between sm:justify-end gap-3 border-t sm:border-0 pt-3 sm:pt-0">
                                         <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-[#e6f4ea] text-[#137333] text-[12px] font-medium">
                                             Items Ready
                                         </span>
-                                        <svg className={`w-5 h-5 text-[#5f6368] transition-transform ${isExpanded ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                        <svg className={`w-5 h-5 text-[#5f6368] transition-transform shrink-0 ${isExpanded ? 'rotate-180' : ''}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                                             <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
                                         </svg>
                                     </div>
                                 </div>
 
+                                {/* Expanded Material Table */}
                                 {isExpanded && (
-                                    <div className="border-t border-[#dadce0] px-6 py-5">
-                                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4 text-[13px]">
+                                    <div className="border-t border-[#dadce0] px-6 py-5 overflow-x-auto custom-scrollbar">
+                                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4 text-[13px] min-w-[600px]">
                                             <div><span className="text-[#5f6368]">Department:</span> <span className="font-medium">{req.serviceDepartmentName}</span></div>
                                             <div><span className="text-[#5f6368]">Requester:</span> <span className="font-medium">{req.requesterName}</span></div>
                                             <div><span className="text-[#5f6368]">Org Dept:</span> <span className="font-medium">{req.organizationDepartmentName}</span></div>
                                             <div><span className="text-[#5f6368]">Created:</span> <span className="font-medium">{formatDate(req.createdAt)}</span></div>
                                         </div>
-                                        <div className="text-[13px] text-[#5f6368] mb-4">
+                                        <div className="text-[13px] text-[#5f6368] mb-4 min-w-[600px]">
                                             <span className="font-medium text-[#202124]">Description:</span> {req.itemDescription}
                                         </div>
                                         {req.materials && req.materials.length > 0 && (
-                                            <table className="w-full text-[13px]">
+                                            <table className="w-full text-[13px] min-w-[800px]">
                                                 <thead className="bg-[#f1f3f4]">
                                                     <tr>
                                                         <th className="px-4 py-2 text-left text-[11px] font-bold text-[#5f6368] uppercase">#</th>

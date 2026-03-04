@@ -102,21 +102,27 @@ const RequestDetailsModal = ({ isOpen, onClose, request, onSuccess }) => {
             <div className="bg-[#f8f9fa] rounded-[24px] w-full max-w-[960px] shadow-[0_24px_60px_rgba(0,0,0,0.15)] flex flex-col relative my-auto animate-fadeUp overflow-hidden max-h-[90vh]">
 
                 {/* Header */}
-                <div className="bg-gradient-to-r from-[#e8f0fe] via-white to-white px-8 py-6 border-b border-[#dadce0] flex justify-between items-center sticky top-0 z-20">
-                    <div>
-                        <div className="flex items-center gap-3 mb-1">
-                            <h2 className="text-[22px] font-bold font-['Google_Sans_Display',sans-serif] text-[#1a73e8]">{request.requestNumber || request.id}</h2>
-                            {getDeptChip(request.serviceDepartmentName || request.dept)}
-                            {isQuotationApproved && (
-                                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-[50px] bg-[#fff8e1] text-[#f9ab00] text-[12px] font-semibold animate-pulse">
-                                    ✉️ Action Required
-                                </span>
-                            )}
+                <div className="bg-gradient-to-r from-[#e8f0fe] via-white to-white px-6 sm:px-8 py-5 sm:py-6 border-b border-[#dadce0] flex flex-row justify-between items-start sm:items-center sticky top-0 z-30">
+                    <div className="flex-1 min-w-0 pr-2">
+                        <div className="flex flex-wrap items-center gap-2 mb-1.5">
+                            <h2 className="text-[18px] sm:text-[22px] font-bold font-['Google_Sans_Display',sans-serif] text-[#1a73e8] shrink-0 leading-tight">
+                                {request.requestNumber || request.id}
+                            </h2>
+                            <div className="flex flex-wrap gap-1.5 items-center">
+                                {getDeptChip(request.serviceDepartmentName || request.dept)}
+                                {isQuotationApproved && (
+                                    <span className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-[50px] bg-[#fff8e1] text-[#f9ab00] text-[11px] font-semibold animate-pulse border border-[#fef3c7]">
+                                        ✉️ Action Required
+                                    </span>
+                                )}
+                            </div>
                         </div>
-                        <p className="text-[14px] font-medium font-['Roboto',sans-serif] text-[#3c4043]">{request.itemDescription || request.desc}</p>
+                        <p className="text-[13px] sm:text-[14px] font-medium font-['Roboto',sans-serif] text-[#3c4043] line-clamp-2 sm:line-clamp-none leading-relaxed">
+                            {request.itemDescription || request.desc}
+                        </p>
                     </div>
-                    <button onClick={onClose} className="w-10 h-10 rounded-full flex items-center justify-center text-[#5f6368] hover:bg-[#e8eaed] hover:text-[#202124] transition-all shadow-sm border border-transparent hover:border-[#dadce0]">
-                        <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <button onClick={onClose} className="flex-shrink-0 w-9 h-9 sm:w-10 sm:h-10 rounded-full flex items-center justify-center text-[#5f6368] hover:bg-[#f1f3f4] transition-all bg-white sm:bg-transparent border border-[#dadce0] sm:border-transparent">
+                        <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
                             <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
                         </svg>
                     </button>
@@ -124,51 +130,51 @@ const RequestDetailsModal = ({ isOpen, onClose, request, onSuccess }) => {
 
                 {/* QUOTATION_APPROVED Banner — user needs to accept */}
                 {isQuotationApproved && (
-                    <div className="px-8 py-4 bg-[#fff8e1] border-b border-[#fde68a] flex items-center justify-between gap-4">
-                        <div>
-                            <div className="text-[14px] font-semibold text-[#b45309]">✉️ Your quotation is ready for review! Please check the details below.</div>
-                            <div className="text-[13px] text-[#92400e]">
+                    <div className="px-6 sm:px-8 py-4 bg-[#fff8e1] border-b border-[#fde68a] flex flex-col sm:flex-row items-center sm:justify-between gap-4">
+                        <div className="text-center sm:text-left w-full sm:w-auto">
+                            <div className="text-[13px] sm:text-[14px] font-semibold text-[#b45309] mb-1">✉️ Quotation ready for review</div>
+                            <div className="text-[12px] sm:text-[13px] text-[#92400e]">
                                 Total: <strong>₹{Number(totalCost ?? 0).toFixed(2)}</strong>
-                                {request.requiredDate && <span> · Required by: <strong>{fmtDate(request.requiredDate)}</strong></span>}
+                                {request.requiredDate && <span className="hidden sm:inline"> · Required by: <strong>{fmtDate(request.requiredDate)}</strong></span>}
                             </div>
                         </div>
                         <button onClick={handleApproveQuotation} disabled={isApproving}
-                            className="flex-shrink-0 bg-[#137333] hover:bg-[#0d652d] text-white px-5 py-[9px] rounded-[50px] text-[13px] font-semibold transition-all shadow-sm disabled:opacity-70">
+                            className="w-full sm:w-auto flex-shrink-0 bg-[#137333] hover:bg-[#0d652d] text-white px-6 py-2.5 rounded-[50px] text-[13px] font-semibold transition-all shadow-sm active:scale-95 disabled:opacity-70 disabled:scale-100">
                             {isApproving ? 'Approving...' : '✅ Accept Quotation'}
                         </button>
                     </div>
                 )}
                 {approveError && (
-                    <div className="px-8 py-3 bg-[#fce8e6] text-[#c5221f] text-[13px] border-b border-[#fad2cf]">{approveError}</div>
+                    <div className="px-6 sm:px-8 py-3 bg-[#fce8e6] text-[#c5221f] text-[12px] sm:text-[13px] border-b border-[#fad2cf] font-medium">{approveError}</div>
                 )}
 
                 {/* Body */}
-                <div className="flex-1 overflow-hidden p-8 flex flex-col lg:flex-row gap-6 bg-[#f8f9fa]">
+                <div className="flex-1 overflow-y-auto p-4 sm:p-8 flex flex-col lg:flex-row gap-6 bg-[#f8f9fa] custom-scrollbar">
 
                     {/* LEFT: Timeline */}
-                    <div className="w-full lg:w-[38%] bg-white rounded-[20px] shadow-sm border border-[#dadce0]/60 p-6 flex-shrink-0 overflow-y-auto custom-scrollbar max-h-[300px] lg:max-h-[calc(90vh-180px)]">
-                        <h3 className="text-[16px] font-['Google_Sans',sans-serif] text-[#202124] font-medium mb-7 flex items-center gap-2">
+                    <div className="w-full lg:w-[38%] bg-white rounded-[20px] shadow-sm border border-[#dadce0]/60 p-5 sm:p-6 shrink-0">
+                        <h3 className="text-[15px] sm:text-[16px] font-['Google_Sans',sans-serif] text-[#202124] font-medium mb-6 flex items-center gap-2 border-b border-[#f1f3f4] pb-3 sm:border-none sm:pb-0 sm:mb-7">
                             <svg className="w-5 h-5 text-[#1a73e8]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
                             </svg>
-                            Status
+                            Request Progress
                         </h3>
-                        <div className="relative pl-3">
-                            <div className="absolute left-[23.5px] top-3 bottom-3 w-[2px] bg-[#dadce0]" />
-                            <div className="absolute left-[23.5px] top-3 w-[2px] bg-[#137333] transition-all duration-700" style={{ height: `calc(${progressPct}% - 12px)` }} />
+                        <div className="relative pl-1 sm:pl-3">
+                            <div className="absolute left-[15.5px] sm:left-[23.5px] top-3 bottom-3 w-[2px] bg-[#f1f3f4]" />
+                            <div className="absolute left-[15.5px] sm:left-[23.5px] top-3 w-[2px] bg-[#137333] transition-all duration-700" style={{ height: `calc(${progressPct}% - 12px)` }} />
                             {steps.map((step, i) => (
-                                <div key={i} className={`flex gap-4 mb-6 relative z-10 ${i === steps.length - 1 ? 'mb-0' : ''}`}>
-                                    <div className={`w-6 h-6 rounded-full flex-shrink-0 mt-0.5 flex items-center justify-center border-2 transition-all
+                                <div key={i} className={`flex gap-3 sm:gap-4 mb-5 sm:mb-6 relative z-10 ${i === steps.length - 1 ? 'mb-0' : ''}`}>
+                                    <div className={`w-5 h-5 sm:w-6 sm:h-6 rounded-full flex-shrink-0 mt-0.5 flex items-center justify-center border-2 transition-all
                                         ${step.done ? 'bg-[#137333] border-[#137333]' : step.active ? 'bg-[#1a73e8] border-[#1a73e8] animate-pulse' : 'border-[#dadce0] bg-white'}`}>
                                         {step.done && (
-                                            <svg className="w-3.5 h-3.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                                            <svg className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3.5}>
                                                 <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
                                             </svg>
                                         )}
                                     </div>
                                     <div>
-                                        <div className={`text-[13px] font-['Google_Sans',sans-serif] ${step.done || step.active ? 'font-medium text-[#202124]' : 'text-[#9aa0a6]'}`}>{step.label}</div>
-                                        {step.sub && <div className="text-[11px] text-[#5f6368] mt-0.5">{step.sub}</div>}
+                                        <div className={`text-[12px] sm:text-[13px] font-['Google_Sans',sans-serif] leading-tight ${step.done || step.active ? 'font-semibold text-[#202124]' : 'text-[#9aa0a6]'}`}>{step.label}</div>
+                                        {step.sub && <div className="text-[10px] sm:text-[11px] text-[#5f6368] mt-0.5">{step.sub}</div>}
                                     </div>
                                 </div>
                             ))}
@@ -176,7 +182,7 @@ const RequestDetailsModal = ({ isOpen, onClose, request, onSuccess }) => {
                     </div>
 
                     {/* RIGHT: Full Quotation Details */}
-                    <div className="w-full bg-white rounded-[20px] shadow-sm border border-[#dadce0]/60 p-6 relative overflow-y-auto custom-scrollbar max-h-[70vh] lg:max-h-[calc(90vh-180px)] flex-1">
+                    <div className="w-full bg-white rounded-[20px] shadow-sm border border-[#dadce0]/60 p-5 sm:p-6 relative flex-1">
                         <div className="absolute top-0 right-0 w-28 h-28 bg-gradient-to-br from-[#1a73e8]/5 to-transparent rounded-bl-[100px] pointer-events-none" />
 
                         <h3 className="text-[16px] font-['Google_Sans',sans-serif] text-[#202124] font-medium mb-5 flex items-center gap-2 relative z-10">
@@ -190,14 +196,18 @@ const RequestDetailsModal = ({ isOpen, onClose, request, onSuccess }) => {
                             <div className="relative z-10 space-y-5">
 
                                 {/* Summary chips */}
-                                <div className="grid grid-cols-2 gap-3">
-                                    <div className="bg-[#e8f0fe]/60 rounded-[12px] p-3 border border-[#1a73e8]/15">
-                                        <div className="text-[11px] text-[#1a73e8] font-medium mb-1">Total Estimated Cost</div>
-                                        <div className="text-[22px] font-bold text-[#1a73e8]">₹{Number(totalCost ?? 0).toFixed(2)}</div>
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                    <div className="bg-[#e8f0fe]/60 rounded-[12px] p-4 border border-[#1a73e8]/15 flex items-center justify-between sm:block">
+                                        <div>
+                                            <div className="text-[10px] sm:text-[11px] text-[#1a73e8] font-bold uppercase tracking-tight mb-1">Estimated Cost</div>
+                                            <div className="text-[20px] sm:text-[24px] font-bold text-[#1a73e8] leading-none">₹{Number(totalCost ?? 0).toFixed(2)}</div>
+                                        </div>
                                     </div>
-                                    <div className="bg-[#f0faf3]/60 rounded-[12px] p-3 border border-[#137333]/15">
-                                        <div className="text-[11px] text-[#137333] font-medium mb-1">📅 Required By</div>
-                                        <div className="text-[18px] font-bold text-[#137333]">{fmtDate(request.requiredDate)}</div>
+                                    <div className="bg-[#f0faf3]/60 rounded-[12px] p-4 border border-[#137333]/15 flex items-center justify-between sm:block">
+                                        <div>
+                                            <div className="text-[10px] sm:text-[11px] text-[#137333] font-bold uppercase tracking-tight mb-1">📅 Required By</div>
+                                            <div className="text-[16px] sm:text-[18px] font-bold text-[#137333] leading-none">{fmtDate(request.requiredDate)}</div>
+                                        </div>
                                     </div>
                                 </div>
 
