@@ -1,11 +1,13 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import { useRequests } from '../../context/RequestContext';
 import RequestDetailsModal from '../../components/requests/RequestDetailsModal';
 import Button from '../../components/Button';
 
 const RequestsPage = () => {
-    const { requests, refreshRequests } = useRequests();
+    const { requests, refreshRequests, loading, error } = useRequests();
     const [selectedRequest, setSelectedRequest] = useState(null);
+    const [query, setQuery] = useState('');
+    const [statusFilter, setStatusFilter] = useState('ALL'); // ALL | ACTIVE | COMPLETED | REJECTED | PAYMENT_PENDING
 
     const handleApprovalSuccess = () => {
         refreshRequests();
@@ -51,28 +53,190 @@ const RequestsPage = () => {
         );
     };
 
+    const filteredRequests = useMemo(() => {
+        const q = query.trim().toLowerCase();
+        let rows = requests;
+
+        if (statusFilter !== 'ALL') {
+            if (statusFilter === 'ACTIVE') {
+                rows = rows.filter(r => r.status !== 'COMPLETED');
+            } else {
+                rows = rows.filter(r => r.status === statusFilter);
+            }
+        }
+
+        if (!q) return rows;
+        return rows.filter((r) => {
+            const hay = [
+                r.requestNumber,
+                r.id,
+                r.itemDescription,
+                r.serviceDepartmentName,
+                r.date,
+                r.status
+            ]
+                .filter(Boolean)
+                .join(' ')
+                .toLowerCase();
+            return hay.includes(q);
+        });
+    }, [requests, query, statusFilter]);
+
+    const counts = useMemo(() => {
+        const active = requests.filter(r => r.status !== 'COMPLETED').length;
+        const completed = requests.filter(r => r.status === 'COMPLETED').length;
+        const rejected = requests.filter(r => r.status === 'REJECTED').length;
+        const paymentPending = requests.filter(r => r.status === 'PAYMENT_PENDING').length;
+        return { active, completed, rejected, paymentPending, total: requests.length };
+    }, [requests]);
+
     return (
         <div className="relative pb-24 px-6 sm:px-8 pt-8 max-w-[1400px] mx-auto animate-fadeUp">
-            <div className="mb-8 flex flex-col md:flex-row md:items-end justify-between gap-4">
+            <div className="mb-6 flex flex-col lg:flex-row lg:items-end justify-between gap-4">
                 <div>
                     <h1 className="text-[32px] text-on-surface font-display font-medium tracking-tight mb-2">My Requests</h1>
                     <p className="text-[15px] text-on-surface-variant font-ui">Manage and monitor your facility maintenance service tickets.</p>
                 </div>
-                <div className="flex gap-3">
-                    {/* Add Request Button could go here */}
+                <div className="flex items-center gap-3">
+                    <Button variant="ghost" onClick={refreshRequests} className="h-10 px-4 text-[13px]">
+                        Refresh
+                    </Button>
                 </div>
             </div>
 
             <div className="google-card border-outline/50 overflow-hidden shadow-sm hover:shadow-md">
-                <div className="flex justify-between items-center px-6 py-5 border-b border-outline/30 bg-white/50">
-                    <h3 className="text-[18px] font-display font-medium text-on-surface">Recent Activity</h3>
-                    <div className="flex items-center gap-2">
-                        <div className="h-2 w-2 rounded-full bg-success"></div>
-                        <span className="text-[13px] text-on-surface-variant font-ui">Live Updates</span>
+                <div className="px-6 py-5 border-b border-outline/30 bg-white/50">
+                    <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+                        <div className="flex items-center gap-3">
+                            <h3 className="text-[18px] font-display font-medium text-on-surface">Requests</h3>
+                            <span className="text-[12px] font-ui font-semibold text-on-surface-variant bg-surface-variant/40 border border-outline/20 px-2.5 py-0.5 rounded-full">
+                                {filteredRequests.length} / {counts.total}
+                            </span>
+                        </div>
+
+                        <div className="flex flex-col sm:flex-row gap-3 w-full md:w-auto">
+                            <div className="relative w-full sm:w-[340px]">
+                                <input
+                                    value={query}
+                                    onChange={(e) => setQuery(e.target.value)}
+                                    placeholder="Search by request #, description, dept, date, status…"
+                                    className="w-full h-10 px-4 rounded-xl border border-outline/30 bg-white text-[13px] font-ui text-on-surface placeholder:text-on-surface-variant/70 focus:outline-none focus:ring-4 focus:ring-primary/10 focus:border-primary/30"
+                                />
+                                {query ? (
+                                    <button
+                                        type="button"
+                                        onClick={() => setQuery('')}
+                                        className="absolute right-3 top-1/2 -translate-y-1/2 text-on-surface-variant/70 hover:text-on-surface"
+                                        aria-label="Clear search"
+                                    >
+                                        <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                            <path strokeLinecap="round" strokeLinejoin="round" d="M18 6L6 18M6 6l12 12" />
+                                        </svg>
+                                    </button>
+                                ) : null}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="mt-4 flex flex-wrap gap-2">
+                        {[
+                            { key: 'ALL', label: 'All', count: counts.total },
+                            { key: 'ACTIVE', label: 'Active', count: counts.active },
+                            { key: 'PAYMENT_PENDING', label: 'Payment Pending', count: counts.paymentPending },
+                            { key: 'REJECTED', label: 'Rejected', count: counts.rejected },
+                            { key: 'COMPLETED', label: 'Completed', count: counts.completed }
+                        ].map(t => {
+                            const active = statusFilter === t.key;
+                            return (
+                                <button
+                                    key={t.key}
+                                    type="button"
+                                    onClick={() => setStatusFilter(t.key)}
+                                    className={`h-9 px-3 rounded-full border text-[12px] font-ui font-semibold transition inline-flex items-center gap-2
+                                        ${active ? 'bg-primary text-white border-transparent shadow-sm' : 'bg-white border-outline/25 text-on-surface-variant hover:text-on-surface hover:border-outline/40'}
+                                    `}
+                                >
+                                    <span>{t.label}</span>
+                                    <span className={`${active ? 'bg-white/20 text-white' : 'bg-surface-variant/50 text-on-surface-variant'} px-2 py-0.5 rounded-full text-[11px]`}>
+                                        {t.count}
+                                    </span>
+                                </button>
+                            );
+                        })}
                     </div>
                 </div>
 
-                <div className="overflow-x-auto custom-scrollbar">
+                {error ? (
+                    <div className="px-6 py-12 text-center">
+                        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-error-container text-error border border-error/20 text-[13px] font-ui font-semibold">
+                            {error}
+                        </div>
+                        <div className="mt-6">
+                            <Button variant="primary" onClick={refreshRequests}>Retry</Button>
+                        </div>
+                    </div>
+                ) : null}
+
+                {loading ? (
+                    <div className="px-6 py-10">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            {[1, 2, 3, 4].map(i => (
+                                <div key={i} className="p-5 rounded-2xl border border-outline/20 bg-white animate-skeleton min-h-[120px]" />
+                            ))}
+                        </div>
+                    </div>
+                ) : null}
+
+                {!loading && !error ? (
+                <>
+                {/* Mobile cards */}
+                <div className="block lg:hidden px-6 py-6">
+                    <div className="grid grid-cols-1 gap-4">
+                        {filteredRequests.map((req, i) => (
+                            <button
+                                key={i}
+                                type="button"
+                                onClick={() => setSelectedRequest(req)}
+                                className="text-left p-5 rounded-2xl border border-outline/20 bg-white hover:shadow-md transition"
+                            >
+                                <div className="flex items-start justify-between gap-3">
+                                    <div className="min-w-0">
+                                        <div className="text-[14px] font-ui font-bold text-primary truncate">
+                                            #{req.requestNumber}
+                                        </div>
+                                        <div className="mt-1 text-[14px] font-body text-on-surface font-medium truncate" title={req.itemDescription}>
+                                            {req.itemDescription}
+                                        </div>
+                                        <div className="mt-2 flex items-center gap-2 flex-wrap">
+                                            {getDeptChip(req.serviceDepartmentName)}
+                                            <span className="text-[12px] font-ui text-on-surface-variant">{req.date}</span>
+                                        </div>
+                                    </div>
+                                    <div className="flex-shrink-0">
+                                        {getStatusChip(req.status)}
+                                    </div>
+                                </div>
+                                <div className="mt-4 flex justify-end">
+                                    <span className="text-[12px] font-ui font-semibold text-primary">View details</span>
+                                </div>
+                            </button>
+                        ))}
+
+                        {filteredRequests.length === 0 && (
+                            <div className="py-10 text-center">
+                                <div className="flex flex-col items-center gap-3 opacity-50">
+                                    <svg className="w-12 h-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                    </svg>
+                                    <span className="font-ui text-[14px]">No requests match your filters.</span>
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                </div>
+
+                {/* Desktop table */}
+                <div className="hidden lg:block overflow-x-auto custom-scrollbar">
                     <table className="w-full text-left border-separate border-spacing-0 min-w-[900px]">
                         <thead>
                             <tr className="bg-surface-variant/30">
@@ -85,7 +249,7 @@ const RequestsPage = () => {
                             </tr>
                         </thead>
                         <tbody className="divide-y divide-outline/10">
-                            {requests.map((req, i) => (
+                            {filteredRequests.map((req, i) => (
                                 <tr
                                     key={i}
                                     onClick={() => setSelectedRequest(req)}
@@ -111,21 +275,25 @@ const RequestsPage = () => {
                                     <td className="px-6 py-4 text-right">
                                         <Button
                                             variant="ghost"
-                                            className="h-8 px-4 text-[13px] opacity-0 group-hover:opacity-100 transition-opacity"
+                                            className="h-8 px-4 text-[13px]"
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                setSelectedRequest(req);
+                                            }}
                                         >
                                             View
                                         </Button>
                                     </td>
                                 </tr>
                             ))}
-                            {requests.length === 0 && (
+                            {filteredRequests.length === 0 && (
                                 <tr>
                                     <td colSpan="6" className="px-6 py-16 text-center">
                                         <div className="flex flex-col items-center gap-3 opacity-40">
                                             <svg className="w-12 h-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                                             </svg>
-                                            <span className="font-ui text-[14px]">No maintenance requests found.</span>
+                                            <span className="font-ui text-[14px]">No requests match your filters.</span>
                                         </div>
                                     </td>
                                 </tr>
@@ -133,6 +301,8 @@ const RequestsPage = () => {
                         </tbody>
                     </table>
                 </div>
+                </>
+                ) : null}
             </div>
 
             <RequestDetailsModal

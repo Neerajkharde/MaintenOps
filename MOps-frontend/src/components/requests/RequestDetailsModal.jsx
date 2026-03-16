@@ -98,8 +98,8 @@ const RequestDetailsModal = ({ isOpen, onClose, request, onSuccess }) => {
     const progressPct = Math.max(0, Math.min(100, (progressFraction / (steps.length - 1)) * 100));
 
     return createPortal(
-        <div className="fixed inset-0 bg-black/40 backdrop-blur-[4px] z-[100] flex items-center justify-center p-4 overflow-y-auto pt-20">
-            <div className="bg-[#f8f9fa] rounded-[24px] w-full max-w-[960px] shadow-[0_24px_60px_rgba(0,0,0,0.15)] flex flex-col relative my-auto animate-fadeUp overflow-hidden max-h-[90vh]">
+        <div className="fixed inset-0 bg-black/40 backdrop-blur-[4px] z-[100] flex items-start justify-center px-4 py-6 sm:py-10 overflow-y-auto">
+            <div className="bg-[#f8f9fa] rounded-[24px] w-full max-w-[960px] shadow-[0_24px_60px_rgba(0,0,0,0.15)] flex flex-col relative animate-fadeUp overflow-hidden max-h-[calc(100vh-3rem)] sm:max-h-[calc(100vh-5rem)]">
 
                 {/* Header */}
                 <div className="bg-gradient-to-r from-[#e8f0fe] via-white to-white px-6 sm:px-8 py-5 sm:py-6 border-b border-[#dadce0] flex flex-row justify-between items-start sm:items-center sticky top-0 z-30">
@@ -149,19 +149,65 @@ const RequestDetailsModal = ({ isOpen, onClose, request, onSuccess }) => {
                 )}
 
                 {/* Body */}
-                <div className="flex-1 overflow-y-auto p-4 sm:p-8 flex flex-col lg:flex-row gap-6 bg-[#f8f9fa] custom-scrollbar">
+                <div className="flex-1 overflow-y-auto p-4 sm:p-8 space-y-6 bg-[#f8f9fa] custom-scrollbar">
 
-                    {/* LEFT: Timeline */}
-                    <div className="w-full lg:w-[38%] bg-white rounded-[20px] shadow-sm border border-[#dadce0]/60 p-5 sm:p-6 shrink-0">
-                        <h3 className="text-[15px] sm:text-[16px] font-['Google_Sans',sans-serif] text-[#202124] font-medium mb-6 flex items-center gap-2 border-b border-[#f1f3f4] pb-3 sm:border-none sm:pb-0 sm:mb-7">
+                    {/* Top summary row */}
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div className="bg-white rounded-[16px] border border-[#dadce0]/70 shadow-sm px-4 py-3 flex items-center justify-between">
+                            <div>
+                                <div className="text-[11px] text-[#5f6368] uppercase tracking-wide mb-1">Status</div>
+                                <div className="text-[14px] font-semibold text-[#202124]">
+                                    {String(status || '—').replace(/_/g, ' ')}
+                                </div>
+                            </div>
+                            <div className="w-8 h-8 rounded-full bg-[#e8f0fe] flex items-center justify-center text-[#1a73e8]">
+                                <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4M7 7h10a2 2 0 012 2v8a2 2 0 01-2 2H7a2 2 0 01-2-2V9a2 2 0 012-2z" />
+                                </svg>
+                            </div>
+                        </div>
+                        <div className="bg-white rounded-[16px] border border-[#dadce0]/70 shadow-sm px-4 py-3 flex items-center justify-between">
+                            <div>
+                                <div className="text-[11px] text-[#5f6368] uppercase tracking-wide mb-1">Estimated Cost</div>
+                                <div className="text-[18px] font-bold text-[#1a73e8]">
+                                    ₹{Number(totalCost ?? 0).toFixed(2)}
+                                </div>
+                            </div>
+                            <div className="w-8 h-8 rounded-full bg-[#e8f0fe] flex items-center justify-center text-[#1a73e8]">
+                                <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 8c-2.21 0-4 .895-4 2s1.79 2 4 2 4 .895 4 2-1.79 2-4 2m0-10V4m0 14v-2" />
+                                </svg>
+                            </div>
+                        </div>
+                        <div className="bg-white rounded-[16px] border border-[#dadce0]/70 shadow-sm px-4 py-3 flex items-center justify-between">
+                            <div>
+                                <div className="text-[11px] text-[#5f6368] uppercase tracking-wide mb-1">Required By</div>
+                                <div className="text-[15px] font-semibold text-[#137333]">
+                                    {fmtDate(request.requiredDate)}
+                                </div>
+                            </div>
+                            <div className="w-8 h-8 rounded-full bg-[#e6f4ea] flex items-center justify-center text-[#137333]">
+                                <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M8 7V5a2 2 0 012-2h4a2 2 0 012 2v2M5 11h14M7 19h10a2 2 0 002-2v-6H5v6a2 2 0 002 2z" />
+                                </svg>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Timeline */}
+                    <div className="bg-white rounded-[20px] border border-[#dadce0]/70 shadow-sm p-5 sm:p-6">
+                        <h3 className="text-[15px] sm:text-[16px] font-['Google_Sans',sans-serif] text-[#202124] font-medium mb-4 flex items-center gap-2">
                             <svg className="w-5 h-5 text-[#1a73e8]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4" />
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
                             </svg>
                             Request Progress
                         </h3>
                         <div className="relative pl-1 sm:pl-3">
                             <div className="absolute left-[15.5px] sm:left-[23.5px] top-3 bottom-3 w-[2px] bg-[#f1f3f4]" />
-                            <div className="absolute left-[15.5px] sm:left-[23.5px] top-3 w-[2px] bg-[#137333] transition-all duration-700" style={{ height: `calc(${progressPct}% - 12px)` }} />
+                            <div
+                                className="absolute left-[15.5px] sm:left-[23.5px] top-3 w-[2px] bg-[#137333] transition-all duration-700"
+                                style={{ height: `${progressPct}%` }}
+                            />
                             {steps.map((step, i) => (
                                 <div key={i} className={`flex gap-3 sm:gap-4 mb-5 sm:mb-6 relative z-10 ${i === steps.length - 1 ? 'mb-0' : ''}`}>
                                     <div className={`w-5 h-5 sm:w-6 sm:h-6 rounded-full flex-shrink-0 mt-0.5 flex items-center justify-center border-2 transition-all
@@ -181,110 +227,143 @@ const RequestDetailsModal = ({ isOpen, onClose, request, onSuccess }) => {
                         </div>
                     </div>
 
-                    {/* RIGHT: Full Quotation Details */}
-                    <div className="w-full bg-white rounded-[20px] shadow-sm border border-[#dadce0]/60 p-5 sm:p-6 relative flex-1">
-                        <div className="absolute top-0 right-0 w-28 h-28 bg-gradient-to-br from-[#1a73e8]/5 to-transparent rounded-bl-[100px] pointer-events-none" />
+                    {/* Details + Quotation */}
+                    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        {/* Request details + notes */}
+                        <div className="bg-white rounded-[20px] border border-[#dadce0]/70 shadow-sm p-5 sm:p-6">
+                            <h3 className="text-[15px] sm:text-[16px] font-['Google_Sans',sans-serif] text-[#202124] font-medium mb-4 flex items-center gap-2">
+                                <svg className="w-5 h-5 text-[#1a73e8]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V6a2 2 0 012-2h4a2 2 0 012 2v1M7 11h10M9 15h6" />
+                                </svg>
+                                Request Details
+                            </h3>
 
-                        <h3 className="text-[16px] font-['Google_Sans',sans-serif] text-[#202124] font-medium mb-5 flex items-center gap-2 relative z-10">
-                            <svg className="w-5 h-5 text-[#f9ab00]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 14l6-6m-5.5.5h.01m4.99 5h.01M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16l3.5-2 3.5 2 3.5-2 3.5 2zM10 8.5a.5.5 0 11-1 0 .5.5 0 011 0zm5 5a.5.5 0 11-1 0 .5.5 0 011 0z" />
-                            </svg>
-                            Quotation Details
-                        </h3>
+                            <dl className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-3 mb-4 text-[12px] sm:text-[13px] text-[#3c4043]">
+                                <div>
+                                    <dt className="text-[11px] uppercase tracking-wide text-[#5f6368] mb-0.5">Created</dt>
+                                    <dd className="font-semibold">{request.date || fmtDate(request.createdAt)}</dd>
+                                </div>
+                                <div>
+                                    <dt className="text-[11px] uppercase tracking-wide text-[#5f6368] mb-0.5">Service Department</dt>
+                                    <dd className="font-semibold">{request.serviceDepartmentName || request.dept || '—'}</dd>
+                                </div>
+                                <div>
+                                    <dt className="text-[11px] uppercase tracking-wide text-[#5f6368] mb-0.5">Required By</dt>
+                                    <dd className="font-semibold">{fmtDate(request.requiredDate)}</dd>
+                                </div>
+                            </dl>
 
-                        {hasQuotation ? (
-                            <div className="relative z-10 space-y-5">
-
-                                {/* Summary chips */}
-                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                                    <div className="bg-[#e8f0fe]/60 rounded-[12px] p-4 border border-[#1a73e8]/15 flex items-center justify-between sm:block">
-                                        <div>
-                                            <div className="text-[10px] sm:text-[11px] text-[#1a73e8] font-bold uppercase tracking-tight mb-1">Estimated Cost</div>
-                                            <div className="text-[20px] sm:text-[24px] font-bold text-[#1a73e8] leading-none">₹{Number(totalCost ?? 0).toFixed(2)}</div>
+                            {(request.adminRemarks || request.superAdminRemarks || request.quotationDescription) ? (
+                                <div className="space-y-3">
+                                    {request.adminRemarks ? (
+                                        <div className="rounded-[10px] p-3 bg-[#f1f3f4] border border-[#dadce0]">
+                                            <div className="text-[11px] text-[#5f6368] font-semibold mb-1 uppercase tracking-wide">Admin Note</div>
+                                            <p className="text-[13px] text-[#3c4043] leading-relaxed">{request.adminRemarks}</p>
                                         </div>
-                                    </div>
-                                    <div className="bg-[#f0faf3]/60 rounded-[12px] p-4 border border-[#137333]/15 flex items-center justify-between sm:block">
-                                        <div>
+                                    ) : null}
+                                    {request.superAdminRemarks ? (
+                                        <div className="rounded-[10px] p-3 bg-[#e8f0fe]/70 border border-[#1a73e8]/15">
+                                            <div className="text-[11px] text-[#1a73e8] font-semibold mb-1 uppercase tracking-wide">Approval Note</div>
+                                            <p className="text-[13px] text-[#3c4043] leading-relaxed">{request.superAdminRemarks}</p>
+                                        </div>
+                                    ) : null}
+                                    {request.quotationDescription ? (
+                                        <div className="rounded-[10px] p-3 bg-[#fef7e0]/70 border border-[#fef0c3]">
+                                            <div className="text-[11px] text-[#ea8600] font-semibold mb-1 uppercase tracking-wide">Scope of Work</div>
+                                            <p className="text-[13px] text-[#3c4043] leading-relaxed">{request.quotationDescription}</p>
+                                        </div>
+                                    ) : null}
+                                </div>
+                            ) : null}
+                        </div>
+
+                        {/* Quotation + materials */}
+                        <div className="bg-white rounded-[20px] border border-[#dadce0]/70 shadow-sm p-5 sm:p-6">
+                            <h3 className="text-[15px] sm:text-[16px] font-['Google_Sans',sans-serif] text-[#202124] font-medium mb-4 flex items-center gap-2">
+                                <svg className="w-5 h-5 text-[#f9ab00]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 14l6-6m-5.5.5h.01m4.99 5h.01M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16l3.5-2 3.5 2 3.5-2 3.5 2zM10 8.5a.5.5 0 11-1 0 .5.5 0 011 0zm5 5a.5.5 0 11-1 0 .5.5 0 011 0z" />
+                                </svg>
+                                Quotation Details
+                            </h3>
+
+                            {hasQuotation ? (
+                                <div className="space-y-4">
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                        <div className="bg-[#e8f0fe]/60 rounded-[12px] p-4 border border-[#1a73e8]/15">
+                                            <div className="text-[10px] sm:text-[11px] text-[#1a73e8] font-bold uppercase tracking-tight mb-1">Estimated Cost</div>
+                                            <div className="text-[20px] sm:text-[22px] font-bold text-[#1a73e8] leading-none">₹{Number(totalCost ?? 0).toFixed(2)}</div>
+                                        </div>
+                                        <div className="bg-[#f0faf3]/60 rounded-[12px] p-4 border border-[#137333]/15">
                                             <div className="text-[10px] sm:text-[11px] text-[#137333] font-bold uppercase tracking-tight mb-1">📅 Required By</div>
                                             <div className="text-[16px] sm:text-[18px] font-bold text-[#137333] leading-none">{fmtDate(request.requiredDate)}</div>
                                         </div>
                                     </div>
-                                </div>
 
-                                {/* Full material breakdown — same columns as SA */}
-                                {materials.length > 0 && (
-                                    <div>
-                                        <div className="text-[12px] font-semibold text-[#5f6368] mb-2 uppercase tracking-wide">Material Breakdown</div>
-                                        <div className="border border-[#dadce0] rounded-[12px] overflow-auto custom-scrollbar">
-                                            <table className="w-full text-[12px] min-w-[500px]">
-                                                <thead className="bg-[#f8f9fa] border-b border-[#dadce0]">
-                                                    <tr>
-                                                        <th className="px-3 py-2.5 text-left text-[#5f6368] font-medium">Item</th>
-                                                        <th className="px-3 py-2.5 text-right text-[#5f6368] font-medium">Qty</th>
-                                                        <th className="px-3 py-2.5 text-right text-[#5f6368] font-medium">Unit ₹</th>
-                                                        <th className="px-3 py-2.5 text-left text-[#5f6368] font-medium">Vendor</th>
-                                                        <th className="px-3 py-2.5 text-right text-[#5f6368] font-medium">Total</th>
-                                                    </tr>
-                                                </thead>
-                                                <tbody>
-                                                    {materials.map((m, i) => (
-                                                        <tr key={i} className="border-t border-[#f1f3f4] hover:bg-[#fafafa]">
-                                                            <td className="px-3 py-2.5">
-                                                                <div className="font-medium text-[#202124]">{m.materialName}</div>
-                                                                {m.specification && <div className="text-[10px] text-[#5f6368]">{m.specification}</div>}
-                                                            </td>
-                                                            <td className="px-3 py-2.5 text-right">{m.quantity} {m.unit}</td>
-                                                            <td className="px-3 py-2.5 text-right">₹{Number(m.unitPrice ?? 0).toFixed(2)}</td>
-                                                            <td className="px-3 py-2.5 text-[#5f6368] text-[11px]">{m.vendorName || '—'}</td>
-                                                            <td className="px-3 py-2.5 text-right font-semibold">₹{Number(m.totalPrice ?? 0).toFixed(2)}</td>
-                                                        </tr>
-                                                    ))}
-                                                </tbody>
-                                                <tfoot className="bg-[#f8f9fa] border-t-2 border-[#dadce0]">
-                                                    <tr>
-                                                        <td colSpan={4} className="px-3 py-2.5 text-right font-semibold text-[#5f6368]">Grand Total</td>
-                                                        <td className="px-3 py-2.5 text-right font-bold text-[#1a73e8]">₹{Number(totalCost ?? 0).toFixed(2)}</td>
-                                                    </tr>
-                                                </tfoot>
-                                            </table>
-                                        </div>
-                                    </div>
-                                )}
-
-                                {/* SA Remarks */}
-                                {request.superAdminRemarks && (
-                                    <div className="bg-[#e8f0fe]/50 rounded-[10px] p-3 border border-[#1a73e8]/10">
-                                        <div className="text-[11px] text-[#1a73e8] font-semibold mb-1 uppercase tracking-wide">Approval Note</div>
-                                        <p className="text-[13px] text-[#3c4043]">{request.superAdminRemarks}</p>
-                                    </div>
-                                )}
-
-                                {/* Authorized By */}
-                                {request.superAdminName && (
-                                    <div className="bg-[#fef7e0]/50 rounded-[12px] p-3 border border-[#fef0c3] flex items-center gap-3">
-                                        <div className="w-9 h-9 rounded-full bg-[#f9ab00] flex items-center justify-center text-white font-bold text-[15px] flex-shrink-0">
-                                            {request.superAdminName.charAt(0)}
-                                        </div>
+                                    {materials.length > 0 && (
                                         <div>
-                                            <div className="text-[10px] text-[#ea8600] font-semibold uppercase tracking-wide">Authorized By</div>
-                                            <div className="text-[14px] font-medium text-[#202124]">{request.superAdminName}</div>
+                                            <div className="text-[12px] font-semibold text-[#5f6368] mb-2 uppercase tracking-wide">Material Breakdown</div>
+                                            <div className="border border-[#dadce0] rounded-[12px] overflow-auto custom-scrollbar">
+                                                <table className="w-full text-[12px] min-w-[500px]">
+                                                    <thead className="bg-[#f8f9fa] border-b border-[#dadce0]">
+                                                        <tr>
+                                                            <th className="px-3 py-2.5 text-left text-[#5f6368] font-medium">Item</th>
+                                                            <th className="px-3 py-2.5 text-right text-[#5f6368] font-medium">Qty</th>
+                                                            <th className="px-3 py-2.5 text-right text-[#5f6368] font-medium">Unit ₹</th>
+                                                            <th className="px-3 py-2.5 text-left text-[#5f6368] font-medium">Vendor</th>
+                                                            <th className="px-3 py-2.5 text-right text-[#5f6368] font-medium">Total</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        {materials.map((m, i) => (
+                                                            <tr key={i} className="border-t border-[#f1f3f4] hover:bg-[#fafafa]">
+                                                                <td className="px-3 py-2.5">
+                                                                    <div className="font-medium text-[#202124]">{m.materialName}</div>
+                                                                    {m.specification && <div className="text-[10px] text-[#5f6368]">{m.specification}</div>}
+                                                                </td>
+                                                                <td className="px-3 py-2.5 text-right">{m.quantity} {m.unit}</td>
+                                                                <td className="px-3 py-2.5 text-right">₹{Number(m.unitPrice ?? 0).toFixed(2)}</td>
+                                                                <td className="px-3 py-2.5 text-[#5f6368] text-[11px]">{m.vendorName || '—'}</td>
+                                                                <td className="px-3 py-2.5 text-right font-semibold">₹{Number(m.totalPrice ?? 0).toFixed(2)}</td>
+                                                            </tr>
+                                                        ))}
+                                                    </tbody>
+                                                    <tfoot className="bg-[#f8f9fa] border-t-2 border-[#dadce0]">
+                                                        <tr>
+                                                            <td colSpan={4} className="px-3 py-2.5 text-right font-semibold text-[#5f6368]">Grand Total</td>
+                                                            <td className="px-3 py-2.5 text-right font-bold text-[#1a73e8]">₹{Number(totalCost ?? 0).toFixed(2)}</td>
+                                                        </tr>
+                                                    </tfoot>
+                                                </table>
+                                            </div>
                                         </div>
-                                    </div>
-                                )}
-                            </div>
-                        ) : (
-                            <div className="flex flex-col items-center justify-center py-10 text-center">
-                                <div className="w-16 h-16 bg-[#f1f3f4] rounded-full flex items-center justify-center mb-4">
-                                    <svg className="w-8 h-8 text-[#9aa0a6]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                                    </svg>
+                                    )}
+
+                                    {request.superAdminName && (
+                                        <div className="bg-[#fef7e0]/50 rounded-[12px] p-3 border border-[#fef0c3] flex items-center gap-3">
+                                            <div className="w-9 h-9 rounded-full bg-[#f9ab00] flex items-center justify-center text-white font-bold text-[15px] flex-shrink-0">
+                                                {request.superAdminName.charAt(0)}
+                                            </div>
+                                            <div>
+                                                <div className="text-[10px] text-[#ea8600] font-semibold uppercase tracking-wide">Authorized By</div>
+                                                <div className="text-[14px] font-medium text-[#202124]">{request.superAdminName}</div>
+                                            </div>
+                                        </div>
+                                    )}
                                 </div>
-                                <h4 className="text-[16px] font-['Google_Sans',sans-serif] font-medium text-[#202124] mb-2">Quotation Pending</h4>
-                                <p className="text-[13px] font-['Roboto',sans-serif] text-[#5f6368] max-w-[240px]">
-                                    The admin is preparing a material-based quotation. You'll be notified once it's ready.
-                                </p>
-                            </div>
-                        )}
+                            ) : (
+                                <div className="flex flex-col items-center justify-center py-10 text-center">
+                                    <div className="w-16 h-16 bg-[#f1f3f4] rounded-full flex items-center justify-center mb-4">
+                                        <svg className="w-8 h-8 text-[#9aa0a6]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                        </svg>
+                                    </div>
+                                    <h4 className="text-[16px] font-['Google_Sans',sans-serif] font-medium text-[#202124] mb-2">Quotation Pending</h4>
+                                    <p className="text-[13px] font-['Roboto',sans-serif] text-[#5f6368] max-w-[260px]">
+                                        The admin is preparing a material-based quotation. You'll be notified once it's ready.
+                                    </p>
+                                </div>
+                            )}
+                        </div>
                     </div>
                 </div>
             </div>
