@@ -80,49 +80,6 @@ const UserDashboard = () => {
         );
     };
 
-    if (loading) {
-        return (
-            <div className="pb-24 px-6 sm:px-8 pt-8 max-w-[1400px] mx-auto animate-fadeUp">
-                <div className="mb-10 w-64 h-12 animate-skeleton rounded-2xl"></div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
-                    {[1, 2, 3, 4].map(i => (
-                        <div key={i} className="card p-6 min-h-[160px] flex flex-col justify-between">
-                            <div className="w-12 h-12 animate-skeleton rounded-2xl"></div>
-                            <div className="w-24 h-10 animate-skeleton rounded-2xl"></div>
-                        </div>
-                    ))}
-                </div>
-                <div className="flex flex-col xl:flex-row gap-8">
-                    <div className="flex-1 card p-8 min-h-[500px]">
-                        <div className="w-1/3 h-8 animate-skeleton rounded-xl mb-8"></div>
-                        <div className="w-full h-24 animate-skeleton rounded-2xl mb-12"></div>
-                        <div className="w-full h-40 animate-skeleton rounded-2xl"></div>
-                    </div>
-                    <div className="w-full xl:w-[450px] card p-8 min-h-[500px]">
-                        <div className="w-1/2 h-8 animate-skeleton rounded-xl mb-8"></div>
-                        <div className="w-full h-40 animate-skeleton rounded-2xl mb-8"></div>
-                        <div className="w-full h-14 animate-skeleton rounded-2xl"></div>
-                    </div>
-                </div>
-            </div>
-        );
-    }
-
-    if (error) {
-        return (
-            <div className="flex flex-col items-center justify-center min-h-[60vh] text-center px-4">
-                <div className="w-16 h-16 bg-error-container text-error rounded-full flex items-center justify-center mb-6 shadow-sm">
-                    <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
-                </div>
-                <h3 className="text-[20px] font-display font-medium text-on-surface mb-2">Service Connection Error</h3>
-                <p className="text-on-surface-variant font-ui max-w-sm mb-8">{error}</p>
-                <Button variant="primary" onClick={refreshRequests}>
-                    Reconnect Now
-                </Button>
-            </div>
-        );
-    }
-
     const currentReq = activeRequests.find(r => r.id === selectedTrackId);
     const selectedReqLabel =
         currentReq?.desc ||
@@ -183,6 +140,49 @@ const UserDashboard = () => {
         if (s === 'REQUEST_CREATED') return 'Submitted';
         return 'Submitted';
     };
+
+    if (loading) {
+        return (
+            <div className="pb-24 px-6 sm:px-8 pt-8 max-w-[1400px] mx-auto animate-fadeUp">
+                <div className="mb-10 w-64 h-12 animate-skeleton rounded-2xl"></div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
+                    {[1, 2, 3, 4].map(i => (
+                        <div key={i} className="card p-6 min-h-[160px] flex flex-col justify-between">
+                            <div className="w-12 h-12 animate-skeleton rounded-2xl"></div>
+                            <div className="w-24 h-10 animate-skeleton rounded-2xl"></div>
+                        </div>
+                    ))}
+                </div>
+                <div className="flex flex-col xl:flex-row gap-8">
+                    <div className="flex-1 card p-8 min-h-[500px]">
+                        <div className="w-1/3 h-8 animate-skeleton rounded-xl mb-8"></div>
+                        <div className="w-full h-24 animate-skeleton rounded-2xl mb-12"></div>
+                        <div className="w-full h-40 animate-skeleton rounded-2xl"></div>
+                    </div>
+                    <div className="w-full xl:w-[450px] card p-8 min-h-[500px]">
+                        <div className="w-1/2 h-8 animate-skeleton rounded-xl mb-8"></div>
+                        <div className="w-full h-40 animate-skeleton rounded-2xl mb-8"></div>
+                        <div className="w-full h-14 animate-skeleton rounded-2xl"></div>
+                    </div>
+                </div>
+            </div>
+        );
+    }
+
+    if (error) {
+        return (
+            <div className="flex flex-col items-center justify-center min-h-[60vh] text-center px-4">
+                <div className="w-16 h-16 bg-error-container text-error rounded-full flex items-center justify-center mb-6 shadow-sm">
+                    <svg className="w-8 h-8" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>
+                </div>
+                <h3 className="text-[20px] font-display font-medium text-on-surface mb-2">Service Connection Error</h3>
+                <p className="text-on-surface-variant font-ui max-w-sm mb-8">{error}</p>
+                <Button variant="primary" onClick={refreshRequests}>
+                    Reconnect Now
+                </Button>
+            </div>
+        );
+    }
 
     return (
 <>
