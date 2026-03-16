@@ -37,4 +37,4 @@ security:
 
 app:
   cors:
-    front-end-url: http://localhost:5173,${FRONTEND_URL}
+    front-end-url: http://localhost:5173,${FRONTEND_URL} # Set Environment Variable for FRONTEND_URL 
