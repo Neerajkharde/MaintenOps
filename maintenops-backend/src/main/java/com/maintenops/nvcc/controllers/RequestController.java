@@ -112,6 +112,21 @@ public class RequestController {
         return ResponseEntity.ok(updated);
     }
 
+    /**
+     * User requests negotiation for the quotation.
+     * Status: QUOTATION_APPROVED -> NEGOTIATION_PENDING
+     */
+    @PostMapping("/{id}/negotiate")
+    @PreAuthorize("hasRole('REQUESTER')")
+    public ResponseEntity<RequestResponseDto> negotiateQuotation(
+            @PathVariable Long id,
+            @RequestBody com.maintenops.nvcc.dtos.NegotiationRequestDto dto,
+            @AuthenticationPrincipal JwtPrincipal principal) {
+
+        RequestResponseDto updated = requestService.negotiateQuotation(id, dto, principal);
+        return ResponseEntity.ok(updated);
+    }
+
     // generateVendorList endpoint moved to AdminController as /api/admin/requests/{id}/generate-lists
 
     /**

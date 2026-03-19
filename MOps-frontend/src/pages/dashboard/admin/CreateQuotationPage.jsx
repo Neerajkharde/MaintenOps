@@ -2,13 +2,15 @@ import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { requestService } from '../../../services/requestService';
 import { quotationService } from '../../../services/materialService';
+import { get } from '../../../services/api';
 import MaterialPicker from '../../../components/requests/MaterialPicker';
 
 /**
- * CreateQuotationPage — Admin page for building a structured quotation.
+ * CreateQuotationPage — indigo-toned admin quotation builder.
  * Route: /admin/create-quotation/:requestId
  */
 const CreateQuotationPage = () => {
+    console.log('[DEBUG] CreateQuotationPage mounting...');
     const { requestId } = useParams();
     const navigate = useNavigate();
 
@@ -25,16 +27,17 @@ const CreateQuotationPage = () => {
     const [success, setSuccess] = useState(false);
 
     useEffect(() => {
-        // Fetch request details
-        fetch(`/api/request/admin/${requestId}`, {
-            headers: {
-                'Authorization': `Bearer ${localStorage.getItem('accessToken') || ''}`,
-            },
-            credentials: 'include',
-        })
+        get(`/api/request/admin/${requestId}`)
             .then(r => r.json())
-            .then(setRequest)
-            .catch(console.error)
+            .then(data => {
+                setRequest(data);
+                if (data.estimatedDays) setEstimatedDays(data.estimatedDays);
+                if (data.adminRemarks) setQuotationNotes(data.adminRemarks);
+            })
+            .catch(err => {
+                console.error('Error fetching request:', err);
+                setError('Could not load request details. Please ensure you are logged in as Admin.');
+            })
             .finally(() => setLoadingRequest(false));
     }, [requestId]);
 
@@ -72,7 +75,6 @@ const CreateQuotationPage = () => {
             });
 
             setSuccess(true);
-            // Navigate back to review modal after short delay to show success state
             setTimeout(() => navigate(`/admin/queue?openReview=${requestId}`), 1000);
         } catch (err) {
             setError(err.message || 'Failed to create quotation.');
@@ -83,149 +85,182 @@ const CreateQuotationPage = () => {
 
     if (loadingRequest) {
         return (
-            <div className="flex items-center justify-center h-64">
-                <div className="w-8 h-8 border-4 border-[#1a73e8] border-t-transparent rounded-full animate-spin" />
+            <div className="min-h-screen bg-gradient-to-br from-[#f4f5fb] via-[#eaecf5] to-[#e2e6f3] flex items-center justify-center">
+                <div className="w-8 h-8 border-[3px] border-[#6366f1] border-t-transparent rounded-full animate-spin" />
             </div>
         );
     }
 
     return (
-        <div className="max-w-5xl mx-auto px-6 py-8">
+        <div className="relative min-h-screen bg-gradient-to-br from-[#f4f5fb] via-[#eaecf5] to-[#e2e6f3] pb-24">
+            {/* Indigo mesh glow */}
+            <div className="absolute top-0 left-0 w-full h-[300px] pointer-events-none"
+                style={{ background: 'radial-gradient(ellipse 60% 50% at 50% 0%, rgba(99,102,241,0.08) 0%, transparent 70%)' }}
+            />
 
-            {/* Header */}
-            <div className="mb-8 flex items-center gap-4">
-                <button
-                    onClick={() => navigate(`/admin/queue?openReview=${requestId}`)}
-                    className="w-9 h-9 rounded-full flex items-center justify-center text-[#5f6368] hover:bg-[#e8eaed] transition-colors"
-                >
-                    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
-                    </svg>
-                </button>
-                <div>
-                    <h1 className="text-[22px] font-['Google_Sans_Display',sans-serif] font-bold text-[#202124]">
-                        Create Quotation
-                    </h1>
-                    <p className="text-[14px] text-[#5f6368]">
-                        {request ? `Request ${request.requestNumber} — ${request.requesterName}` : `Request #${requestId}`}
-                    </p>
-                </div>
-            </div>
+            <div className="relative max-w-5xl mx-auto px-6 sm:px-8 pt-10 animate-fadeUp">
 
-            {/* Request Summary Card */}
-            {request && (
-                <div className="mb-6 bg-[#f8f9fa] border border-[#f1f3f4] rounded-[16px] p-5">
-                    <div className="grid grid-cols-3 gap-4 mb-3">
-                        <div>
-                            <div className="text-[11px] text-[#5f6368] mb-1">Service</div>
-                            <div className="inline-block px-2 py-[3px] rounded-[50px] bg-[#e6f4ea] text-[#137333] text-[12px] font-medium">
-                                {request.serviceDepartmentName}
-                            </div>
-                        </div>
-                        <div>
-                            <div className="text-[11px] text-[#5f6368] mb-1">Department</div>
-                            <div className="text-[13px] font-medium text-[#202124]">{request.organizationDepartmentName}</div>
-                        </div>
-                        <div>
-                            <div className="text-[11px] text-[#5f6368] mb-1">Required By</div>
-                            <div className="text-[13px] font-medium text-[#202124]">
-                                {request.requiredDate ? new Date(request.requiredDate).toLocaleDateString('en-IN') : 'Not set'}
-                            </div>
-                        </div>
-                    </div>
+                {/* Header */}
+                <div className="mb-8 flex items-center gap-4">
+                    <button
+                        onClick={() => navigate(`/admin/queue?openReview=${requestId}`)}
+                        className="w-9 h-9 rounded-xl bg-white/80 backdrop-blur-sm border border-[#6366f1]/10 flex items-center justify-center text-on-surface-variant hover:bg-[#6366f1]/5 hover:border-[#6366f1]/25 transition-all shadow-sm"
+                    >
+                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+                        </svg>
+                    </button>
                     <div>
-                        <div className="text-[11px] text-[#5f6368] mb-1">Work Description</div>
-                        <p className="text-[13px] text-[#3c4043] bg-white border border-[#dadce0] rounded-[8px] p-3 leading-relaxed">
-                            {request.itemDescription}
+                        <div className="flex items-center gap-2 mb-1">
+                            <div className="w-6 h-6 rounded-md bg-gradient-to-br from-[#6366f1] to-[#818cf8] flex items-center justify-center">
+                                <svg className="w-3.5 h-3.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                </svg>
+                            </div>
+                            <span className="text-[10px] font-ui font-bold uppercase tracking-[0.2em] text-[#6366f1]">Quotation Builder</span>
+                        </div>
+                        <h1 className="text-[24px] font-display font-semibold text-on-surface tracking-tight">
+                            Create Quotation
+                        </h1>
+                        <p className="text-[13px] font-ui text-on-surface-variant/60 mt-0.5">
+                            {request ? `Request ${request.requestNumber} — ${request.requesterName}` : `Request #${requestId}`}
                         </p>
                     </div>
                 </div>
-            )}
 
-            {/* Material Picker */}
-            <div className="mb-6">
-                <h2 className="text-[16px] font-['Google_Sans',sans-serif] font-semibold text-[#202124] mb-4">
-                    Select Materials
-                </h2>
-                <MaterialPicker onMaterialsChange={handleMaterialsChange} />
-            </div>
-
-            {/* Quotation Details */}
-            <div className="border border-[#dadce0] rounded-[16px] p-5 space-y-4">
-                <h2 className="text-[16px] font-['Google_Sans',sans-serif] font-semibold text-[#202124]">
-                    Quotation Details
-                </h2>
-
-                <div className="grid grid-cols-2 gap-4">
-                    <div>
-                        <label className="block text-[13px] font-['Google_Sans',sans-serif] font-medium text-[#5f6368] mb-1.5">
-                            Estimated Completion Time (days) <span className="text-[#c5221f]">*</span>
-                        </label>
-                        <input
-                            type="number"
-                            min="1"
-                            value={estimatedDays}
-                            onChange={e => setEstimatedDays(e.target.value)}
-                            className="w-full h-10 px-3 border-[1.5px] border-[#dadce0] rounded-[8px] text-[14px] focus:outline-none focus:border-[#1a73e8]"
-                        />
-                    </div>
-
-                    <div className="flex items-end">
-                        <div className="bg-[#e8f0fe] rounded-[12px] px-5 py-3 w-full">
-                            <div className="text-[12px] text-[#1a73e8] mb-1">Total Estimated Cost</div>
-                            <div className="text-[22px] font-bold text-[#1a73e8]">₹{totalCost.toFixed(2)}</div>
+                {/* Request Summary Card */}
+                {request && (
+                    <div className="mb-6 rounded-xl bg-white/80 backdrop-blur-sm border border-white/60 shadow-sm overflow-hidden">
+                        <div className="px-5 py-3 bg-[#6366f1]/5 border-b border-[#6366f1]/10">
+                            <span className="text-[10px] font-ui font-bold uppercase tracking-[0.15em] text-[#6366f1]">Request Summary</span>
+                        </div>
+                        <div className="p-5">
+                            <div className="grid grid-cols-3 gap-5 mb-4">
+                                <div>
+                                    <div className="text-[10px] font-ui font-bold text-on-surface-variant/50 uppercase tracking-wider mb-1.5">Service</div>
+                                    <span className="inline-block px-2.5 py-1 rounded-md bg-[#10b981]/10 text-[#10b981] text-[11px] font-ui font-bold border border-[#10b981]/15">
+                                        {request.serviceDepartmentName}
+                                    </span>
+                                </div>
+                                <div>
+                                    <div className="text-[10px] font-ui font-bold text-on-surface-variant/50 uppercase tracking-wider mb-1.5">Department</div>
+                                    <div className="text-[13px] font-display font-medium text-on-surface">{request.organizationDepartmentName}</div>
+                                </div>
+                                <div>
+                                    <div className="text-[10px] font-ui font-bold text-on-surface-variant/50 uppercase tracking-wider mb-1.5">Required By</div>
+                                    <div className="text-[13px] font-display font-medium text-on-surface">
+                                        {request.requiredDate ? new Date(request.requiredDate).toLocaleDateString('en-IN') : 'Not set'}
+                                    </div>
+                                </div>
+                            </div>
+                            <div>
+                                <div className="text-[10px] font-ui font-bold text-on-surface-variant/50 uppercase tracking-wider mb-1.5">Work Description</div>
+                                <p className="text-[13px] font-ui text-on-surface bg-[#f0f2f8] border border-[#dde1ed] rounded-lg p-3 leading-relaxed">
+                                    {request.itemDescription}
+                                </p>
+                            </div>
                         </div>
                     </div>
-                </div>
+                )}
 
-                <div>
-                    <label className="block text-[13px] font-['Google_Sans',sans-serif] font-medium text-[#5f6368] mb-1.5">
-                        Internal Admin Notes <span className="text-[11px] text-[#80868b]">(not visible to requester)</span>
-                    </label>
-                    <textarea
-                        value={quotationNotes}
-                        onChange={e => setQuotationNotes(e.target.value)}
-                        rows={3}
-                        placeholder="Optional notes for SA..."
-                        className="w-full p-3 border-[1.5px] border-[#dadce0] rounded-[8px] text-[14px] focus:outline-none focus:border-[#1a73e8] resize-none"
+                {/* Material Picker */}
+                <div className="mb-6">
+                    <div className="flex items-center gap-2.5 mb-4">
+                        <div className="w-5 h-5 rounded-md bg-[#6366f1]/10 flex items-center justify-center">
+                            <div className="w-1.5 h-1.5 rounded-full bg-[#6366f1]"></div>
+                        </div>
+                        <h2 className="text-[15px] font-display font-bold text-on-surface tracking-tight">Select Materials</h2>
+                    </div>
+                    <MaterialPicker 
+                        onMaterialsChange={handleMaterialsChange} 
+                        initialItems={request?.materials || []} 
                     />
                 </div>
 
-                {/* Auto-generated description */}
-                {description && (
-                    <div className="bg-[#f8f9fa] border border-[#f1f3f4] rounded-[8px] p-3">
-                        <div className="text-[12px] text-[#5f6368] mb-1 font-medium">Auto-Generated Description</div>
-                        <p className="text-[13px] text-[#3c4043]">{description}</p>
+                {/* Quotation Details */}
+                <div className="rounded-xl bg-white/80 backdrop-blur-sm border border-white/60 shadow-sm overflow-hidden">
+                    <div className="px-5 py-3 bg-[#6366f1]/5 border-b border-[#6366f1]/10 flex items-center gap-2.5">
+                        <div className="w-5 h-5 rounded-md bg-[#6366f1]/10 flex items-center justify-center">
+                            <div className="w-1.5 h-1.5 rounded-full bg-[#6366f1]"></div>
+                        </div>
+                        <span className="text-[12px] font-display font-bold text-on-surface tracking-tight">Quotation Details</span>
                     </div>
-                )}
 
-                {error && (
-                    <div className="px-4 py-3 bg-[#fce8e6] border border-[#fad2cf] rounded-[8px] text-[#c5221f] text-[13px]">
-                        {error}
+                    <div className="p-5 space-y-5">
+                        <div className="grid grid-cols-2 gap-5">
+                            <div>
+                                <label className="block text-[11px] font-ui font-bold text-on-surface-variant/60 uppercase tracking-wider mb-2">
+                                    Est. Completion (days) <span className="text-error">*</span>
+                                </label>
+                                <input
+                                    type="number"
+                                    min="1"
+                                    value={estimatedDays}
+                                    onChange={e => setEstimatedDays(e.target.value)}
+                                    className="w-full h-10 px-3 border border-[#dde1ed] rounded-lg text-[14px] font-ui text-on-surface bg-white focus:outline-none focus:border-[#6366f1] focus:ring-2 focus:ring-[#6366f1]/10 transition-all"
+                                />
+                            </div>
+
+                            <div className="flex items-end">
+                                <div className="bg-gradient-to-r from-[#6366f1]/8 to-[#818cf8]/8 border border-[#6366f1]/10 rounded-xl px-5 py-3 w-full">
+                                    <div className="text-[10px] font-ui font-bold text-[#6366f1]/60 uppercase tracking-wider mb-0.5">Total Estimated Cost</div>
+                                    <div className="text-[22px] font-display font-bold text-[#6366f1]">₹{totalCost.toFixed(2)}</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label className="block text-[11px] font-ui font-bold text-on-surface-variant/60 uppercase tracking-wider mb-2">
+                                Internal Admin Notes <span className="text-[10px] font-normal text-on-surface-variant/40">(not visible to requester)</span>
+                            </label>
+                            <textarea
+                                value={quotationNotes}
+                                onChange={e => setQuotationNotes(e.target.value)}
+                                rows={3}
+                                placeholder="Optional notes for SA..."
+                                className="w-full p-3 border border-[#dde1ed] rounded-lg text-[13px] font-ui text-on-surface bg-white focus:outline-none focus:border-[#6366f1] focus:ring-2 focus:ring-[#6366f1]/10 transition-all resize-none placeholder:text-on-surface-variant/30"
+                            />
+                        </div>
+
+                        {/* Auto-generated description */}
+                        {description && (
+                            <div className="bg-[#f0f2f8] border border-[#dde1ed] rounded-lg p-3">
+                                <div className="text-[10px] font-ui font-bold text-on-surface-variant/50 uppercase tracking-wider mb-1">Auto-Generated Description</div>
+                                <p className="text-[13px] font-ui text-on-surface">{description}</p>
+                            </div>
+                        )}
+
+                        {error && (
+                            <div className="px-4 py-3 bg-error/5 border border-error/15 rounded-lg text-error text-[12px] font-ui font-medium flex items-center gap-2">
+                                <svg className="w-4 h-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                                </svg>
+                                {error}
+                            </div>
+                        )}
+
+                        {success && (
+                            <div className="px-4 py-3 bg-[#10b981]/5 border border-[#10b981]/15 rounded-lg text-[#10b981] text-[12px] font-ui font-medium flex items-center gap-2">
+                                <svg className="w-4 h-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                                </svg>
+                                Quotation saved! Returning to review form…
+                            </div>
+                        )}
+
+                        <div className="flex gap-3 pt-1">
+                            <button
+                                onClick={handleSubmit}
+                                disabled={isSubmitting || materials.length === 0 || success}
+                                className="px-6 py-2.5 rounded-xl text-[13px] font-ui font-bold text-white bg-gradient-to-r from-[#6366f1] to-[#818cf8] shadow-md shadow-[#6366f1]/20 hover:opacity-90 hover:shadow-lg active:scale-[0.97] transition-all disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-2"
+                            >
+                                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
+                                </svg>
+                                {isSubmitting ? 'Saving…' : 'Save Quotation'}
+                            </button>
+                        </div>
                     </div>
-                )}
-
-                {success && (
-                    <div className="px-4 py-3 bg-[#e6f4ea] border border-[#ceead6] rounded-[8px] text-[#137333] text-[13px] flex items-center gap-2">
-                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                        </svg>
-                        Quotation saved! Returning to review form...
-                    </div>
-                )}
-
-                <div className="flex gap-3 pt-2">
-                    {/* Save quotation to DB (does NOT change status) */}
-                    <button
-                        onClick={handleSubmit}
-                        disabled={isSubmitting || materials.length === 0 || success}
-                        className="px-6 py-[10px] rounded-[50px] text-[14px] font-['Google_Sans',sans-serif] font-medium bg-[#1a73e8] hover:bg-[#1557b0] text-white transition-all shadow-md disabled:opacity-60 disabled:cursor-not-allowed flex items-center gap-2"
-                    >
-                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4" />
-                        </svg>
-                        {isSubmitting ? 'Saving...' : 'Save Quotation'}
-                    </button>
                 </div>
             </div>
         </div>

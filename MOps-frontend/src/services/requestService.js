@@ -356,4 +356,21 @@ export const requestService = {
             throw error;
         }
     },
+
+    /**
+     * Admin approves the negotiated quotation
+     */
+    approveNegotiation: async (requestId) => {
+        try {
+            const response = await post(`/api/admin/requests/${requestId}/approve-negotiation`);
+            if (!response.ok) {
+                const errorData = await response.json().catch(() => ({}));
+                throw new Error(errorData.message || 'Failed to approve negotiation');
+            }
+            return await response.json();
+        } catch (error) {
+            console.error('[RequestService] Error approving negotiation:', error);
+            throw error;
+        }
+    },
 };

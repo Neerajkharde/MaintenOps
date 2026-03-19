@@ -229,6 +229,8 @@ public class QuotationServiceImpl implements QuotationService {
         dto.setMaterialName(rm.getMaterialName());
         dto.setSpecification(rm.getSpecificationText());
         dto.setQuantity(rm.getQuantityRequired());
+        dto.setNegotiationQuantity(rm.getNegotiationQuantity());
+        dto.setNegotiationReason(rm.getNegotiationReason());
         dto.setUnit(rm.getUnit());
         dto.setUnitPrice(rm.getUnitPrice());
         dto.setTotalPrice(rm.getTotalPrice());

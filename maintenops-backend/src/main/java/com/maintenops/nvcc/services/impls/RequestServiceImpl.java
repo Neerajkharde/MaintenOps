@@ -63,6 +63,9 @@ public class RequestServiceImpl implements RequestService {
             response.setSuperAdminReviewedAt(request.getSuperAdminReviewedAt());
         }
 
+        // Negotiation Field
+        response.setNegotiationNote(request.getNegotiationNote());
+
         // New quotation fields (from material picker)
         response.setTotalEstimatedCost(request.getTotalEstimatedCost());
         response.setEstimatedDays(request.getEstimatedDays());
@@ -74,6 +77,9 @@ public class RequestServiceImpl implements RequestService {
                 response.setMaterials(materials.stream().map(rm -> {
                     MaterialLineItemDTO dto = new MaterialLineItemDTO();
                     dto.setId(rm.getId());
+                    dto.setMaterialId(rm.getMaterial() != null ? rm.getMaterial().getId() : null);
+                    dto.setSpecificationId(rm.getSpecification() != null ? rm.getSpecification().getId() : null);
+                    dto.setVendorId(rm.getVendor() != null ? rm.getVendor().getId() : null);
                     dto.setMaterialName(rm.getMaterialName());
                     dto.setSpecification(rm.getSpecificationText());
                     dto.setQuantity(rm.getQuantityRequired());
@@ -82,6 +88,8 @@ public class RequestServiceImpl implements RequestService {
                     dto.setTotalPrice(rm.getTotalPrice());
                     dto.setVendorName(rm.getVendorName());
                     dto.setLastPurchaseRate(rm.getLastPurchaseRate());
+                    dto.setNegotiationQuantity(rm.getNegotiationQuantity());
+                    dto.setNegotiationReason(rm.getNegotiationReason());
                     dto.setStatus(rm.getStatus());
                     return dto;
                 }).collect(Collectors.toList()));
@@ -427,6 +435,60 @@ public class RequestServiceImpl implements RequestService {
         }
 
         request.setStatus(RequestStatus.COMPLETED);
+        return mapToResponse(requestRepository.save(request));
+    }
+
+    @Override
+    public RequestResponseDto negotiateQuotation(Long id, com.maintenops.nvcc.dtos.NegotiationRequestDto dto, JwtPrincipal principal) {
+        Request request = requestRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Request not found: " + id));
+
+        // Verify the logged-in user is the requester
+        if (!request.getRequester().getId().equals(principal.getUserId())) {
+            throw new ResourceNotFoundException("You do not have access to this request");
+        }
+
+        if (!request.getStatus().equals(RequestStatus.QUOTATION_APPROVED) && !request.getStatus().equals(RequestStatus.NEGOTIATION_PENDING)) {
+            throw new RuntimeException("Request is not in a negotiable state. Status: " + request.getStatus());
+        }
+
+        request.setNegotiationNote(dto.getOverallNote());
+        request.setStatus(RequestStatus.NEGOTIATION_PENDING);
+
+        // Update individual material negotiation details
+        List<RequestMaterial> materials = requestMaterialRepo.findByRequestId(id);
+        if (dto.getItems() != null) {
+            for (com.maintenops.nvcc.dtos.NegotiationItemDto itemDto : dto.getItems()) {
+                materials.stream()
+                        .filter(rm -> rm.getId().equals(itemDto.getMaterialId()))
+                        .findFirst()
+                        .ifPresent(rm -> {
+                            rm.setNegotiationQuantity(itemDto.getQuantity());
+                            rm.setNegotiationReason(itemDto.getReason());
+                            requestMaterialRepo.save(rm);
+                        });
+            }
+        }
+
+        return mapToResponse(requestRepository.save(request));
+    }
+
+    @Override
+    public RequestResponseDto approveNegotiation(Long id, JwtPrincipal adminPrincipal) {
+        Request request = requestRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Request not found: " + id));
+
+        if (!request.getStatus().equals(RequestStatus.NEGOTIATION_PENDING)) {
+            throw new RuntimeException("Request is not in NEGOTIATION_PENDING status. Status: " + request.getStatus());
+        }
+
+        // Set status back to QUOTATION_APPROVED (bypassing Super Admin)
+        request.setStatus(RequestStatus.QUOTATION_APPROVED);
+        
+        // Clear negotiation details once adjusted/approved? 
+        // Or keep them for history? Let's keep them on items but maybe clear the overall note or just leave it.
+        // Actually, let's just update the status.
+
         return mapToResponse(requestRepository.save(request));
     }
 

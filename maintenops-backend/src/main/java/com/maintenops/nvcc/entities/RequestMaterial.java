@@ -36,6 +36,12 @@ public class RequestMaterial {
     @Column(name = "quantity_required", nullable = false, precision = 10, scale = 2)
     private BigDecimal quantityRequired;
 
+    @Column(name = "negotiation_quantity", precision = 10, scale = 2)
+    private BigDecimal negotiationQuantity; // Quantity requested by user
+
+    @Column(name = "negotiation_reason", columnDefinition = "TEXT")
+    private String negotiationReason; // Reason for change requested by user
+
     @Column(nullable = false)
     private String unit;
 

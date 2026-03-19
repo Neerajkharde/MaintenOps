@@ -30,7 +30,7 @@ const Navbar = () => {
 
     return (
         <>
-            <nav className="fixed top-0 left-0 right-0 glass-panel z-50 h-[64px]">
+            <nav className="fixed top-0 left-0 right-0 bg-white border-b border-outline/20 z-50 h-[64px]">
                 <div className="max-w-[1440px] mx-auto h-full px-6 flex items-center justify-between">
                     <Link to="/" className="flex items-center gap-2 group">
                         <span className="text-[22px] font-normal font-google-sans text-[#5f6368] tracking-tight group-hover:text-[#1a73e8] transition-colors">

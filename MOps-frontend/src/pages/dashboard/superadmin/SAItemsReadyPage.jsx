@@ -56,14 +56,14 @@ const SAItemsReadyPage = () => {
 
             {/* Stats */}
             <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mb-8">
-                <div className="bg-white rounded-xl p-5 border border-[#dadce0]/50 shadow-sm">
+                <div className="card p-5">
                     <div className="flex items-center gap-3 mb-2">
                         <span className="w-9 h-9 bg-[#e6f4ea] rounded-lg flex items-center justify-center text-[16px]">✅</span>
                         <div className="text-[10px] font-bold text-[#5f6368] uppercase tracking-wider">Ready for Production</div>
                     </div>
                     <div className="text-[28px] font-bold text-[#137333]">{requests.length}</div>
                 </div>
-                <div className="bg-white rounded-xl p-5 border border-[#dadce0]/50 shadow-sm">
+                <div className="card p-5">
                     <div className="flex items-center gap-3 mb-2">
                         <span className="w-9 h-9 bg-[#e8f0fe] rounded-lg flex items-center justify-center text-[16px]">📦</span>
                         <div className="text-[10px] font-bold text-[#5f6368] uppercase tracking-wider">Total Materials</div>
@@ -72,7 +72,7 @@ const SAItemsReadyPage = () => {
                         {requests.reduce((sum, r) => sum + (r.materials?.length || 0), 0)}
                     </div>
                 </div>
-                <div className="bg-white rounded-xl p-5 border border-[#dadce0]/50 shadow-sm">
+                <div className="card p-5">
                     <div className="flex items-center gap-3 mb-2">
                         <span className="w-9 h-9 bg-[#fef7e0] rounded-lg flex items-center justify-center text-[16px]">💰</span>
                         <div className="text-[10px] font-bold text-[#5f6368] uppercase tracking-wider">Total Value</div>
@@ -99,7 +99,7 @@ const SAItemsReadyPage = () => {
                     {requests.map((req) => {
                         const isExpanded = expandedId === req.id;
                         return (
-                            <div key={req.id} className="bg-white border border-[#dadce0]/60 rounded-2xl shadow-sm overflow-hidden transition-all">
+                            <div key={req.id} className="card overflow-hidden transition-all">
                                 <div
                                     className="flex flex-col sm:flex-row sm:items-center justify-between px-6 py-5 cursor-pointer hover:bg-[#f8f9fa] transition-colors gap-4"
                                     onClick={() => setExpandedId(isExpanded ? null : req.id)}

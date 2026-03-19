@@ -84,7 +84,7 @@ const SAVendorListsPage = () => {
                     { label: 'Pending', value: lists.filter(i => !i.isPurchased && i.status !== 'PROCURED').length, icon: '⏳', bg: 'bg-[#fff3e0]', color: 'text-[#e65100]' },
                     { label: 'Procured', value: lists.filter(i => i.isPurchased || i.status === 'PROCURED').length, icon: '✅', bg: 'bg-[#e6f4ea]', color: 'text-[#137333]' },
                 ].map((s, i) => (
-                    <div key={i} className="bg-white rounded-xl p-5 border border-[#dadce0]/50 shadow-sm">
+                    <div key={i} className="card p-5">
                         <div className="flex items-center gap-3 mb-2">
                             <span className={`w-9 h-9 ${s.bg} rounded-lg flex items-center justify-center text-[16px]`}>{s.icon}</span>
                             <div className="text-[10px] font-bold text-[#5f6368] uppercase tracking-wider">{s.label}</div>
@@ -110,7 +110,7 @@ const SAVendorListsPage = () => {
                     {vendorEntries.map(([vendorName, data]) => {
                         const isExpanded = expandedVendor === vendorName;
                         return (
-                            <div key={vendorName} className="bg-white border border-[#dadce0]/60 rounded-2xl shadow-sm overflow-hidden transition-all">
+                            <div key={vendorName} className="card overflow-hidden transition-all">
                                 {/* Vendor Header */}
                                 <div
                                     className="flex flex-col sm:flex-row sm:items-start justify-between px-6 py-5 cursor-pointer hover:bg-[#f8f9fa] transition-colors gap-4"

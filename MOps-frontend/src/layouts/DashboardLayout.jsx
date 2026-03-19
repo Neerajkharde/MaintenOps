@@ -21,7 +21,7 @@ const DashboardLayout = () => {
             <div className={`md:pl-[240px] flex flex-col min-h-screen transition-all duration-300`}>
                 <Topbar onMenuClick={toggleSidebar} />
                 {/* Main Content Area */}
-                <main className="pt-[64px] flex-grow bg-white">
+                <main className="pt-[64px] flex-grow bg-background">
                     <Outlet />
                 </main>
             </div>

@@ -19,6 +19,64 @@ export const materialService = {
     },
 
     /**
+     * Get all active materials
+     * @returns {Promise<Array>} List of MaterialSearchDTO
+     */
+    getAllMaterials: async () => {
+        const response = await get('/api/materials');
+        if (!response.ok) throw new Error('Failed to fetch materials');
+        return response.json();
+    },
+
+    /**
+     * Create a new material (Admin only)
+     * @param {Object} payload - MaterialRequestDTO
+     */
+    createMaterial: async (payload) => {
+        const response = await post('/api/materials', payload);
+        if (!response.ok) {
+            const err = await response.json().catch(() => ({}));
+            throw new Error(err.message || 'Failed to create material');
+        }
+        return response.json();
+    },
+
+    /**
+     * Update an existing material (Admin only)
+     * @param {number} id
+     * @param {Object} payload - MaterialRequestDTO
+     */
+    updateMaterial: async (id, payload) => {
+        const response = await fetch(`/api/materials/${id}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${localStorage.getItem('accessToken') || ''}`
+            },
+            body: JSON.stringify(payload)
+        });
+        if (!response.ok) {
+            const err = await response.json().catch(() => ({}));
+            throw new Error(err.message || 'Failed to update material');
+        }
+        return response.json();
+    },
+
+    /**
+     * Delete (deactivate) a material (Admin only)
+     * @param {number} id
+     */
+    deleteMaterial: async (id) => {
+        const response = await fetch(`/api/materials/${id}`, {
+            method: 'DELETE',
+            headers: {
+                'Authorization': `Bearer ${localStorage.getItem('accessToken') || ''}`
+            }
+        });
+        if (!response.ok) throw new Error('Failed to delete material');
+    },
+
+    /**
      * Get full material details (specs, vendors, last rate)
      * @param {number} materialId
      * @returns {Promise<Object>} MaterialSearchDTO
@@ -28,6 +86,20 @@ export const materialService = {
         if (!response.ok) throw new Error('Failed to fetch material details');
         return response.json();
     },
+};
+
+/**
+ * Vendor-related service calls
+ */
+export const vendorService = {
+    /**
+     * Get all active vendors
+     */
+    getAllVendors: async () => {
+        const response = await get('/api/vendors');
+        if (!response.ok) throw new Error('Failed to fetch vendors');
+        return response.json();
+    }
 };
 
 /**
@@ -109,6 +181,20 @@ export const quotationService = {
         if (!response.ok) {
             const err = await response.json().catch(() => ({}));
             throw new Error(err.message || 'Failed to generate vendor list');
+        }
+        return response.json();
+    },
+
+    /**
+     * Submit negotiation request (QUOTATION_APPROVED → NEGOTIATION_PENDING)
+     * @param {number} requestId
+     * @param {Object} payload - NegotiationRequestDto
+     */
+    negotiateQuotation: async (requestId, payload) => {
+        const response = await post(`/api/request/${requestId}/negotiate`, payload);
+        if (!response.ok) {
+            const err = await response.json().catch(() => ({}));
+            throw new Error(err.message || 'Failed to submit negotiation');
         }
         return response.json();
     },

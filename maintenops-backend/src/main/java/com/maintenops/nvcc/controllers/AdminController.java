@@ -47,6 +47,18 @@ public class AdminController {
     }
 
     /**
+     * Admin approves the negotiated quotation.
+     * Status: NEGOTIATION_PENDING -> QUOTATION_APPROVED
+     */
+    @PostMapping("/requests/{id}/approve-negotiation")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<RequestResponseDto> approveNegotiation(
+            @PathVariable Long id,
+            @AuthenticationPrincipal JwtPrincipal principal) {
+        return ResponseEntity.ok(requestService.approveNegotiation(id, principal));
+    }
+
+    /**
      * Get review history for the logged-in Admin
      */
     @GetMapping("/requests/history")

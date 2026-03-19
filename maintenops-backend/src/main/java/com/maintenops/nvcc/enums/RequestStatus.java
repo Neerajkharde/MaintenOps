@@ -5,6 +5,7 @@ public enum RequestStatus {
     REQUEST_CREATED,        // Step 1: Requester created the request
     QUOTATION_ADDED,        // Step 2: Admin added quotation + required date
     QUOTATION_APPROVED,     // Step 3: Super Admin approved the quotation
+    NEGOTIATION_PENDING,    // Step 3.5: Requester requested changes in quotation
     APPROVED,               // Step 4: Requester accepted the quotation
 
     // Phase 2: List Preparation

@@ -10,7 +10,6 @@ const AdminReviewModal = ({ isOpen, onClose, request, onSuccess }) => {
     const [error, setError] = useState('');
 
     // Auto-compute requiredDate = today + estimatedDays
-    // estimatedDays comes from the quotation the admin already created
     const computeRequiredDate = (estimatedDays) => {
         if (!estimatedDays) return '';
         const d = new Date();
@@ -20,7 +19,6 @@ const AdminReviewModal = ({ isOpen, onClose, request, onSuccess }) => {
 
     const [requiredDate, setRequiredDate] = useState(() => computeRequiredDate(request?.estimatedDays));
 
-    // Re-compute when request changes (e.g. admin comes back after creating quotation)
     useEffect(() => {
         if (request?.estimatedDays) {
             setRequiredDate(computeRequiredDate(request.estimatedDays));
@@ -30,6 +28,20 @@ const AdminReviewModal = ({ isOpen, onClose, request, onSuccess }) => {
     if (!isOpen || !request) return null;
 
     const hasQuotation = !!request.estimatedDays;
+    const isNegotiationPending = request.status === 'NEGOTIATION_PENDING';
+
+    const handleApproveNegotiation = async () => {
+        setIsSubmitting(true);
+        setError('');
+        try {
+            await requestService.approveNegotiation(request.id);
+            onSuccess();
+        } catch (err) {
+            console.error('Approve negotiation failed:', err);
+            setError(err.message || 'Failed to approve negotiation');
+            setIsSubmitting(false);
+        }
+    };
 
     const handleSubmit = async () => {
         if (!requiredDate || !adminRemarks.trim()) {
@@ -108,7 +120,7 @@ const AdminReviewModal = ({ isOpen, onClose, request, onSuccess }) => {
                             <div className="mt-4 p-3 bg-[#fce8e6] rounded-[8px] border border-[#fad2cf]">
                                 <div className="flex items-center gap-2 mb-1">
                                     <svg className="w-4 h-4 text-[#c5221f]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                                        <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                                     </svg>
                                     <span className="text-[13px] font-bold text-[#c5221f]">Urgent Request</span>
                                 </div>
@@ -117,7 +129,7 @@ const AdminReviewModal = ({ isOpen, onClose, request, onSuccess }) => {
                         )}
                     </div>
 
-                    {/* Quotation Summary (if admin already created one) */}
+                    {/* Quotation Summary */}
                     {hasQuotation && (
                         <div className="mb-5 p-4 bg-[#e6f4ea] border border-[#ceead6] rounded-[12px]">
                             <div className="flex items-center gap-2 mb-2">
@@ -140,6 +152,63 @@ const AdminReviewModal = ({ isOpen, onClose, request, onSuccess }) => {
                             </div>
                             <div className="mt-2 text-[12px] text-[#137333]">
                                 Required date auto-set to <strong>{requiredDate}</strong> (today + {request.estimatedDays} days)
+                            </div>
+                        </div>
+                    )}
+
+                    {/* Negotiation Details */}
+                    {isNegotiationPending && (
+                        <div className="mb-6 space-y-4">
+                            <div className="bg-orange-50 border border-orange-100 rounded-[16px] p-5">
+                                <div className="flex items-center gap-2 mb-3">
+                                    <div className="w-8 h-8 rounded-full bg-orange-100 flex items-center justify-center text-orange-600">
+                                        <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                                        </svg>
+                                    </div>
+                                    <span className="text-[15px] font-bold text-orange-800">Negotiation Requested</span>
+                                </div>
+                                
+                                {request.negotiationNote && (
+                                    <div className="mb-4">
+                                        <label className="block text-[11px] uppercase font-bold text-orange-600/70 mb-1">User's Note</label>
+                                        <p className="text-[14px] text-orange-900 bg-white/50 p-3 rounded-lg border border-orange-200/50 italic">
+                                            "{request.negotiationNote}"
+                                        </p>
+                                    </div>
+                                )}
+
+                                <div className="space-y-3">
+                                    <label className="block text-[11px] uppercase font-bold text-orange-600/70">Requested Changes</label>
+                                    <div className="bg-white rounded-xl border border-orange-200 overflow-hidden shadow-sm">
+                                        <table className="w-full text-left text-[13px]">
+                                            <thead className="bg-orange-50/50 text-orange-800 font-bold border-b border-orange-100">
+                                                <tr>
+                                                    <th className="px-4 py-2">Item</th>
+                                                    <th className="px-4 py-2 text-center">New Qty</th>
+                                                    <th className="px-4 py-2">Reason</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody className="divide-y divide-orange-50">
+                                                {request.materials?.filter(m => m.negotiationQuantity != null).map((m, idx) => (
+                                                    <tr key={idx}>
+                                                        <td className="px-4 py-2 font-medium">{m.materialName}</td>
+                                                        <td className="px-4 py-2 text-center bg-orange-50/30">
+                                                            <span className="line-through text-gray-400 mr-1">{m.quantity}</span>
+                                                            <span className="font-bold text-orange-700">{m.negotiationQuantity} {m.unit}</span>
+                                                        </td>
+                                                        <td className="px-4 py-2 text-gray-600 italic">
+                                                            {m.negotiationReason || 'No reason provided'}
+                                                        </td>
+                                                    </tr>
+                                                ))}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                    <p className="text-[11px] text-orange-700 mt-2 italic">
+                                        * Review the requested changes above. You can adjust the quotation quantities using the "Edit Quotation" button below to match these requests.
+                                    </p>
+                                </div>
                             </div>
                         </div>
                     )}
@@ -187,14 +256,24 @@ const AdminReviewModal = ({ isOpen, onClose, request, onSuccess }) => {
                 {/* Footer Actions */}
                 <div className="px-8 py-5 border-t border-[#dadce0] bg-[#f8f9fa] flex flex-row-reverse gap-3">
                     {/* Submit is primary only if quotation is created */}
-                    <button
-                        onClick={handleSubmit}
-                        disabled={isSubmitting || !hasQuotation}
-                        title={!hasQuotation ? 'Please create a quotation first' : ''}
-                        className="bg-[#1a73e8] hover:bg-[#1557b0] text-white px-6 py-[10px] rounded-[50px] font-['Google_Sans',sans-serif] text-[14px] font-medium transition-all shadow-md flex items-center justify-center min-w-[160px] disabled:opacity-50 disabled:cursor-not-allowed"
-                    >
-                        {isSubmitting ? 'Submitting...' : 'Submit'}
-                    </button>
+                    {isNegotiationPending ? (
+                        <button
+                            onClick={handleApproveNegotiation}
+                            disabled={isSubmitting}
+                            className="bg-orange-600 hover:bg-orange-700 text-white px-6 py-[10px] rounded-[50px] font-['Google_Sans',sans-serif] text-[14px] font-medium transition-all shadow-md flex items-center justify-center min-w-[180px] disabled:opacity-50"
+                        >
+                            {isSubmitting ? 'Approving...' : 'Approve Negotiation'}
+                        </button>
+                    ) : (
+                        <button
+                            onClick={handleSubmit}
+                            disabled={isSubmitting || !hasQuotation}
+                            title={!hasQuotation ? 'Please create a quotation first' : ''}
+                            className="bg-[#1a73e8] hover:bg-[#1557b0] text-white px-6 py-[10px] rounded-[50px] font-['Google_Sans',sans-serif] text-[14px] font-medium transition-all shadow-md flex items-center justify-center min-w-[160px] disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                            {isSubmitting ? 'Submitting...' : 'Submit'}
+                        </button>
+                    )}
                     <button
                         onClick={() => {
                             onClose();

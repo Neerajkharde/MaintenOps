@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { createPortal } from 'react-dom';
 import { quotationService } from '../../services/materialService';
+import NegotiationModal from './NegotiationModal';
 
 /**
  * QuotationDetailsModal — shown to REQUESTER when status = QUOTATION_SENT.
@@ -8,6 +9,7 @@ import { quotationService } from '../../services/materialService';
  */
 const QuotationDetailsModal = ({ isOpen, onClose, request, onSuccess }) => {
     const [isApproving, setIsApproving] = useState(false);
+    const [isNegotiateOpen, setIsNegotiateOpen] = useState(false);
     const [error, setError] = useState('');
 
     if (!isOpen || !request) return null;
@@ -149,6 +151,16 @@ const QuotationDetailsModal = ({ isOpen, onClose, request, onSuccess }) => {
                         {isApproving ? 'Approving...' : 'Approve Quotation'}
                     </button>
                     <button
+                        onClick={() => setIsNegotiateOpen(true)}
+                        disabled={isApproving}
+                        className="bg-white border border-gray-300 hover:bg-gray-50 text-gray-700 px-6 py-[10px] rounded-[50px] font-['Google_Sans',sans-serif] text-[14px] font-medium transition-all shadow-sm flex items-center gap-2 min-w-[140px] justify-center disabled:opacity-70"
+                    >
+                        <svg className="w-4 h-4 text-orange-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                            <path strokeLinecap="round" strokeLinejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                        </svg>
+                        Negotiate
+                    </button>
+                    <button
                         onClick={onClose}
                         disabled={isApproving}
                         className="px-6 py-[10px] rounded-[50px] font-['Google_Sans',sans-serif] text-[14px] font-medium text-[#5f6368] hover:bg-[#e8eaed] transition-colors"
@@ -157,6 +169,16 @@ const QuotationDetailsModal = ({ isOpen, onClose, request, onSuccess }) => {
                     </button>
                 </div>
             </div>
+
+            <NegotiationModal
+                isOpen={isNegotiateOpen}
+                onClose={() => setIsNegotiateOpen(false)}
+                request={request}
+                onNegotiated={() => {
+                    onSuccess();
+                    onClose();
+                }}
+            />
         </div>,
         document.body
     );

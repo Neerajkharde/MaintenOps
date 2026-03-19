@@ -37,6 +37,8 @@ public class RequestResponseDto {
     private String superAdminName;
     private Instant superAdminReviewedAt;
 
+    private String negotiationNote;
+
     // Material Line Items (populated when quotation is created)
     private List<MaterialLineItemDTO> materials;
 

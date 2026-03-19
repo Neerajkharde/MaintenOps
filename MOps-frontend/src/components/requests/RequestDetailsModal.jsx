@@ -1,11 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { quotationService } from '../../services/materialService';
+import NegotiationModal from './NegotiationModal';
 
 const RequestDetailsModal = ({ isOpen, onClose, request, onSuccess }) => {
     const [isApproving, setIsApproving] = useState(false);
     const [approveError, setApproveError] = useState('');
     const [fetchedMaterials, setFetchedMaterials] = useState(null); // null = not fetched yet
+    const [isNegotiateOpen, setIsNegotiateOpen] = useState(false);
 
     // If request.materials is empty but a quotation exists, fetch materials directly
     useEffect(() => {
@@ -27,6 +29,7 @@ const RequestDetailsModal = ({ isOpen, onClose, request, onSuccess }) => {
     const isRequestCreated = status === 'REQUEST_CREATED';
     const isQuotationAdded = status === 'QUOTATION_ADDED';
     const isQuotationApproved = status === 'QUOTATION_APPROVED';
+    const isNegotiationPending = status === 'NEGOTIATION_PENDING';
     const isApproved = status === 'APPROVED';
     const isPendingSA = status === 'PENDING_SA_APPROVAL';
     const isVendorListApproved = status === 'VENDOR_LIST_APPROVED';
@@ -74,6 +77,7 @@ const RequestDetailsModal = ({ isOpen, onClose, request, onSuccess }) => {
     // Timeline steps covering all 10 statuses
     const pastQuotationAdded = !isRequestCreated;
     const pastQuotationApproved = !isRequestCreated && !isQuotationAdded;
+    const pastNegotiationRequest = isNegotiationPending;
     const pastApproved = isApproved || isPendingSA || isVendorListApproved || isItemsReady || isInProduction || isPaymentPending || isCompleted;
     const pastListGenerated = isPendingSA || isVendorListApproved || isItemsReady || isInProduction || isPaymentPending || isCompleted;
     const pastVendorApproved = isVendorListApproved || isItemsReady || isInProduction || isPaymentPending || isCompleted;
@@ -85,6 +89,7 @@ const RequestDetailsModal = ({ isOpen, onClose, request, onSuccess }) => {
         { label: 'Request Created', sub: request.date, done: true },
         { label: 'Quotation Added by Admin', sub: pastQuotationAdded ? 'Materials & costs assessed' : 'Awaiting admin review', done: pastQuotationAdded },
         { label: 'Quotation Approved by SA', sub: pastQuotationApproved ? 'Ready for your review' : 'Awaiting SA sign-off', done: pastQuotationApproved, active: isQuotationApproved },
+        { label: 'Negotiation Initiated', sub: isNegotiationPending ? 'Awaiting admin response' : '', done: isNegotiationPending || pastApproved, active: isNegotiationPending },
         { label: 'You Accepted the Quotation', sub: pastApproved ? 'Quotation accepted' : 'Pending your approval', done: pastApproved, active: isQuotationApproved },
         { label: 'Lists Generated', sub: pastListGenerated ? 'Material & vendor lists created' : 'Pending', done: pastListGenerated },
         { label: 'Vendor Lists Approved', sub: pastVendorApproved ? 'Procurement authorized' : 'Awaiting SA approval', done: pastVendorApproved },
@@ -138,10 +143,36 @@ const RequestDetailsModal = ({ isOpen, onClose, request, onSuccess }) => {
                                 {request.requiredDate && <span className="hidden sm:inline"> · Required by: <strong>{fmtDate(request.requiredDate)}</strong></span>}
                             </div>
                         </div>
-                        <button onClick={handleApproveQuotation} disabled={isApproving}
-                            className="w-full sm:w-auto flex-shrink-0 bg-[#137333] hover:bg-[#0d652d] text-white px-6 py-2.5 rounded-[50px] text-[13px] font-semibold transition-all shadow-sm active:scale-95 disabled:opacity-70 disabled:scale-100">
-                            {isApproving ? 'Approving...' : '✅ Accept Quotation'}
-                        </button>
+                        <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
+                            <button onClick={handleApproveQuotation} disabled={isApproving}
+                                className="flex-1 sm:flex-none flex items-center justify-center bg-[#137333] hover:bg-[#0d652d] text-white px-6 py-2.5 rounded-[50px] text-[13px] font-semibold transition-all shadow-sm active:scale-95 disabled:opacity-70 disabled:scale-100">
+                                {isApproving ? 'Approving...' : '✅ Accept Quotation'}
+                            </button>
+                            <button onClick={() => setIsNegotiateOpen(true)} disabled={isApproving}
+                                className="flex-1 sm:flex-none flex items-center justify-center bg-white border border-[#b45309]/30 hover:bg-white text-[#b45309] px-6 py-2.5 rounded-[50px] text-[13px] font-semibold transition-all shadow-sm active:scale-95 disabled:opacity-70 disabled:scale-100 gap-2">
+                                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                                </svg>
+                                Negotiate
+                            </button>
+                        </div>
+                    </div>
+                )}
+
+                {/* NEGOTIATION_PENDING Banner */}
+                {isNegotiationPending && (
+                    <div className="px-6 sm:px-8 py-4 bg-blue-50 border-b border-blue-100 flex items-center justify-between gap-4">
+                        <div className="flex items-center gap-3 text-blue-800">
+                            <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center text-blue-600">
+                                <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+                                </svg>
+                            </div>
+                            <div>
+                                <div className="text-[14px] font-semibold">Negotiation in Progress</div>
+                                <div className="text-[12px] opacity-80">Awaiting response from admin on your requested modifications.</div>
+                            </div>
+                        </div>
                     </div>
                 )}
                 {approveError && (
@@ -367,6 +398,16 @@ const RequestDetailsModal = ({ isOpen, onClose, request, onSuccess }) => {
                     </div>
                 </div>
             </div>
+
+            <NegotiationModal
+                isOpen={isNegotiateOpen}
+                onClose={() => setIsNegotiateOpen(false)}
+                request={request}
+                onNegotiated={() => {
+                    if (onSuccess) onSuccess();
+                    onClose();
+                }}
+            />
         </div>,
         document.body
     );

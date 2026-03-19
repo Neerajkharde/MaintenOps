@@ -89,6 +89,9 @@ public class Request {
     @Column(name = "quotation_notes", columnDefinition = "TEXT")
     private String quotationNotes; // Internal admin notes (not shown to requester)
 
+    @Column(name = "negotiation_note", columnDefinition = "TEXT")
+    private String negotiationNote; // Requester's overall feedback during negotiation
+
     @Column(name = "super_admin_remarks", columnDefinition = "TEXT")
     private String superAdminRemarks; // Super Admin's comments
 

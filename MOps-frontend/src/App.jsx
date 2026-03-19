@@ -13,8 +13,8 @@ import RequestsPage from './pages/dashboard/RequestsPage';
 import ProfilePage from './pages/dashboard/ProfilePage';
 import { RequestProvider } from './context/RequestContext';
 import ActionQueuePage from './pages/dashboard/admin/ActionQueuePage';
-import VendorsPage from './pages/dashboard/admin/VendorsPage';
-import InventoryPage from './pages/dashboard/admin/InventoryPage';
+import MaterialsPage from './pages/dashboard/admin/MaterialsPage';
+
 import CreateQuotationPage from './pages/dashboard/admin/CreateQuotationPage';
 import ApprovalQueuePage from './pages/dashboard/superadmin/ApprovalQueuePage';
 import SystemAdminsPage from './pages/dashboard/superadmin/SystemAdminsPage';
@@ -47,8 +47,8 @@ function App() {
               <Route path="/admin" element={<DashboardLayout />}>
                 <Route index element={<AdminDashboard />} />
                 <Route path="queue" element={<ActionQueuePage />} />
-                <Route path="vendors" element={<VendorsPage />} />
-                <Route path="inventory" element={<InventoryPage />} />
+                <Route path="materials" element={<MaterialsPage />} />
+
                 <Route path="create-quotation/:requestId" element={<CreateQuotationPage />} />
               </Route>
             </Route>

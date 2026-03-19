@@ -28,6 +28,8 @@ public interface RequestService {
 
     // Phase 1: Quotation Flow
     RequestResponseDto userApproveQuotation(Long requestId, JwtPrincipal principal);
+    RequestResponseDto negotiateQuotation(Long id, com.maintenops.nvcc.dtos.NegotiationRequestDto dto, JwtPrincipal principal);
+    RequestResponseDto approveNegotiation(Long id, JwtPrincipal adminPrincipal);
     RequestResponseDto getRequestByIdForAdmin(Long requestId);
 
     // Phase 2: List Preparation

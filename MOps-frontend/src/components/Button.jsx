@@ -16,7 +16,6 @@ const Button = ({
         outline: "border border-outline text-on-surface-variant hover:bg-surface-variant/40 hover:border-on-surface-variant",
         ghost: "bg-transparent text-on-surface-variant hover:bg-surface-variant/50 shadow-none hover:shadow-sm",
         danger: "bg-error text-white border-t border-white/20 shadow-lg shadow-error/25",
-        vanguard: "bg-on-surface text-surface border-t border-white/10 shadow-2xl shadow-on-surface/20",
     };
 
     return (

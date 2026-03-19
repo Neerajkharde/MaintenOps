@@ -9,9 +9,14 @@ import java.math.BigDecimal;
 @Data
 public class MaterialLineItemDTO {
     private Long id;
+    private Long materialId;
+    private Long specificationId;
+    private Long vendorId;
     private String materialName;
     private String specification;
     private BigDecimal quantity;
+    private BigDecimal negotiationQuantity;
+    private String negotiationReason;
     private String unit;
     private BigDecimal unitPrice;
     private BigDecimal totalPrice;
