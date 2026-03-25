@@ -3,7 +3,7 @@ server:
 
 spring:
   datasource:
-    url: jdbc:postgresql://localhost:5432/maintenops_db
+    url: jdbc:postgresql://maintenops-db.c3m8mk28831k.eu-north-1.rds.amazonaws.com:5432/postgres
     username: postgres
     password: ${JDBC_PASSWORD} # Set Environment Variable for JDBC_PASSWORD
 
