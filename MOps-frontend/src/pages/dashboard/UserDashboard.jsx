@@ -186,10 +186,7 @@ const UserDashboard = () => {
 
     return (
 <>
-<div className="relative min-h-screen bg-gradient-to-b from-[#fdfdfc] via-[#f7f9ff] to-[#eef2ff] pb-24">
-
-{/* Divine glow */}
-<div className="absolute top-0 left-0 w-full h-[350px] bg-[radial-gradient(circle_at_top,rgba(255,215,0,0.15),transparent_70%)] pointer-events-none"/>
+<div className="relative min-h-screen pb-24">
 
 <div className="relative px-6 sm:px-8 pt-10 max-w-[1400px] mx-auto animate-fadeUp">
 

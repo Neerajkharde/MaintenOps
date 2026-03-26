@@ -139,12 +139,7 @@ const AdminDashboard = () => {
 
     return (
         <>
-            <div className="relative min-h-screen bg-gradient-to-br from-[#f4f5fb] via-[#eaecf5] to-[#e2e6f3] pb-24">
-
-                {/* Cool indigo mesh glow — distinct from user's golden glow */}
-                <div className="absolute top-0 left-0 w-full h-[400px] pointer-events-none"
-                    style={{ background: 'radial-gradient(ellipse 70% 50% at 30% 0%, rgba(99,102,241,0.10) 0%, transparent 70%), radial-gradient(ellipse 50% 40% at 80% 0%, rgba(59,130,246,0.08) 0%, transparent 60%)' }}
-                />
+            <div className="relative min-h-screen pb-24">
 
                 <div className="relative px-6 sm:px-8 pt-10 max-w-[1400px] mx-auto animate-fadeUp">
 

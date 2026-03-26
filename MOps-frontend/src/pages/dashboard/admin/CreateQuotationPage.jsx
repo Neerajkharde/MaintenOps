@@ -85,18 +85,14 @@ const CreateQuotationPage = () => {
 
     if (loadingRequest) {
         return (
-            <div className="min-h-screen bg-gradient-to-br from-[#f4f5fb] via-[#eaecf5] to-[#e2e6f3] flex items-center justify-center">
-                <div className="w-8 h-8 border-[3px] border-[#6366f1] border-t-transparent rounded-full animate-spin" />
+            <div className="min-h-screen flex items-center justify-center">
+                <div className="w-8 h-8 border-[3px] border-primary border-t-transparent rounded-full animate-spin" />
             </div>
         );
     }
 
     return (
-        <div className="relative min-h-screen bg-gradient-to-br from-[#f4f5fb] via-[#eaecf5] to-[#e2e6f3] pb-24">
-            {/* Indigo mesh glow */}
-            <div className="absolute top-0 left-0 w-full h-[300px] pointer-events-none"
-                style={{ background: 'radial-gradient(ellipse 60% 50% at 50% 0%, rgba(99,102,241,0.08) 0%, transparent 70%)' }}
-            />
+        <div className="relative min-h-screen pb-24">
 
             <div className="relative max-w-5xl mx-auto px-6 sm:px-8 pt-10 animate-fadeUp">
 

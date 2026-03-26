@@ -17,7 +17,7 @@ const ProfilePage = () => {
     };
 
     return (
-        <div className="relative pb-24 px-6 sm:px-8 mt-4 max-w-[1400px] mx-auto animate-fadeUp">
+        <div className="relative pb-24 px-6 sm:px-8 pt-10 max-w-[1400px] mx-auto animate-fadeUp">
             {/* Page Header */}
             <div className="mb-8">
                 <h1 className="text-[28px] sm:text-[32px] font-display font-medium text-on-surface tracking-tight mb-1">My Profile</h1>

@@ -12,7 +12,7 @@ const DashboardLayout = () => {
     const closeSidebar = () => setIsSidebarOpen(false);
 
     return (
-        <div className="min-h-screen bg-white font-['Roboto',sans-serif]">
+        <div className="min-h-screen bg-background font-body">
             <Sidebar
                 role={user?.role}
                 isOpen={isSidebarOpen}
@@ -21,8 +21,10 @@ const DashboardLayout = () => {
             <div className={`md:pl-[240px] flex flex-col min-h-screen transition-all duration-300`}>
                 <Topbar onMenuClick={toggleSidebar} />
                 {/* Main Content Area */}
-                <main className="pt-[64px] flex-grow bg-background">
-                    <Outlet />
+                <main className="pt-[64px] flex-grow p-4 md:p-8">
+                    <div className="max-w-7xl mx-auto">
+                        <Outlet />
+                    </div>
                 </main>
             </div>
         </div>

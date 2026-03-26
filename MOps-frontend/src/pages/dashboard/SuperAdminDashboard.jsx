@@ -122,12 +122,7 @@ const SuperAdminDashboard = () => {
 
     return (
         <>
-            <div className="relative min-h-screen bg-gradient-to-br from-[#f8fafc] via-[#f1f5f9] to-[#e2e8f0] pb-24">
-
-                {/* Executive Violet & Amber mesh glow */}
-                <div className="absolute top-0 left-0 w-full h-[400px] pointer-events-none"
-                    style={{ background: 'radial-gradient(ellipse 70% 50% at 30% 0%, rgba(124,58,237,0.12) 0%, transparent 70%), radial-gradient(ellipse 50% 40% at 80% 0%, rgba(217,119,6,0.08) 0%, transparent 60%)' }}
-                />
+            <div className="relative min-h-screen pb-24">
 
                 <div className="relative px-6 sm:px-8 pt-10 max-w-[1400px] mx-auto animate-fadeUp">
                     {/* HEADER — Executive Profile Style */}

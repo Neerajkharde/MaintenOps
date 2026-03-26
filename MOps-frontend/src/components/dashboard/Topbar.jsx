@@ -38,10 +38,10 @@ const Topbar = ({ onMenuClick }) => {
                         </svg>
                     </button>
                     <div>
-                        <h1 className="text-[17px] sm:text-[18px] font-display font-semibold text-on-surface tracking-tight leading-tight">
-                            Dashboard
+                        <h1 className="text-[18px] sm:text-[20px] font-display font-bold text-secondary tracking-tight">
+                            MaintenOps Dashboard
                         </h1>
-                        <p className="hidden sm:block text-[11px] text-on-surface-variant font-ui mt-0.5 uppercase tracking-wider font-bold opacity-60">Maintenance Management System</p>
+                        <p className="hidden sm:block text-[10px] text-primary font-ui mt-0.5 uppercase tracking-[0.1em] font-bold opacity-80">ISKCON NVCC Pune | Maintenance System</p>
                     </div>
                 </div>
 
