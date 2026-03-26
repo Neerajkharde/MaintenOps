@@ -115,6 +115,7 @@ const SignupPage = () => {
                             value={formData.password}
                             onChange={handleChange}
                             className="font-ui text-sm sm:text-base"
+                            showPasswordToggle={true}
                             required
                         />
                         <Input
@@ -125,6 +126,7 @@ const SignupPage = () => {
                             value={formData.confirmPassword}
                             onChange={handleChange}
                             className="font-ui text-sm sm:text-base"
+                            showPasswordToggle={true}
                             required
                         />
                     </div>
