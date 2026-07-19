@@ -9,8 +9,6 @@ const ProfilePage = () => {
         name: user?.name || user?.username || 'User',
         email: user?.email || '',
         phone: user?.mobileNumber || '',
-        // Map possible backend keys into Assigned Department
-        department: user?.organizationDepartmentName || user?.orgDeptName || user?.department || 'Not set',
         role: user?.role === 'REQUESTER' ? 'Standard User' : (user?.role || 'REQUESTER'),
         joinDate: user?.createdAt ? new Date(user.createdAt).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }) : '—',
         location: user?.location || ''
@@ -78,7 +76,6 @@ const ProfilePage = () => {
                                     { label: 'Display Name', value: profileInfo.name },
                                     { label: 'Work Email', value: profileInfo.email || 'Not set', isEmail: !!profileInfo.email },
                                     { label: 'Contact Number', value: profileInfo.phone || 'Not set' },
-                                    { label: 'Assigned Department', value: profileInfo.department }
                                 ].map((item, idx) => (
                                     <div key={idx} className="group">
                                         <div className="text-[12px] font-ui font-bold text-on-surface-variant uppercase tracking-widest mb-1 group-hover:text-primary transition-colors">{item.label}</div>

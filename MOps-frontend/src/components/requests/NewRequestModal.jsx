@@ -1,8 +1,10 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
+import { useAuth } from '../../context/AuthContext';
 import { useRequests } from '../../context/RequestContext';
 import { requestService } from '../../services/requestService';
 
 const NewRequestModal = ({ isOpen, onClose }) => {
+    const { user } = useAuth();
     const { addRequest } = useRequests();
     const [step, setStep] = useState(1);
     const [selectedDept, setSelectedDept] = useState(null);
@@ -10,10 +12,13 @@ const NewRequestModal = ({ isOpen, onClose }) => {
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [isSuccess, setIsSuccess] = useState(false);
     const [createdToken, setCreatedToken] = useState(null);
+    const [selectedFiles, setSelectedFiles] = useState([]);
+    const [previews, setPreviews] = useState([]);
+    const fileInputRef = useRef(null);
 
     // Form State for backend DTO
     const [formData, setFormData] = useState({
-        mobileNumber: '',
+        mobileNumber: user?.mobileNumber || '',
         itemDescription: '',
         urgencyReason: ''
     });
@@ -55,6 +60,48 @@ const NewRequestModal = ({ isOpen, onClose }) => {
         return Object.keys(newErrors).length === 0;
     };
 
+    const handleFileSelect = (e) => {
+        const files = Array.from(e.target.files);
+        const remaining = 4 - selectedFiles.length;
+        if (remaining <= 0) {
+            setErrors(prev => ({ ...prev, images: 'Maximum 4 photos allowed' }));
+            return;
+        }
+
+        const validFiles = [];
+        for (const file of files.slice(0, remaining)) {
+            if (!['image/jpeg', 'image/png'].includes(file.type)) {
+                setErrors(prev => ({ ...prev, images: 'Only JPG and PNG files are allowed' }));
+                continue;
+            }
+            if (file.size > 5 * 1024 * 1024) {
+                setErrors(prev => ({ ...prev, images: 'Each file must be under 5MB' }));
+                continue;
+            }
+            validFiles.push(file);
+        }
+
+        if (validFiles.length > 0) {
+            const newFiles = [...selectedFiles, ...validFiles];
+            setSelectedFiles(newFiles);
+            setErrors(prev => { const { images, ...rest } = prev; return rest; });
+
+            // Generate previews
+            const newPreviews = validFiles.map(file => URL.createObjectURL(file));
+            setPreviews(prev => [...prev, ...newPreviews]);
+        }
+
+        // Reset input so the same file can be selected again
+        e.target.value = '';
+    };
+
+    const removeFile = (index) => {
+        // Revoke the object URL to free memory
+        URL.revokeObjectURL(previews[index]);
+        setSelectedFiles(prev => prev.filter((_, i) => i !== index));
+        setPreviews(prev => prev.filter((_, i) => i !== index));
+    };
+
     const handleNext = () => setStep(2);
     const handleBack = () => setStep(1);
 
@@ -73,7 +120,7 @@ const NewRequestModal = ({ isOpen, onClose }) => {
                 urgencyReason: isUrgent ? formData.urgencyReason : ''
             };
 
-            const createdRequest = await requestService.createRequest(payload);
+            const createdRequest = await requestService.createRequest(payload, selectedFiles);
 
             // Add the real request returned from backend to context
             addRequest(createdRequest);
@@ -95,8 +142,12 @@ const NewRequestModal = ({ isOpen, onClose }) => {
         setIsUrgent(false);
         setIsSuccess(false);
         setCreatedToken(null);
-        setFormData({ mobileNumber: '', itemDescription: '', urgencyReason: '' });
+        setFormData({ mobileNumber: user?.mobileNumber || '', itemDescription: '', urgencyReason: '' });
         setErrors({});
+        // Clean up image previews
+        previews.forEach(url => URL.revokeObjectURL(url));
+        setSelectedFiles([]);
+        setPreviews([]);
         onClose();
     };
 
@@ -282,7 +333,7 @@ const NewRequestModal = ({ isOpen, onClose }) => {
                                         {errors.mobileNumber && <p className="text-[#c5221f] text-[12px] mt-1">{errors.mobileNumber}</p>}
                                     </div>
                                     <div className="flex items-end text-[12px] text-[#5f6368] pb-4">
-                                        <p>Your name and org department are auto-captured.</p>
+                                        <p>Your name and contact details are auto-captured.</p>
                                     </div>
                                 </div>
 
@@ -309,13 +360,54 @@ const NewRequestModal = ({ isOpen, onClose }) => {
                                 {/* Photo Upload */}
                                 <div>
                                     <label className="block text-[13px] font-['Google_Sans',sans-serif] font-medium text-[#5f6368] mb-1.5">Upload Photos (optional)</label>
-                                    <div className="border-2 border-dashed border-[#dadce0] rounded-[12px] p-6 flex flex-col items-center justify-center bg-[#fafafa] hover:bg-[#f8f9fa] cursor-pointer transition-colors hover:border-[#1a73e8] group">
+                                    <input
+                                        type="file"
+                                        ref={fileInputRef}
+                                        onChange={handleFileSelect}
+                                        accept="image/jpeg,image/png"
+                                        multiple
+                                        className="hidden"
+                                    />
+                                    <div
+                                        onClick={() => selectedFiles.length < 4 && fileInputRef.current?.click()}
+                                        className={`border-2 border-dashed rounded-[12px] p-6 flex flex-col items-center justify-center transition-colors group ${
+                                            selectedFiles.length >= 4
+                                                ? 'border-[#dadce0] bg-[#f8f9fa] cursor-not-allowed opacity-60'
+                                                : 'border-[#dadce0] bg-[#fafafa] hover:bg-[#f8f9fa] cursor-pointer hover:border-[#1a73e8]'
+                                        }`}
+                                    >
                                         <svg className="w-8 h-8 text-[#5f6368] group-hover:text-[#1a73e8] mb-2 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 15a4 4 0 004 4h9a5 5 0 10-.1-9.999 5.002 5.002 0 10-9.78 2.096A4.001 4.001 0 003 15z" />
                                         </svg>
-                                        <div className="text-[14px] font-['Google_Sans',sans-serif] text-[#202124] mb-1">Drag photos here or click to browse</div>
-                                        <div className="text-[12px] font-['Roboto',sans-serif] text-[#5f6368]">JPG, PNG up to 5MB each · Max 4 photos</div>
+                                        <div className="text-[14px] font-['Google_Sans',sans-serif] text-[#202124] mb-1">
+                                            {selectedFiles.length >= 4 ? 'Maximum photos reached' : 'Click to browse photos'}
+                                        </div>
+                                        <div className="text-[12px] font-['Roboto',sans-serif] text-[#5f6368]">JPG, PNG up to 5MB each · {selectedFiles.length}/4 photos</div>
                                     </div>
+                                    {errors.images && <p className="text-[#c5221f] text-[12px] mt-1">{errors.images}</p>}
+
+                                    {/* Image Previews */}
+                                    {previews.length > 0 && (
+                                        <div className="grid grid-cols-4 gap-3 mt-3">
+                                            {previews.map((src, idx) => (
+                                                <div key={idx} className="relative group/img rounded-[10px] overflow-hidden border border-[#dadce0] aspect-square bg-[#f8f9fa]">
+                                                    <img src={src} alt={`Preview ${idx + 1}`} className="w-full h-full object-cover" />
+                                                    <button
+                                                        type="button"
+                                                        onClick={() => removeFile(idx)}
+                                                        className="absolute top-1.5 right-1.5 w-6 h-6 rounded-full bg-black/50 hover:bg-black/70 flex items-center justify-center text-white opacity-0 group-hover/img:opacity-100 transition-opacity"
+                                                    >
+                                                        <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                                                            <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                                                        </svg>
+                                                    </button>
+                                                    <div className="absolute bottom-0 left-0 right-0 bg-black/40 text-white text-[10px] px-1.5 py-0.5 truncate font-['Roboto',sans-serif]">
+                                                        {selectedFiles[idx]?.name}
+                                                    </div>
+                                                </div>
+                                            ))}
+                                        </div>
+                                    )}
                                 </div>
 
                                 {/* Urgent Toggle */}

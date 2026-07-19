@@ -1,4 +1,4 @@
-const API_BASE_URL = import.meta.env.VITE_API_URL || '';
+export const API_BASE_URL = import.meta.env.VITE_API_URL || '';
 
 let isRefreshing = false;
 let refreshPromise = null;
@@ -74,9 +74,14 @@ export const apiCall = async (endpoint, options = {}) => {
     const tokenType = localStorage.getItem('tokenType') || 'Bearer';
 
     const headers = {
-        'Content-Type': 'application/json',
         ...options.headers,
     };
+
+    // Only set Content-Type to JSON if body is NOT FormData
+    // (FormData needs the browser to auto-set the multipart boundary)
+    if (!(options.body instanceof FormData)) {
+        headers['Content-Type'] = headers['Content-Type'] || 'application/json';
+    }
 
     // Add authorization header if token exists
     if (token) {
@@ -167,5 +172,21 @@ export const patch = (endpoint, body, options = {}) => {
         ...options,
         method: 'PATCH',
         body: JSON.stringify(body),
+    });
+};
+
+/**
+ * POST request helper for FormData (multipart/form-data)
+ * Does NOT set Content-Type — the browser auto-sets it with the correct boundary.
+ */
+export const postFormData = (endpoint, formData, options = {}) => {
+    return apiCall(endpoint, {
+        ...options,
+        method: 'POST',
+        body: formData,
+        headers: {
+            // Explicitly remove Content-Type so browser sets multipart boundary
+            ...options.headers,
+        },
     });
 };

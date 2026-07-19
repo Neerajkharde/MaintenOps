@@ -153,15 +153,13 @@ const AdminDashboard = () => {
                                         <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                                     </svg>
                                 </div>
-                                <span className="text-[11px] font-ui font-bold uppercase tracking-[0.2em] text-[#6366f1]">Admin Dashboard | MaintenOps - ISKCON NVCC</span>
+                                <span className="text-[11px] font-ui font-bold uppercase tracking-[0.2em] text-[#6366f1]">Admin Dashboard</span>
                             </div>
 
-                            <h2 className="text-[30px] font-display font-semibold text-on-surface tracking-tight mb-1">
-                                Hare Krishna{user?.name ? `, ${user.name.split(' ')[0]}` : ''} Prabhu
+                            <h2 className="text-[32px] font-display font-semibold text-on-surface tracking-tight mb-2">
+                                Hare Krishna, {user?.name?.replace(/\bDas\b/gi, '').trim() || user?.username || 'Krishna Das'} Prabhu
                             </h2>
-                            <p className="text-[14px] font-ui text-on-surface-variant">
-                                Your maintenance operations at a glance. Stay on top of every request.
-                            </p>
+                            
 
                             {/* Indigo line divider — distinct from user's lotus */}
                             <div className="flex items-center gap-3 mt-5">

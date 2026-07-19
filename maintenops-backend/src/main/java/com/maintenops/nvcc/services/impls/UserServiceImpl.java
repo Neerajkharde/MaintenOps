@@ -2,13 +2,11 @@ package com.maintenops.nvcc.services.impls;
 
 import com.maintenops.nvcc.dtos.UserRequestDto;
 import com.maintenops.nvcc.dtos.UserResponseDto;
-import com.maintenops.nvcc.entities.OrganizationDepartment;
 import com.maintenops.nvcc.entities.Role;
 import com.maintenops.nvcc.entities.User;
 import com.maintenops.nvcc.enums.ERole;
 import com.maintenops.nvcc.exceptions.ResourceAlreadyExistsException;
 import com.maintenops.nvcc.exceptions.ResourceNotFoundException;
-import com.maintenops.nvcc.repositories.OrgDepartmentRepository;
 import com.maintenops.nvcc.repositories.RoleRepository;
 import com.maintenops.nvcc.repositories.UserRepository;
 import com.maintenops.nvcc.services.UserService;
@@ -29,7 +27,6 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final ModelMapper modelMapper;
-    private final OrgDepartmentRepository orgDeptRepository;
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
 
@@ -44,13 +41,9 @@ public class UserServiceImpl implements UserService {
         // We do this first to initialize the User object
         User user = modelMapper.map(dto, User.class);
 
-        // 2. Resolve Department by Name
-        // Since the frontend sends a String from a dropdown, we find the real Entity
-        if (dto.getOrgDeptName() != null) {
-            OrganizationDepartment dept = orgDeptRepository.findByName(dto.getOrgDeptName())
-                    .orElseThrow(() -> new ResourceNotFoundException("Department not found: " + dto.getOrgDeptName()));
-            user.setOrganizationDepartment(dept);
-        }
+        // 2. Mobile number is already mapped via ModelMapper from dto to entity
+        // No additional mapping needed if names match, but being explicit:
+        user.setMobileNumber(dto.getMobileNumber());
 
         // 3. Resolve Roles (String -> ERole Enum -> Role Entity)
         if (dto.getRoles() != null && !dto.getRoles().isEmpty()) {

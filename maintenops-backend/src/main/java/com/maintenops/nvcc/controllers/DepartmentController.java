@@ -18,19 +18,6 @@ public class DepartmentController {
 
     private final DepartmentService departmentService;
 
-    @PostMapping("/org")
-    @PreAuthorize("hasRole('SUPER_ADMIN')")
-    public ResponseEntity<String> createOrgDept(@Valid @RequestBody DeptDto dto) {
-        departmentService.createOrgDepartment(dto);
-        return ResponseEntity.status(HttpStatus.CREATED).body("Org Department Created");
-    }
-
-    @GetMapping("/org")
-    @PreAuthorize("hasAnyRole('ADMIN','SUPER_ADMIN')")
-    public ResponseEntity<List<DeptDto>> getOrgDepartments(){
-        List<DeptDto> orgDepartments = departmentService.getOrgDepartments();
-        return ResponseEntity.ok(orgDepartments);
-    }
 
     @PostMapping("/service")
     @PreAuthorize("hasRole('SUPER_ADMIN')")

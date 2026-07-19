@@ -6,12 +6,14 @@ import com.maintenops.nvcc.enums.RequestStatus;
 import com.maintenops.nvcc.exceptions.ResourceNotFoundException;
 import com.maintenops.nvcc.repositories.*;
 import com.maintenops.nvcc.security.JwtPrincipal;
+import com.maintenops.nvcc.services.FileStorageService;
 import com.maintenops.nvcc.services.QuotationService;
 import com.maintenops.nvcc.entities.VendorPurchaseList;
 import com.maintenops.nvcc.services.RequestService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.Instant;
 import java.time.LocalDate;
@@ -28,6 +30,7 @@ public class RequestServiceImpl implements RequestService {
     private final RequestMaterialRepository requestMaterialRepo;
     private final QuotationService quotationService;
     private final VendorPurchaseListRepository vendorPurchaseListRepo;
+    private final FileStorageService fileStorageService;
 
     private RequestResponseDto mapToResponse(Request request) {
 
@@ -43,8 +46,14 @@ public class RequestServiceImpl implements RequestService {
         response.setStatus(request.getStatus().name());
         response.setCreatedAt(request.getCreatedAt());
 
+        // Map image paths to URLs
+        if (request.getImages() != null && !request.getImages().isEmpty()) {
+            response.setImages(request.getImages().stream()
+                    .map(fileStorageService::getImageUrl)
+                    .collect(Collectors.toList()));
+        }
+
         response.setRequesterName(request.getRequester().getUsername());
-        response.setOrganizationDepartmentName(request.getOrganizationDepartment().getName());
         response.setServiceDepartmentName(request.getServiceDepartment().getName());
 
         // Admin Review Fields
@@ -101,7 +110,7 @@ public class RequestServiceImpl implements RequestService {
 
     // ==================== Phase 1: Request & Quotation ====================
 
-    public RequestResponseDto createRequest(RequestRequestDto dto, JwtPrincipal principal) {
+    public RequestResponseDto createRequest(RequestRequestDto dto, JwtPrincipal principal, MultipartFile[] images) {
 
         Request request = new Request();
 
@@ -117,12 +126,6 @@ public class RequestServiceImpl implements RequestService {
                 .orElseThrow(() -> new RuntimeException("User not found"));
         request.setRequester(requester);
 
-        // Auto-populate Organization Department from logged-in user
-        OrganizationDepartment orgDept = requester.getOrganizationDepartment();
-        if (orgDept == null) {
-            throw new ResourceNotFoundException("User's organization department not found. Please contact admin.");
-        }
-        request.setOrganizationDepartment(orgDept);
 
         // Resolve Service Department by Name (from DTO)
         ServiceDepartment serviceDept = serviceDeptRepository.findByName(dto.getServiceDepartmentName())
@@ -130,8 +133,15 @@ public class RequestServiceImpl implements RequestService {
         request.setServiceDepartment(serviceDept);
 
         // Generate unique Request Number
-        request.setRequestNumber(generateRequestNumber());
+        String requestNumber = generateRequestNumber();
+        request.setRequestNumber(requestNumber);
         request.setStatus(RequestStatus.REQUEST_CREATED);
+
+        // Store uploaded images
+        if (images != null && images.length > 0) {
+            List<String> imagePaths = fileStorageService.storeImages(images, requestNumber);
+            request.setImages(imagePaths);
+        }
 
         Request savedRequest = requestRepository.save(request);
 

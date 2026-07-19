@@ -167,9 +167,9 @@ const CreateQuotationPage = () => {
                         </div>
                         <h2 className="text-[15px] font-display font-bold text-on-surface tracking-tight">Select Materials</h2>
                     </div>
-                    <MaterialPicker 
-                        onMaterialsChange={handleMaterialsChange} 
-                        initialItems={request?.materials || []} 
+                    <MaterialPicker
+                        onMaterialsChange={handleMaterialsChange}
+                        initialItems={request?.materials || []}
                     />
                 </div>
 

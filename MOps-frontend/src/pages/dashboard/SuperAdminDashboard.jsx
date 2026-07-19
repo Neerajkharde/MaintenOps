@@ -134,15 +134,13 @@ const SuperAdminDashboard = () => {
                                         <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
                                     </svg>
                                 </div>
-                                <span className="text-[11px] font-ui font-bold uppercase tracking-[0.2em] text-[#7c3aed]">Super Admin | MaintenOps - ISKCON NVCC</span>
+                                <h2 className="text-[30px] font-display font-semibold text-on-surface tracking-tight mb-1">
+                                    Superadmin Dashboard
+                                </h2>
                             </div>
 
-                            <h2 className="text-[30px] font-display font-semibold text-on-surface tracking-tight mb-1">
-                                Executive Oversight Dashboard
-                            </h2>
-                            <p className="text-[14px] font-ui text-on-surface-variant">
-                                Global view of all maintenance operations, approvals, and procurement workflows.
-                            </p>
+
+
 
                             {/* Violet line divider */}
                             <div className="flex items-center gap-3 mt-5">
@@ -220,7 +218,7 @@ const SuperAdminDashboard = () => {
                                     const cfg = STATUS_CONFIG[req.status];
                                     const isActing = actionLoading === req.id;
                                     const isQuotation = req.status === 'QUOTATION_ADDED';
-                                    
+
                                     const highValue = Number(req.totalEstimatedCost) >= 15000;
                                     const daysOld = req.createdAt ? Math.floor((new Date() - new Date(req.createdAt)) / (1000 * 60 * 60 * 24)) : 0;
                                     const isUrgent = highValue || daysOld >= 2;
@@ -279,7 +277,7 @@ const SuperAdminDashboard = () => {
                                                                     className={`flex-1 sm:flex-none px-4 py-2 rounded-lg text-[12px] font-ui font-bold text-white transition-all hover:opacity-90 active:scale-[0.97] ${isUrgent
                                                                         ? 'bg-gradient-to-r from-red-500 to-red-600 shadow-sm shadow-red-500/20'
                                                                         : 'bg-gradient-to-r from-[#7c3aed] to-[#a78bfa] shadow-sm shadow-[#7c3aed]/20'
-                                                                    }`}
+                                                                        }`}
                                                                 >
                                                                     {cfg.action}
                                                                 </button>
@@ -290,7 +288,7 @@ const SuperAdminDashboard = () => {
                                                                     className={`flex-1 sm:flex-none px-4 py-2 rounded-lg text-[12px] font-ui font-bold text-white transition-all hover:opacity-90 active:scale-[0.97] disabled:opacity-40 ${isUrgent
                                                                         ? 'bg-gradient-to-r from-red-500 to-red-600 shadow-sm shadow-red-500/20'
                                                                         : 'bg-gradient-to-r from-[#7c3aed] to-[#a78bfa] shadow-sm shadow-[#7c3aed]/20'
-                                                                    }`}
+                                                                        }`}
                                                                 >
                                                                     {isActing ? 'Wait...' : cfg.action}
                                                                 </button>
@@ -306,74 +304,74 @@ const SuperAdminDashboard = () => {
                         </section>
                     )}
 
-                        {inProgress.length > 0 && (
-                            <section className="mb-10">
-                                <div className="flex items-center gap-3 mb-4">
-                                    <div className="w-2 h-2 rounded-full bg-[#e65100]"></div>
-                                    <h2 className="text-[17px] font-display font-semibold text-on-surface">In Progress</h2>
-                                    <span className="text-[12px] font-bold px-2.5 py-0.5 rounded-full bg-[#fff3e0] text-[#e65100]">{inProgress.length}</span>
-                                </div>
-                                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
-                                    {inProgress.map(req => {
-                                        const cfg = STATUS_CONFIG[req.status] || { label: req.status, color: '#5e6c84', bg: '#f1f3f4', icon: '📎' };
-                                        return (
-                                            <div
-                                                key={req.id}
-                                                className="card p-5 cursor-pointer flex flex-col justify-between min-h-[140px]"
-                                                onClick={() => { setDetailRequest(req); setIsDetailOpen(true); }}
-                                            >
-                                                <div className="flex items-center justify-between mb-3">
-                                                    <span className="text-[12px] font-medium text-on-surface-variant">#{req.requestNumber}</span>
-                                                    <span className="text-[11px] font-medium px-2 py-0.5 rounded-md" style={{ background: cfg.bg, color: cfg.color }}>
-                                                        {cfg.label}
-                                                    </span>
-                                                </div>
-                                                <div className="text-[15px] font-display font-medium text-on-surface line-clamp-1 mb-2">{req.itemDescription}</div>
-                                                <div className="flex items-center gap-3 text-[13px] text-on-surface-variant">
-                                                    <span>{req.requesterName}</span>
-                                                    {req.totalEstimatedCost && (
-                                                        <span className="text-[13px] font-bold text-success">₹{Number(req.totalEstimatedCost).toLocaleString('en-IN')}</span>
-                                                    )}
-                                                </div>
-                                            </div>
-                                        );
-                                    })}
-                                </div>
-                            </section>
-                        )}
-
-                        {completed.length > 0 && (
-                            <section>
-                                <div className="flex items-center gap-3 mb-4">
-                                    <div className="w-2 h-2 rounded-full bg-[#137333]"></div>
-                                    <h2 className="text-[17px] font-display font-semibold text-on-surface">Recently Completed</h2>
-                                    <span className="text-[12px] font-bold px-2.5 py-0.5 rounded-full bg-[#e6f4ea] text-[#137333]">{completed.length}</span>
-                                </div>
-                                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-3">
-                                    {completed.slice(0, 8).map(req => (
+                    {inProgress.length > 0 && (
+                        <section className="mb-10">
+                            <div className="flex items-center gap-3 mb-4">
+                                <div className="w-2 h-2 rounded-full bg-[#e65100]"></div>
+                                <h2 className="text-[17px] font-display font-semibold text-on-surface">In Progress</h2>
+                                <span className="text-[12px] font-bold px-2.5 py-0.5 rounded-full bg-[#fff3e0] text-[#e65100]">{inProgress.length}</span>
+                            </div>
+                            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+                                {inProgress.map(req => {
+                                    const cfg = STATUS_CONFIG[req.status] || { label: req.status, color: '#5e6c84', bg: '#f1f3f4', icon: '📎' };
+                                    return (
                                         <div
                                             key={req.id}
-                                            className="card p-5 cursor-pointer flex flex-col justify-between min-h-[120px]"
+                                            className="card p-5 cursor-pointer flex flex-col justify-between min-h-[140px]"
                                             onClick={() => { setDetailRequest(req); setIsDetailOpen(true); }}
                                         >
-                                            <div>
-                                                <div className="text-[12px] text-on-surface-variant mb-1">#{req.requestNumber}</div>
-                                                <div className="text-[14px] font-medium text-on-surface line-clamp-1">{req.itemDescription}</div>
+                                            <div className="flex items-center justify-between mb-3">
+                                                <span className="text-[12px] font-medium text-on-surface-variant">#{req.requestNumber}</span>
+                                                <span className="text-[11px] font-medium px-2 py-0.5 rounded-md" style={{ background: cfg.bg, color: cfg.color }}>
+                                                    {cfg.label}
+                                                </span>
                                             </div>
-                                            <div className="text-[13px] text-on-surface-variant">{req.requesterName}</div>
+                                            <div className="text-[15px] font-display font-medium text-on-surface line-clamp-1 mb-2">{req.itemDescription}</div>
+                                            <div className="flex items-center gap-3 text-[13px] text-on-surface-variant">
+                                                <span>{req.requesterName}</span>
+                                                {req.totalEstimatedCost && (
+                                                    <span className="text-[13px] font-bold text-success">₹{Number(req.totalEstimatedCost).toLocaleString('en-IN')}</span>
+                                                )}
+                                            </div>
                                         </div>
-                                    ))}
-                                </div>
-                            </section>
-                        )}
-
-                        {allRequests.length === 0 && (
-                            <div className="text-center py-20 bg-surface-variant/20 rounded-2xl border border-dashed border-outline/20">
-                                <div className="text-5xl mb-4 opacity-30">✨</div>
-                                <div className="text-[17px] font-display font-medium text-on-surface mb-1">All clear</div>
-                                <p className="text-[14px] text-on-surface-variant">No requests in the system.</p>
+                                    );
+                                })}
                             </div>
-                        )}
+                        </section>
+                    )}
+
+                    {completed.length > 0 && (
+                        <section>
+                            <div className="flex items-center gap-3 mb-4">
+                                <div className="w-2 h-2 rounded-full bg-[#137333]"></div>
+                                <h2 className="text-[17px] font-display font-semibold text-on-surface">Recently Completed</h2>
+                                <span className="text-[12px] font-bold px-2.5 py-0.5 rounded-full bg-[#e6f4ea] text-[#137333]">{completed.length}</span>
+                            </div>
+                            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-3">
+                                {completed.slice(0, 8).map(req => (
+                                    <div
+                                        key={req.id}
+                                        className="card p-5 cursor-pointer flex flex-col justify-between min-h-[120px]"
+                                        onClick={() => { setDetailRequest(req); setIsDetailOpen(true); }}
+                                    >
+                                        <div>
+                                            <div className="text-[12px] text-on-surface-variant mb-1">#{req.requestNumber}</div>
+                                            <div className="text-[14px] font-medium text-on-surface line-clamp-1">{req.itemDescription}</div>
+                                        </div>
+                                        <div className="text-[13px] text-on-surface-variant">{req.requesterName}</div>
+                                    </div>
+                                ))}
+                            </div>
+                        </section>
+                    )}
+
+                    {allRequests.length === 0 && (
+                        <div className="text-center py-20 bg-surface-variant/20 rounded-2xl border border-dashed border-outline/20">
+                            <div className="text-5xl mb-4 opacity-30">✨</div>
+                            <div className="text-[17px] font-display font-medium text-on-surface mb-1">All clear</div>
+                            <p className="text-[14px] text-on-surface-variant">No requests in the system.</p>
+                        </div>
+                    )}
                 </div>
             </div>
 

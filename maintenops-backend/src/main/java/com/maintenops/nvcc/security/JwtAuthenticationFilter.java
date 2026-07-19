@@ -50,7 +50,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
                 String username = claims.get("username", String.class);
                 String email = claims.get("email", String.class);
-                Long orgDeptId = claims.get("orgDeptId", Long.class);
 
                 // Extract roles (List<String>)
                 List<String> roleStrings = claims.get("roles", List.class);
@@ -64,7 +63,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                         userId,
                         username,
                         email,
-                        orgDeptId,
                         roleStrings
                 );
 

@@ -11,6 +11,5 @@ public class JwtPrincipal {
     private Long userId;
     private String username;
     private String email;
-    private Long orgDeptId;
     private List<String> roles;
 }

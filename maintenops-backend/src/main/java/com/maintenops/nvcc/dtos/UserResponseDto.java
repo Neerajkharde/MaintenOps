@@ -13,6 +13,6 @@ public class UserResponseDto {
     private Long id;
     private String username;
     private String email;
-    private String departmentName;
+    private String mobileNumber;
     private Set<String> roles; // Back to Set<String>
 }

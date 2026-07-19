@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { quotationService } from '../../services/materialService';
+import { requestService } from '../../services/requestService';
 import { downloadQuotationPDF } from '../../utils/downloadUtils';
 import { formatDate } from '../../utils/dateUtils';
 
@@ -159,6 +160,29 @@ const SARequestDetailModal = ({ isOpen, onClose, request }) => {
                                     <p className="text-[13px] text-[#202124] leading-relaxed">{request.superAdminRemarks}</p>
                                 </div>
                             )}
+                        </div>
+                    )}
+
+                    {/* Attached Photos */}
+                    {request.images && request.images.length > 0 && (
+                        <div className="bg-white rounded-xl border border-[#e8eaed] p-4">
+                            <div className="flex items-center gap-2 mb-3">
+                                <span className="text-[12px] font-bold text-[#5f6368] uppercase tracking-wider">📷 Attached Photos</span>
+                                <span className="text-[12px] font-medium text-[#5f6368] bg-[#f1f3f4] px-2.5 py-0.5 rounded-full">{request.images.length}</span>
+                            </div>
+                            <div className="grid grid-cols-4 gap-2">
+                                {request.images.map((imgUrl, idx) => (
+                                    <a
+                                        key={idx}
+                                        href={requestService.formatImageUrl(imgUrl)}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="block aspect-square rounded-lg overflow-hidden border border-[#e8eaed] hover:border-[#1a73e8] hover:shadow-md transition-all"
+                                    >
+                                        <img src={requestService.formatImageUrl(imgUrl)} alt={`Request photo ${idx + 1}`} className="w-full h-full object-cover" />
+                                    </a>
+                                ))}
+                            </div>
                         </div>
                     )}
 

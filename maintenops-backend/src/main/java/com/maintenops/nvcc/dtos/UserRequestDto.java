@@ -21,7 +21,8 @@ public class UserRequestDto {
     private String password;
 
     @NotBlank
-    private String orgDeptName;
+    @jakarta.validation.constraints.Pattern(regexp = "^\\d{10}$", message = "Mobile number must be exactly 10 digits")
+    private String mobileNumber;
 
     @NotEmpty
     private Set<String> roles;

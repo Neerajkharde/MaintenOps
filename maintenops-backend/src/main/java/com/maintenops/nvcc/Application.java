@@ -4,7 +4,6 @@ import java.util.Set;
 
 import com.maintenops.nvcc.dtos.DeptDto;
 import com.maintenops.nvcc.dtos.UserRequestDto;
-import com.maintenops.nvcc.entities.OrganizationDepartment;
 import com.maintenops.nvcc.entities.Role;
 import com.maintenops.nvcc.enums.ERole;
 import com.maintenops.nvcc.repositories.RoleRepository;
@@ -25,7 +24,5 @@ public class Application {
 
 	public static void main(String[] args) {
 		SpringApplication.run(Application.class, args);
-
-
 	}
 }

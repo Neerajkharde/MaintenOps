@@ -108,9 +108,7 @@ public class AuthController {
                         user.getId(),
                         user.getUsername(),
                         user.getEmail(),
-                        user.getOrganizationDepartment() != null
-                                ? user.getOrganizationDepartment().getName()
-                                : null,
+                        user.getMobileNumber(),
                         user.getRoles()
                                 .stream()
                                 .map(role -> role.getName().name())
@@ -185,9 +183,7 @@ public class AuthController {
                         user.getId(),
                         user.getUsername(),
                         user.getEmail(),
-                        user.getOrganizationDepartment() != null
-                                ? user.getOrganizationDepartment().getName()
-                                : null,
+                        user.getMobileNumber(),
                         user.getRoles()
                                 .stream()
                                 .map(role -> role.getName().name())

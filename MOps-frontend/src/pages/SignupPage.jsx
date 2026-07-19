@@ -10,19 +10,12 @@ const SignupPage = () => {
         email: '',
         password: '',
         confirmPassword: '',
-        department: ''
+        mobileNumber: ''
     });
     const [error, setError] = useState('');
     const [loading, setLoading] = useState(false);
     const { signup } = useAuth();
     const navigate = useNavigate();
-
-    const departments = [
-        { id: 'Seva Office', label: 'Seva Office', icon: 'M12 8c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4m0-2c3.31 0 6 2.69 6 6s-2.69 6-6 6-6-2.69-6-6 2.69-6 6-6zm3.5 8c.83 0 1.5.67 1.5 1.5S16.33 19 15.5 19 14 18.33 14 17.5s.67-1.5 1.5-1.5z', color: '#1a73e8' },
-        { id: 'Jiva Daya', label: 'Jiva Daya', icon: 'M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z', color: '#d93025' },
-        { id: 'Campus Program', label: 'Campus Program', icon: 'M12 14l9-5-9-5-9 5m0 0l9 5m-9-5v10l9 5m0-10l9-5m-9 5v10m0-10l-9-5m19 5l-9-5', color: '#f9ab00' },
-        { id: 'Kitchen', label: 'Kitchen', icon: 'M9 3v2H5v4h4v2H2v4h2v8c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2v-8h2v-4h-7V5h4V3H9zm0 5h6v10H9V8z', color: '#137333' }
-    ];
 
     const handleChange = (e) => {
         setFormData({
@@ -31,9 +24,6 @@ const SignupPage = () => {
         });
     };
 
-    const handleDeptSelect = (deptId) => {
-        setFormData({ ...formData, department: deptId });
-    };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -49,14 +39,14 @@ const SignupPage = () => {
             return;
         }
 
-        if (!formData.department) {
-            setError('Please select a department');
+        if (!/^\d{10}$/.test(formData.mobileNumber)) {
+            setError('Please enter a valid 10-digit mobile number');
             return;
         }
 
         try {
             setLoading(true);
-            await signup(formData.name, formData.email, formData.password, formData.department);
+            await signup(formData.name, formData.email, formData.password, formData.mobileNumber);
             navigate('/login');
         } catch (err) {
             setError(err.message || 'Failed to create account');
@@ -106,6 +96,16 @@ const SignupPage = () => {
                         required
                     />
 
+                    <Input
+                        label="Mobile Number (10 digits)"
+                        name="mobileNumber"
+                        placeholder="9876543210"
+                        value={formData.mobileNumber}
+                        onChange={handleChange}
+                        className="font-ui text-sm sm:text-base"
+                        required
+                    />
+
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                         <Input
                             label="Password"
@@ -131,37 +131,6 @@ const SignupPage = () => {
                         />
                     </div>
 
-                    {/* Department Selection */}
-                    <div className="space-y-3">
-                        <label className="text-[11px] sm:text-[12px] font-ui font-bold text-on-surface-variant uppercase tracking-widest pl-1">Target Department</label>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 sm:gap-3">
-                            {departments.map((dept) => (
-                                <div
-                                    key={dept.id}
-                                    onClick={() => handleDeptSelect(dept.id)}
-                                    className={`relative bg-transparent border-[1.5px] rounded-[14px] p-3 sm:p-3 cursor-pointer transition-all flex items-center gap-3 group
-                                        ${formData.department === dept.id
-                                            ? 'border-primary bg-primary-container/20'
-                                            : 'border-outline/40 hover:border-outline hover:bg-surface-variant/20'}`}
-                                >
-                                    <div className={`w-8 h-8 sm:w-8 sm:h-8 rounded-lg flex items-center justify-center shrink-0 transition-colors
-                                        ${formData.department === dept.id ? 'bg-primary text-white' : 'bg-surface-variant text-on-surface-variant group-hover:bg-surface-variant/50'}`}>
-                                        <svg className="w-5 h-5 sm:w-5 sm:h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d={dept.icon} />
-                                        </svg>
-                                    </div>
-                                    <span className={`text-[12px] sm:text-[13px] font-display font-medium transition-colors ${formData.department === dept.id ? 'text-primary' : 'text-on-surface-variant'}`}>
-                                        {dept.label}
-                                    </span>
-                                    {formData.department === dept.id && (
-                                        <div className="absolute -top-1 -right-1 w-5 h-5 bg-primary text-white rounded-full flex items-center justify-center shadow-sm">
-                                            <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M5 13l4 4L19 7" /></svg>
-                                        </div>
-                                    )}
-                                </div>
-                            ))}
-                        </div>
-                    </div>
 
                     {error && (
                         <div className="text-[12px] sm:text-[13px] text-error bg-error-container/30 px-3 py-2.5 sm:px-4 sm:py-3 rounded-xl border border-error/10 flex items-center gap-2 font-ui animate-fadeUp">

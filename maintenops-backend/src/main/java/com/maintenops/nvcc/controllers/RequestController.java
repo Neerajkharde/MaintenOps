@@ -9,10 +9,12 @@ import com.maintenops.nvcc.services.impls.RequestServiceImpl;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -21,7 +23,7 @@ import java.util.List;
  * Users can create requests, view their own requests, and manage the request lifecycle.
  *
  * Endpoints:
- * - POST /api/request - Create a new maintenance request
+ * - POST /api/request - Create a new maintenance request (multipart/form-data)
  * - GET /api/request/my - Get all requests created by the logged-in user
  * - GET /api/request/{id} - Get details of a specific request
  */
@@ -32,35 +34,30 @@ public class RequestController {
     private final RequestService requestService;
 
     /**
-     * Creates a new maintenance request.
+     * Creates a new maintenance request with optional image uploads.
      *
-     * Request Body Example:
-     * {
-     *   "mobileNumber": "9876543210",
-     *   "itemDescription": "Fix the broken air conditioner in Conference Room A",
-     *   "serviceDepartmentName": "Electrical",
-     *   "urgencyRequested": true,
-     *   "urgencyReason": "Conference room is unusable",
-     *   "requiredDate": null
-     * }
+     * This endpoint accepts multipart/form-data with:
+     * - "request" part: JSON with mobileNumber, itemDescription, serviceDepartmentName, etc.
+     * - "images" part (optional): Up to 4 image files (JPG/PNG, max 5MB each)
      *
      * Notes:
      * - requester and organizationDepartmentName are auto-populated from logged-in user
      * - requiredDate is optional and can be set by Admin later
-     * - organizationDepartmentName can be optionally provided, otherwise uses user's organization
      *
-     * @param request the request details (mobileNumber, itemDescription, serviceDepartmentName are required)
+     * @param request the request details
+     * @param images optional image files
      * @param principal the authenticated user making the request
      * @return ResponseEntity with the created request details and HTTP 201 (CREATED) status
      */
-    @PostMapping
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @PreAuthorize("hasRole('REQUESTER')")
     public ResponseEntity<RequestResponseDto> createRequest(
             @Valid
-            @RequestBody RequestRequestDto request,
+            @RequestPart("request") RequestRequestDto request,
+            @RequestPart(value = "images", required = false) MultipartFile[] images,
             @AuthenticationPrincipal JwtPrincipal principal) {
 
-        RequestResponseDto savedRequest = requestService.createRequest(request, principal);
+        RequestResponseDto savedRequest = requestService.createRequest(request, principal, images);
         return ResponseEntity.status(HttpStatus.CREATED).body(savedRequest);
     }
 

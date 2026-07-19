@@ -82,7 +82,7 @@ const UserDashboard = () => {
 
     const currentReq = activeRequests.find(r => r.id === selectedTrackId);
     const selectedReqLabel =
-        currentReq?.desc ||
+        currentReq?.itemDescription ||
         (activeRequests.length > 0 ? 'Select a request' : 'No active requests');
 
     const filteredRequests = useMemo(() => {
@@ -185,352 +185,350 @@ const UserDashboard = () => {
     }
 
     return (
-<>
-<div className="relative min-h-screen pb-24">
+        <>
+            <div className="relative min-h-screen pb-24">
 
-<div className="relative px-6 sm:px-8 pt-10 max-w-[1400px] mx-auto animate-fadeUp">
+                <div className="relative px-6 sm:px-8 pt-10 max-w-[1400px] mx-auto animate-fadeUp">
 
-{/* HEADER */}
-<div className="mb-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
+                    {/* HEADER */}
+                    <div className="mb-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
 
-    <div>
-        <h2 className="text-[32px] font-display font-semibold text-on-surface tracking-tight mb-2">
-        Hare Krishna , {user?.name?.split(' ')[0] || user?.username || 'Krishna Das'} Prabhu
-        </h2>
+                        <div>
+                            <h2 className="text-[32px] font-display font-semibold text-on-surface tracking-tight mb-2">
+                                Hare Krishna, {user?.name?.replace(/\bDas\b/gi, '').trim() || user?.username || 'Krishna Das'} Prabhu
+                            </h2>
 
-        <p className="text-[15px] font-ui text-on-surface-variant">
-        May your day be peaceful. Here is the status of your maintenance requests.
-        </p>
 
-        {/* Lotus divider */}
-        <div className="flex items-center gap-4 mt-6 mb-2">
 
-            <div className="flex-1 h-[2px] bg-gradient-to-r from-transparent via-primary/40 to-transparent"></div>
+                            {/* Lotus divider */}
+                            <div className="flex items-center gap-4 mt-6 mb-2">
 
-            <div className="flex items-center justify-center w-8 h-8 rounded-full bg-white border border-primary/20 shadow-sm">
-                <span className="text-[18px]">🪷</span>
-            </div>
+                                <div className="flex-1 h-[2px] bg-gradient-to-r from-transparent via-primary/40 to-transparent"></div>
 
-            <div className="flex-1 h-[2px] bg-gradient-to-r from-transparent via-primary/40 to-transparent"></div>
+                                <div className="flex items-center justify-center w-8 h-8 rounded-full bg-white border border-primary/20 shadow-sm">
+                                    <span className="text-[18px]">🪷</span>
+                                </div>
 
-        </div>
-        
-    </div>
+                                <div className="flex-1 h-[2px] bg-gradient-to-r from-transparent via-primary/40 to-transparent"></div>
 
-</div>
+                            </div>
 
-{/* STATS */}
-<div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
+                        </div>
 
-{[
-{ label: 'Total Tickets', val: animatedStats.total, icon: 'M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z', color: 'text-primary'},
-{ label: 'Active', val: animatedStats.active, icon: 'M13 10V3L4 14h7v7l9-11h-7z', color: 'text-primary'},
-{ label: 'Awaiting Review', val: animatedStats.pending, icon: 'M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0y', color: 'text-warning'},
-{ label: 'Resolved', val: animatedStats.completed, icon: 'M5 13l4 4L19 7', color: 'text-success'}
-].map((s,i)=> (
-
-<div
-key={i}
-className="group relative p-6 rounded-2xl backdrop-blur-xl bg-white/70 border border-outline/10 shadow-lg transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl"
->
-
-<div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center mb-6 shadow-inner">
-
-<svg
-className={`w-6 h-6 ${s.color}`}
-fill="none"
-viewBox="0 0 24 24"
-stroke="currentColor"
->
-<path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={s.icon}/>
-</svg>
-
-</div>
-
-<div>
-<div className="text-[32px] font-display font-bold text-on-surface leading-none mb-1">
-{s.val}
-</div>
-
-<div className="text-[13px] font-ui font-medium text-on-surface-variant uppercase tracking-wider">
-{s.label}
-</div>
-</div>
-
-</div>
-
-))}
-
-</div>
-
-{/* MAIN CARD */}
-<div className="flex flex-col xl:flex-row gap-8">
-
-<div className="flex-1 p-8 rounded-2xl backdrop-blur-xl bg-white/70 border border-outline/10 shadow-lg">
-
-<div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8 pb-6 border-b border-outline/10">
-
-<div>
-<h3 className="text-[20px] font-display font-bold text-on-surface tracking-tight mb-1">
-Service Progress
-</h3>
-
-<p className="text-[13px] text-on-surface-variant">
-Track your maintenance request journey
-</p>
-</div>
-
-<div ref={dropdownRef} className="relative w-full sm:w-auto">
-    <button
-        type="button"
-        onClick={() => {
-            if (activeRequests.length === 0) return;
-            setIsDropdownOpen(v => {
-                const next = !v;
-                if (next) setRequestQuery('');
-                return next;
-            });
-        }}
-        className={`w-full sm:w-[340px] inline-flex items-center justify-between gap-3 px-4 py-2.5 rounded-xl border shadow-sm text-[13px] font-ui transition
-            ${activeRequests.length === 0
-                ? 'bg-white/60 border-outline/10 text-on-surface-variant/60 cursor-not-allowed'
-                : 'bg-white border-outline/15 text-on-surface hover:shadow-md hover:border-outline/25'}
-        `}
-        aria-haspopup="listbox"
-        aria-expanded={isDropdownOpen}
-        disabled={activeRequests.length === 0}
-        title={selectedReqLabel}
-    >
-        <span className="truncate text-left">
-            {selectedReqLabel}
-            {activeRequests.length > 0 ? (
-                <span className="ml-2 text-[12px] text-on-surface-variant/70 font-ui font-medium">
-                    ({activeRequests.length})
-                </span>
-            ) : null}
-        </span>
-        <svg className={`w-4 h-4 flex-shrink-0 transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`} viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-            <path fillRule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 10.94l3.71-3.71a.75.75 0 111.06 1.06l-4.24 4.24a.75.75 0 01-1.06 0L5.21 8.29a.75.75 0 01.02-1.08z" clipRule="evenodd" />
-        </svg>
-    </button>
-
-    {isDropdownOpen && activeRequests.length > 0 && (
-        <div
-            className="absolute right-0 mt-2 w-full sm:w-[420px] z-50 rounded-2xl border border-outline/15 bg-white shadow-xl overflow-hidden"
-            role="listbox"
-            aria-label="Select maintenance request"
-        >
-            <div className="p-3 border-b border-outline/10 bg-white">
-                <input
-                    value={requestQuery}
-                    onChange={(e) => setRequestQuery(e.target.value)}
-                    autoFocus
-                    placeholder="Search by ID, description, dept, date, status…"
-                    className="w-full px-3 py-2 rounded-xl border border-outline/15 bg-white text-[13px] font-ui text-on-surface placeholder:text-on-surface-variant/70 focus:outline-none focus:ring-4 focus:ring-primary/10 focus:border-primary/30"
-                />
-                <div className="mt-2 text-[12px] font-ui text-on-surface-variant flex items-center justify-between">
-                    <span>{filteredRequests.length} result(s)</span>
-                    {requestQuery ? (
-                        <button
-                            type="button"
-                            onClick={() => setRequestQuery('')}
-                            className="text-primary font-ui font-semibold hover:underline"
-                        >
-                            Clear
-                        </button>
-                    ) : null}
-                </div>
-            </div>
-
-            <div className="max-h-[320px] overflow-auto">
-                {filteredRequests.length === 0 ? (
-                    <div className="px-4 py-10 text-center">
-                        <div className="text-[13px] font-ui font-semibold text-on-surface">No matches</div>
-                        <div className="text-[12px] font-ui text-on-surface-variant mt-1">Try a different keyword.</div>
                     </div>
-                ) : null}
 
-                {filteredRequests.map((r) => {
-                    const isSelected = r.id === selectedTrackId;
-                    const line1 = r.desc || `Request #${r.id}`;
-                    const line2 = [r.dept, r.date].filter(Boolean).join(' • ');
-                    return (
-                        <button
-                            key={r.id}
-                            type="button"
-                            onClick={() => {
-                                setSelectedTrackId(r.id);
-                                setIsDropdownOpen(false);
-                            }}
-                            className={`w-full text-left px-4 py-3.5 border-b border-outline/10 transition
+                    {/* STATS */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
+
+                        {[
+                            { label: 'Total Tickets', val: animatedStats.total, icon: 'M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z', color: 'text-primary' },
+                            { label: 'Active', val: animatedStats.active, icon: 'M13 10V3L4 14h7v7l9-11h-7z', color: 'text-primary' },
+                            { label: 'Awaiting Review', val: animatedStats.pending, icon: 'M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0', color: 'text-warning' },
+                            { label: 'Resolved', val: animatedStats.completed, icon: 'M5 13l4 4L19 7', color: 'text-success' }
+                        ].map((s, i) => (
+
+                            <div
+                                key={i}
+                                className="group relative p-6 rounded-2xl backdrop-blur-xl bg-white/70 border border-outline/10 shadow-lg transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl"
+                            >
+
+                                <div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center mb-6 shadow-inner">
+
+                                    <svg
+                                        className={`w-6 h-6 ${s.color}`}
+                                        fill="none"
+                                        viewBox="0 0 24 24"
+                                        stroke="currentColor"
+                                    >
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={s.icon} />
+                                    </svg>
+
+                                </div>
+
+                                <div>
+                                    <div className="text-[32px] font-display font-bold text-on-surface leading-none mb-1">
+                                        {s.val}
+                                    </div>
+
+                                    <div className="text-[13px] font-ui font-medium text-on-surface-variant uppercase tracking-wider">
+                                        {s.label}
+                                    </div>
+                                </div>
+
+                            </div>
+
+                        ))}
+
+                    </div>
+
+                    {/* MAIN CARD */}
+                    <div className="flex flex-col xl:flex-row gap-8">
+
+                        <div className="flex-1 p-8 rounded-2xl backdrop-blur-xl bg-white/70 border border-outline/10 shadow-lg">
+
+                            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8 pb-6 border-b border-outline/10">
+
+                                <div>
+                                    <h3 className="text-[20px] font-display font-bold text-on-surface tracking-tight mb-1">
+                                        Service Progress
+                                    </h3>
+
+                                    <p className="text-[13px] text-on-surface-variant">
+                                        Track your maintenance request journey
+                                    </p>
+                                </div>
+
+                                <div ref={dropdownRef} className="relative w-full sm:w-auto">
+                                    <button
+                                        type="button"
+                                        onClick={() => {
+                                            if (activeRequests.length === 0) return;
+                                            setIsDropdownOpen(v => {
+                                                const next = !v;
+                                                if (next) setRequestQuery('');
+                                                return next;
+                                            });
+                                        }}
+                                        className={`w-full sm:w-[340px] inline-flex items-center justify-between gap-3 px-4 py-2.5 rounded-xl border shadow-sm text-[13px] font-ui transition
+            ${activeRequests.length === 0
+                                                ? 'bg-white/60 border-outline/10 text-on-surface-variant/60 cursor-not-allowed'
+                                                : 'bg-white border-outline/15 text-on-surface hover:shadow-md hover:border-outline/25'}
+        `}
+                                        aria-haspopup="listbox"
+                                        aria-expanded={isDropdownOpen}
+                                        disabled={activeRequests.length === 0}
+                                        title={selectedReqLabel}
+                                    >
+                                        <span className="truncate text-left">
+                                            {selectedReqLabel}
+                                            {activeRequests.length > 0 ? (
+                                                <span className="ml-2 text-[12px] text-on-surface-variant/70 font-ui font-medium">
+                                                    ({activeRequests.length})
+                                                </span>
+                                            ) : null}
+                                        </span>
+                                        <svg className={`w-4 h-4 flex-shrink-0 transition-transform ${isDropdownOpen ? 'rotate-180' : ''}`} viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                                            <path fillRule="evenodd" d="M5.23 7.21a.75.75 0 011.06.02L10 10.94l3.71-3.71a.75.75 0 111.06 1.06l-4.24 4.24a.75.75 0 01-1.06 0L5.21 8.29a.75.75 0 01.02-1.08z" clipRule="evenodd" />
+                                        </svg>
+                                    </button>
+
+                                    {isDropdownOpen && activeRequests.length > 0 && (
+                                        <div
+                                            className="absolute right-0 mt-2 w-full sm:w-[420px] z-50 rounded-2xl border border-outline/15 bg-white shadow-xl overflow-hidden"
+                                            role="listbox"
+                                            aria-label="Select maintenance request"
+                                        >
+                                            <div className="p-3 border-b border-outline/10 bg-white">
+                                                <input
+                                                    value={requestQuery}
+                                                    onChange={(e) => setRequestQuery(e.target.value)}
+                                                    autoFocus
+                                                    placeholder="Search by ID, description, dept, date, status…"
+                                                    className="w-full px-3 py-2 rounded-xl border border-outline/15 bg-white text-[13px] font-ui text-on-surface placeholder:text-on-surface-variant/70 focus:outline-none focus:ring-4 focus:ring-primary/10 focus:border-primary/30"
+                                                />
+                                                <div className="mt-2 text-[12px] font-ui text-on-surface-variant flex items-center justify-between">
+                                                    <span>{filteredRequests.length} result(s)</span>
+                                                    {requestQuery ? (
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => setRequestQuery('')}
+                                                            className="text-primary font-ui font-semibold hover:underline"
+                                                        >
+                                                            Clear
+                                                        </button>
+                                                    ) : null}
+                                                </div>
+                                            </div>
+
+                                            <div className="max-h-[320px] overflow-auto">
+                                                {filteredRequests.length === 0 ? (
+                                                    <div className="px-4 py-10 text-center">
+                                                        <div className="text-[13px] font-ui font-semibold text-on-surface">No matches</div>
+                                                        <div className="text-[12px] font-ui text-on-surface-variant mt-1">Try a different keyword.</div>
+                                                    </div>
+                                                ) : null}
+
+                                                {filteredRequests.map((r) => {
+                                                    const isSelected = r.id === selectedTrackId;
+                                                    const line1 = r.itemDescription || `Request #${r.id}`;
+                                                    const line2 = [r.serviceDepartmentName, r.date].filter(Boolean).join(' • ');
+                                                    return (
+                                                        <button
+                                                            key={r.id}
+                                                            type="button"
+                                                            onClick={() => {
+                                                                setSelectedTrackId(r.id);
+                                                                setIsDropdownOpen(false);
+                                                            }}
+                                                            className={`w-full text-left px-4 py-3.5 border-b border-outline/10 transition
                                 ${isSelected ? 'bg-primary/6' : 'hover:bg-surface-variant/20'}
                             `}
-                            role="option"
-                            aria-selected={isSelected}
-                        >
-                            <div className="flex items-start justify-between gap-3">
-                                <div className="min-w-0">
-                                    <div className="text-[13px] font-ui font-semibold text-on-surface truncate">
-                                        {line1}
-                                    </div>
-                                    {line2 ? (
-                                        <div className="text-[12px] font-ui text-on-surface-variant truncate mt-0.5">
-                                            {line2}
+                                                            role="option"
+                                                            aria-selected={isSelected}
+                                                        >
+                                                            <div className="flex items-start justify-between gap-3">
+                                                                <div className="min-w-0">
+                                                                    <div className="text-[13px] font-ui font-semibold text-on-surface truncate">
+                                                                        {line1}
+                                                                    </div>
+                                                                    {line2 ? (
+                                                                        <div className="text-[12px] font-ui text-on-surface-variant truncate mt-0.5">
+                                                                            {line2}
+                                                                        </div>
+                                                                    ) : null}
+                                                                    <div className="mt-1.5 flex items-center gap-2">
+                                                                        <span className="text-[11px] font-ui font-semibold text-on-surface-variant">
+                                                                            {r.id}
+                                                                        </span>
+                                                                        {getStatusPill(r.status)}
+                                                                    </div>
+                                                                </div>
+                                                                <div className="flex items-center gap-2 flex-shrink-0">
+                                                                    {r.serviceDepartmentName ? getDeptChip(r.serviceDepartmentName) : null}
+                                                                    {isSelected ? (
+                                                                        <span className="inline-flex items-center gap-1.5 text-primary text-[12px] font-ui font-semibold">
+                                                                            <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                                                                <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                                                                            </svg>
+                                                                            Selected
+                                                                        </span>
+                                                                    ) : null}
+                                                                </div>
+                                                            </div>
+                                                        </button>
+                                                    );
+                                                })}
+                                            </div>
                                         </div>
-                                    ) : null}
-                                    <div className="mt-1.5 flex items-center gap-2">
-                                        <span className="text-[11px] font-ui font-semibold text-on-surface-variant">
-                                            {r.id}
-                                        </span>
-                                        {getStatusPill(r.status)}
-                                    </div>
+                                    )}
                                 </div>
-                                <div className="flex items-center gap-2 flex-shrink-0">
-                                    {r.dept ? getDeptChip(r.dept) : null}
-                                    {isSelected ? (
-                                        <span className="inline-flex items-center gap-1.5 text-primary text-[12px] font-ui font-semibold">
-                                            <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                                                <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                                            </svg>
-                                            Selected
-                                        </span>
-                                    ) : null}
-                                </div>
+
                             </div>
-                        </button>
-                    );
-                })}
+
+                            {/* REQUEST CONTENT */}
+                            {currentReq ? (
+
+                                <div className="animate-fadeUp">
+
+                                    <div className="mb-10 bg-primary/5 p-5 rounded-xl border border-primary/10">
+
+                                        <h4 className="text-[16px] font-display font-medium text-on-surface mb-2">
+                                            {currentReq.itemDescription}
+                                        </h4>
+
+                                        <div className="flex gap-2 flex-wrap">
+
+                                            {getDeptChip(currentReq.serviceDepartmentName)}
+
+                                            <span className="px-2.5 py-0.5 rounded-md border border-outline/20 bg-white text-[12px] font-medium text-on-surface-variant">
+                                                Submitted on {currentReq.date}
+                                            </span>
+
+                                        </div>
+
+                                    </div>
+
+                                    {/* TIMELINE */}
+                                    <div className="rounded-2xl border border-outline/10 bg-white/70 backdrop-blur-xl shadow-sm p-6">
+                                        <div className="flex items-center justify-between gap-4 mb-4">
+                                            <div>
+                                                <div className="text-[14px] font-ui font-semibold text-on-surface">Timeline</div>
+                                                <div className="text-[12px] font-ui text-on-surface-variant">
+                                                    {currentReq.status ? currentReq.status.replace(/_/g, ' ') : '—'}
+                                                </div>
+                                            </div>
+
+                                            {String(currentReq.status || '').toUpperCase() === 'REJECTED' ? (
+                                                <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-error-container text-error border border-error/20 text-[12px] font-ui font-semibold">
+                                                    Rejected
+                                                </span>
+                                            ) : null}
+                                        </div>
+
+                                        <StatusTracker currentStage={statusToStage(currentReq.status)} />
+                                    </div>
+
+                                    {/* STATUS */}
+                                    <div className="mt-8 flex-grow flex flex-col justify-center items-center text-center p-8 border border-dashed border-outline/30 rounded-2xl bg-surface-variant/5">
+
+                                        <div className="text-[14px] font-medium text-on-surface-variant mb-3">
+                                            Live Status
+                                        </div>
+
+                                        <div className="inline-flex items-center gap-2.5 px-5 py-2.5 bg-white rounded-xl border border-outline/10 shadow-sm text-primary font-bold text-[14px]">
+
+                                            <div className="w-2.5 h-2.5 rounded-full bg-primary animate-pulse shadow-[0_0_8px_rgba(26,115,232,0.6)]"></div>
+
+                                            {currentReq.status.replace(/_/g, ' ')}
+
+                                        </div>
+
+                                        <p className="mt-4 text-[13px] text-on-surface-variant/60 max-w-sm leading-relaxed">
+                                            Please remain peaceful. The service team will update you when the next phase begins.
+                                        </p>
+
+                                    </div>
+
+                                </div>
+
+                            ) : (
+
+                                <div className="flex flex-col items-center justify-center py-24 text-center">
+
+                                    <div className="w-20 h-20 bg-surface-variant/40 rounded-full flex items-center justify-center mb-6">
+
+                                        <span className="text-3xl">🪷</span>
+
+                                    </div>
+
+                                    <h4 className="text-[17px] font-display font-medium text-on-surface mb-2">
+                                        All Clear
+                                    </h4>
+
+                                    <p className="text-[14px] text-on-surface-variant max-w-[260px]">
+                                        You currently have no active maintenance requests.
+                                    </p>
+
+                                </div>
+
+                            )}
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                {/* FLOATING BUTTON */}
+
+                <button
+                    onClick={() => setIsModalOpen(true)}
+                    className="fixed bottom-8 right-8 h-14 bg-primary text-white px-6 rounded-full font-medium text-[15px] shadow-lg shadow-primary/30 hover:shadow-xl hover:scale-105 transition-all flex items-center gap-2"
+                >
+
+                    <svg
+                        className="w-5 h-5"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                        stroke="currentColor"
+                        strokeWidth={2}
+                    >
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4" />
+                    </svg>
+
+                    New Request
+
+                </button>
+
             </div>
-        </div>
-    )}
-</div>
 
-</div>
+            <NewRequestModal
+                isOpen={isModalOpen}
+                onClose={() => setIsModalOpen(false)}
+            />
 
-{/* REQUEST CONTENT */}
-{currentReq ? (
-
-<div className="animate-fadeUp">
-
-<div className="mb-10 bg-primary/5 p-5 rounded-xl border border-primary/10">
-
-<h4 className="text-[16px] font-display font-medium text-on-surface mb-2">
-{currentReq.desc}
-</h4>
-
-<div className="flex gap-2 flex-wrap">
-
-{getDeptChip(currentReq.dept)}
-
-<span className="px-2.5 py-0.5 rounded-md border border-outline/20 bg-white text-[12px] font-medium text-on-surface-variant">
-Submitted on {currentReq.date}
-</span>
-
-</div>
-
-</div>
-
-{/* TIMELINE */}
-<div className="rounded-2xl border border-outline/10 bg-white/70 backdrop-blur-xl shadow-sm p-6">
-    <div className="flex items-center justify-between gap-4 mb-4">
-        <div>
-            <div className="text-[14px] font-ui font-semibold text-on-surface">Timeline</div>
-            <div className="text-[12px] font-ui text-on-surface-variant">
-                {currentReq.status ? currentReq.status.replace(/_/g, ' ') : '—'}
-            </div>
-        </div>
-
-        {String(currentReq.status || '').toUpperCase() === 'REJECTED' ? (
-            <span className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-error-container text-error border border-error/20 text-[12px] font-ui font-semibold">
-                Rejected
-            </span>
-        ) : null}
-    </div>
-
-    <StatusTracker currentStage={statusToStage(currentReq.status)} />
-</div>
-
-{/* STATUS */}
-<div className="mt-8 flex-grow flex flex-col justify-center items-center text-center p-8 border border-dashed border-outline/30 rounded-2xl bg-surface-variant/5">
-
-<div className="text-[14px] font-medium text-on-surface-variant mb-3">
-Live Status
-</div>
-
-<div className="inline-flex items-center gap-2.5 px-5 py-2.5 bg-white rounded-xl border border-outline/10 shadow-sm text-primary font-bold text-[14px]">
-
-<div className="w-2.5 h-2.5 rounded-full bg-primary animate-pulse shadow-[0_0_8px_rgba(26,115,232,0.6)]"></div>
-
-{currentReq.status.replace(/_/g,' ')}
-
-</div>
-
-<p className="mt-4 text-[13px] text-on-surface-variant/60 max-w-sm leading-relaxed">
-Please remain peaceful. The service team will update you when the next phase begins.
-</p>
-
-</div>
-
-</div>
-
-) : (
-
-<div className="flex flex-col items-center justify-center py-24 text-center">
-
-<div className="w-20 h-20 bg-surface-variant/40 rounded-full flex items-center justify-center mb-6">
-
-<span className="text-3xl">🪷</span>
-
-</div>
-
-<h4 className="text-[17px] font-display font-medium text-on-surface mb-2">
-All Clear
-</h4>
-
-<p className="text-[14px] text-on-surface-variant max-w-[260px]">
-You currently have no active maintenance requests.
-</p>
-
-</div>
-
-)}
-
-</div>
-
-</div>
-
-</div>
-
-{/* FLOATING BUTTON */}
-
-<button
-onClick={()=>setIsModalOpen(true)}
-className="fixed bottom-8 right-8 h-14 bg-primary text-white px-6 rounded-full font-medium text-[15px] shadow-lg shadow-primary/30 hover:shadow-xl hover:scale-105 transition-all flex items-center gap-2"
->
-
-<svg
-className="w-5 h-5"
-fill="none"
-viewBox="0 0 24 24"
-stroke="currentColor"
-strokeWidth={2}
->
-<path strokeLinecap="round" strokeLinejoin="round" d="M12 4v16m8-8H4"/>
-</svg>
-
-New Request
-
-</button>
-
-</div>
-
-<NewRequestModal
-isOpen={isModalOpen}
-onClose={()=>setIsModalOpen(false)}
-/>
-
-</>
-);
+        </>
+    );
 };
 
 export default UserDashboard;

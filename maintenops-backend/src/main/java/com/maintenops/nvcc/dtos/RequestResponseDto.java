@@ -20,7 +20,6 @@ public class RequestResponseDto {
     private String urgencyReason;
 
     private String requesterName;
-    private String organizationDepartmentName;
     private String serviceDepartmentName;
 
     // Admin Review Fields
@@ -41,6 +40,9 @@ public class RequestResponseDto {
 
     // Material Line Items (populated when quotation is created)
     private List<MaterialLineItemDTO> materials;
+
+    // Images attached to the request
+    private List<String> images;
 
     private Instant createdAt;
 }

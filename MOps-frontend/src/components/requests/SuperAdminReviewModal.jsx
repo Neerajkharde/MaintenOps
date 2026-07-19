@@ -94,6 +94,30 @@ const SuperAdminReviewModal = ({ isOpen, onClose, request, onSuccess }) => {
                             <p className="text-[13px] text-[#202124]">{request.itemDescription}</p>
                         </div>
 
+                        {/* Attached Photos */}
+                        {request.images && request.images.length > 0 && (
+                            <div className="mt-4">
+                                <label className="block text-[11px] text-[#5f6368] mb-2 uppercase tracking-wide">Attached Photos</label>
+                                <div className="grid grid-cols-4 gap-2">
+                                    {request.images.map((imgUrl, idx) => (
+                                        <a
+                                            key={idx}
+                                            href={requestService.formatImageUrl(imgUrl)}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="block aspect-square rounded-[8px] overflow-hidden border border-[#dadce0] hover:border-[#1a73e8] hover:shadow-md transition-all cursor-pointer"
+                                        >
+                                            <img
+                                                src={requestService.formatImageUrl(imgUrl)}
+                                                alt={`Request photo ${idx + 1}`}
+                                                className="w-full h-full object-cover"
+                                            />
+                                        </a>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+
                         {/* Admin Assessment */}
                         {request.adminName && (
                             <div className="mt-3 bg-white border border-[#1a73e8]/20 rounded-[8px] p-3">

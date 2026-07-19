@@ -1,4 +1,4 @@
-import { get, post, put } from './api';
+import { get, post, put, postFormData, API_BASE_URL } from './api';
 
 const REQUESTS_API_URL = '/api/request';
 
@@ -6,14 +6,37 @@ const REQUESTS_API_URL = '/api/request';
  * Service handling all request-related API calls
  */
 export const requestService = {
+    // Helper to format image URLs
+    formatImageUrl: (path) => {
+        if (!path) return '';
+        if (path.startsWith('http')) return path;
+        // Prepend API_BASE_URL if path is relative
+        return `${API_BASE_URL}${path}`;
+    },
+
     // ==================== Phase 1: Request & Quotation ====================
 
     /**
-     * Create a new maintenance request
+     * Create a new maintenance request with optional image uploads
+     * @param {Object} requestData - The request payload (mobileNumber, itemDescription, etc.)
+     * @param {File[]} imageFiles - Optional array of image File objects
      */
-    createRequest: async (requestData) => {
+    createRequest: async (requestData, imageFiles = []) => {
         try {
-            const response = await post(REQUESTS_API_URL, requestData);
+            const formData = new FormData();
+
+            // Add the request JSON as a Blob with application/json content type
+            const requestBlob = new Blob([JSON.stringify(requestData)], { type: 'application/json' });
+            formData.append('request', requestBlob);
+
+            // Add image files
+            if (imageFiles && imageFiles.length > 0) {
+                imageFiles.forEach((file) => {
+                    formData.append('images', file);
+                });
+            }
+
+            const response = await postFormData(REQUESTS_API_URL, formData);
             if (!response.ok) {
                 const errorData = await response.json().catch(() => ({}));
                 throw new Error(errorData.message || 'Failed to create request');

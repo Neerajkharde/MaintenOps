@@ -5,12 +5,13 @@ import com.maintenops.nvcc.dtos.RequestRequestDto;
 import com.maintenops.nvcc.dtos.RequestResponseDto;
 import com.maintenops.nvcc.dtos.SuperAdminReviewRequestDto;
 import com.maintenops.nvcc.security.JwtPrincipal;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
 public interface RequestService {
     // Requester Operations
-    RequestResponseDto createRequest(RequestRequestDto request, JwtPrincipal principal);
+    RequestResponseDto createRequest(RequestRequestDto request, JwtPrincipal principal, MultipartFile[] images);
     List<RequestResponseDto> getRequestsByUserId(JwtPrincipal principal);
     RequestResponseDto getRequestById(Long id, JwtPrincipal principal);
 

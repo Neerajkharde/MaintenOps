@@ -72,7 +72,7 @@ export const AuthProvider = ({ children }) => {
         }
     };
 
-    const signup = async (name, email, password, department) => {
+    const signup = async (name, email, password, mobileNumber) => {
         setLoading(true);
         try {
             const response = await fetch(`${API_BASE_URL}/api/auth/register`, {
@@ -85,7 +85,7 @@ export const AuthProvider = ({ children }) => {
                     username: name,
                     email,
                     password,
-                    orgDeptName: department,
+                    mobileNumber,
                     roles: ['REQUESTER']
                 }),
             });

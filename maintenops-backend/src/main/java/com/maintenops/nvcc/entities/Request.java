@@ -4,6 +4,8 @@ import com.maintenops.nvcc.enums.RequestStatus;
 import jakarta.persistence.*;
 import lombok.Data;
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "requests")
@@ -29,10 +31,6 @@ public class Request {
     private ServiceDepartment serviceDepartment; // service_department_id (FK)
     // Services like Electrical, Plumbing, etc.
 
-    @ManyToOne
-    @JoinColumn(name = "org_dept_id", nullable = false)
-    private OrganizationDepartment organizationDepartment; // organization_department_id (FK)
-    // Departments like Jivadaya, EM, Campus Programs, etc.
 
     @Column(name = "item_description", nullable = false, columnDefinition = "TEXT")
     private String itemDescription; // item_description
@@ -101,6 +99,12 @@ public class Request {
 
     @Column(name = "super_admin_reviewed_at")
     private Instant superAdminReviewedAt; // Timestamp when super admin reviewed
+
+    // --- Images ---
+    @ElementCollection
+    @CollectionTable(name = "request_images", joinColumns = @JoinColumn(name = "request_id"))
+    @Column(name = "image_path")
+    private List<String> images = new ArrayList<>();
 
     // --- Status & Security ---
     @Enumerated(EnumType.STRING)

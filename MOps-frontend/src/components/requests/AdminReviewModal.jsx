@@ -127,6 +127,37 @@ const AdminReviewModal = ({ isOpen, onClose, request, onSuccess }) => {
                                 <p className="text-[13px] text-[#c5221f] ml-6">{request.urgencyReason}</p>
                             </div>
                         )}
+
+                        {/* Attached Photos */}
+                        {request.images && request.images.length > 0 && (
+                            <div className="mt-4">
+                                <label className="block text-[12px] font-['Roboto',sans-serif] text-[#5f6368] mb-2">
+                                    <span className="flex items-center gap-1.5">
+                                        <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                                            <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909M3.75 21h16.5A2.25 2.25 0 0022.5 18.75V5.25A2.25 2.25 0 0020.25 3H3.75A2.25 2.25 0 001.5 5.25v13.5A2.25 2.25 0 003.75 21z" />
+                                        </svg>
+                                        Attached Photos ({request.images.length})
+                                    </span>
+                                </label>
+                                <div className="grid grid-cols-4 gap-2">
+                                    {request.images.map((imgUrl, idx) => (
+                                        <a
+                                            key={idx}
+                                            href={requestService.formatImageUrl(imgUrl)}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="block aspect-square rounded-[8px] overflow-hidden border border-[#dadce0] hover:border-[#1a73e8] hover:shadow-md transition-all cursor-pointer"
+                                        >
+                                            <img
+                                                src={requestService.formatImageUrl(imgUrl)}
+                                                alt={`Request photo ${idx + 1}`}
+                                                className="w-full h-full object-cover"
+                                            />
+                                        </a>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
                     </div>
 
                     {/* Quotation Summary */}

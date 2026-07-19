@@ -56,21 +56,15 @@ public class JwtService {
         claims.put("username", user.getUsername());
         claims.put("email", user.getEmail());
         claims.put("roles", roles);
-        claims.put(
-                "orgDeptId",
-                user.getOrganizationDepartment() != null
-                        ? user.getOrganizationDepartment().getId()
-                        : null
-        );
         claims.put("typ", "access");
 
         return Jwts.builder()
+                .claims(claims)
                 .id(UUID.randomUUID().toString())
                 .subject(user.getId().toString())
                 .issuer(issuer)
                 .issuedAt(Date.from(now))
                 .expiration(Date.from(now.plusSeconds(accessTtlSeconds)))
-                .claims(claims)
                 .signWith(key, SignatureAlgorithm.HS512)
                 .compact();
     }
@@ -80,12 +74,12 @@ public class JwtService {
         Instant now = Instant.now();
 
         return Jwts.builder()
+                .claims(Map.of("typ", "refresh"))
                 .id(jti)
                 .subject(user.getId().toString())
                 .issuer(issuer)
                 .issuedAt(Date.from(now))
                 .expiration(Date.from(now.plusSeconds(refreshTtlSeconds)))
-                .claims(Map.of("typ", "refresh"))
                 .signWith(key, SignatureAlgorithm.HS512)
                 .compact();
     }
@@ -131,10 +125,6 @@ public class JwtService {
         return claims.get("roles", List.class);
     }
 
-    public Long getOrgDeptId(String token) {
-        Claims claims = parse(token).getPayload();
-        return claims.get("orgDeptId", Long.class);
-    }
 
     public String getJti(String token) {
         Claims claims = parse(token).getPayload();

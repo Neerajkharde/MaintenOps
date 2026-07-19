@@ -26,10 +26,8 @@ public class User implements UserDetails {
     @Column(nullable = false, unique = true)
     private String email;
 
-    // We link the User to an Organization Department (Day 2 requirement)
-    @ManyToOne
-    @JoinColumn(name = "org_dept_id")
-    private OrganizationDepartment organizationDepartment;
+    @Column(name = "mobile_number")
+    private String mobileNumber;
 
     // Roles will be handled as a Set to allow multiple permissions
     @ManyToMany(fetch = FetchType.EAGER)
