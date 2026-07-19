@@ -50,7 +50,6 @@ public class SecurityConfig {
                 .authorizeHttpRequests(authorize ->
                         authorize
                                 .requestMatchers("/api/auth/**").permitAll()
-                                .requestMatchers("/uploads/**").permitAll()
                                 .anyRequest().authenticated()
                 )
                 .httpBasic(AbstractHttpConfigurer::disable)
