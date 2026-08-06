@@ -51,6 +51,7 @@ public class SecurityConfig {
                         authorize
                                 .dispatcherTypeMatchers(jakarta.servlet.DispatcherType.ERROR).permitAll()
                                 .requestMatchers("/api/auth/**").permitAll()
+                                .requestMatchers("/api/images/**").permitAll()
                                 .anyRequest().authenticated()
                 )
                 .httpBasic(AbstractHttpConfigurer::disable)

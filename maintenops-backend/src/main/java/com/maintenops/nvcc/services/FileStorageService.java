@@ -25,4 +25,12 @@ public interface FileStorageService {
      * @return the URL path accessible via HTTP
      */
     String getImageUrl(String filePath);
+
+    /**
+     * Download the raw image bytes for a given file ID.
+     *
+     * @param fileId the stored file path/ID
+     * @return the raw bytes of the image
+     */
+    byte[] downloadImage(String fileId);
 }

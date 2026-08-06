@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -57,8 +58,20 @@ public class GoogleDriveStorageServiceImpl implements FileStorageService {
 
     @Override
     public String getImageUrl(String fileId) {
-        // Return a direct viewer link using the file ID
-        return "https://drive.google.com/uc?id=" + fileId;
+        // Return a proxy link to our backend instead of Google Drive directly
+        return "/api/images/" + fileId;
+    }
+
+    @Override
+    public byte[] downloadImage(String fileId) {
+        try {
+            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+            googleDrive.files().get(fileId).executeMediaAndDownloadTo(outputStream);
+            return outputStream.toByteArray();
+        } catch (IOException e) {
+            log.error("Failed to download file from Google Drive: {}", fileId, e);
+            throw new RuntimeException("Failed to download image from Google Drive: " + fileId, e);
+        }
     }
 
     private String uploadToDrive(MultipartFile multipartFile, String fileName) {
