@@ -140,7 +140,8 @@ public class SupabaseStorageServiceImpl implements FileStorageService {
             String contentType = file.getContentType();
 
             restClient.post()
-                    .uri("/storage/v1/object/{bucket}/{objectPath}", config.getBucket(), objectPath)
+            // It should be /storage/v1/object....
+                    .uri("/object/{bucket}/{objectPath}", config.getBucket(), objectPath)
                     .contentType(MediaType.parseMediaType(contentType))
                     .header("cache-control", "max-age=3600")
                     .header("x-upsert", "false")
