@@ -24,11 +24,13 @@ spring:
       max-file-size: 5MB
       max-request-size: 25MB
 
-# Google Drive Storage configuration (all values from environment variables)
+# Google Drive Storage configuration (OAuth2 user credentials)
 google:
   drive:
     folder-id: ${GOOGLE_DRIVE_FOLDER_ID}
-    credentials-json: ${GOOGLE_CREDENTIALS_JSON}
+    client-id: ${GOOGLE_CLIENT_ID}
+    client-secret: ${GOOGLE_CLIENT_SECRET}
+    refresh-token: ${GOOGLE_REFRESH_TOKEN}
 
 logging:
   level:
