@@ -24,12 +24,11 @@ spring:
       max-file-size: 5MB
       max-request-size: 25MB
 
-# Supabase Storage configuration (all values from environment variables)
-supabase:
-  url: ${SUPABASE_URL}
-  service-key: ${SUPABASE_SERVICE_ROLE_KEY}
-  bucket: ${SUPABASE_BUCKET:request-images}
-  signed-url-expiry-seconds: ${SUPABASE_SIGNED_URL_EXPIRY:900}
+# Google Drive Storage configuration (all values from environment variables)
+google:
+  drive:
+    folder-id: ${GOOGLE_DRIVE_FOLDER_ID}
+    credentials-json: ${GOOGLE_CREDENTIALS_JSON}
 
 logging:
   level:
@@ -49,4 +48,4 @@ security:
 
 app:
   cors:
-    front-end-url: ${FRONTEND_URL}
+    front-end-url: ${FRONTEND_URL}
